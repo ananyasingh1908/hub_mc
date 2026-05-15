@@ -1,26 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
+import HubMCLanding from "@/components/HubMCLanding";
 
 export const Route = createFileRoute("/")({
   component: Index,
+  head: () => ({
+    meta: [
+      { title: "HubMC — The World You Love. Evolved." },
+      { name: "description", content: "Enter the premium Minecraft server universe. New biomes, new mobs, new adventures. Endless possibilities." },
+      { property: "og:title", content: "HubMC — The World You Love. Evolved." },
+      { property: "og:description", content: "A premium Minecraft server experience. New biomes, new mobs, endless adventures." },
+    ],
+  }),
 });
 
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
-
 function Index() {
-  return <PlaceholderIndex />;
+  return <HubMCLanding />;
 }
