@@ -33,8 +33,8 @@ function Navbar() {
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
         scrolled
-          ? "backdrop-blur-xl bg-black/55 border-b border-white/10 shadow-[0_8px_40px_-12px_rgba(120,80,255,0.35)]"
-          : "backdrop-blur-md bg-black/10 border-b border-transparent"
+          ? "backdrop-blur-xl bg-black/70 border-b border-white/10 shadow-[0_8px_40px_-12px_rgba(60,140,255,0.25)]"
+          : "backdrop-blur-md bg-black/40 border-b border-white/5"
       }`}
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:py-5">
@@ -42,10 +42,11 @@ function Navbar() {
           <img
             src={logoImg}
             alt="HubMC"
-            className="h-9 w-9 rounded-md object-cover transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_12px_rgba(120,80,255,0.5)]"
+            className="h-9 w-9 rounded-md object-contain transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_12px_rgba(60,140,255,0.5)]"
           />
-          <span className="text-lg font-black tracking-widest text-white">
-            HUB<span className="text-[var(--hub-purple-glow)]">MC</span>
+          <span className="text-lg font-black tracking-widest">
+            <span className="text-[var(--hub-blue)]">HUB</span>
+            <span className="text-[var(--hub-orange)]">MC</span>
           </span>
         </a>
 
@@ -57,8 +58,8 @@ function Navbar() {
                 className="group relative px-4 py-2 text-sm font-medium uppercase tracking-wider text-white/80 transition-colors duration-300 hover:text-white"
               >
                 <span className="relative z-10">{l.label}</span>
-                <span className="pointer-events-none absolute left-4 right-4 -bottom-0.5 h-px origin-left scale-x-0 bg-gradient-to-r from-transparent via-[var(--hub-purple-glow)] to-transparent transition-transform duration-500 group-hover:scale-x-100" />
-                <span className="pointer-events-none absolute inset-0 rounded-md opacity-0 blur-md transition-opacity duration-500 group-hover:opacity-100 bg-[var(--hub-purple)]/20" />
+                <span className="pointer-events-none absolute left-4 right-4 -bottom-0.5 h-px origin-left scale-x-0 bg-gradient-to-r from-transparent via-[var(--hub-orange)] to-transparent transition-transform duration-500 group-hover:scale-x-100" />
+                <span className="pointer-events-none absolute inset-0 rounded-md opacity-0 blur-md transition-opacity duration-500 group-hover:opacity-100 bg-[var(--hub-blue)]/20" />
               </a>
             </li>
           ))}
@@ -72,56 +73,57 @@ function Hero() {
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
-    offset: ["start start", "end start"],
+    offset: ["start start", "end end"],
   });
   const smooth = useSpring(scrollYProgress, {
-    stiffness: 80,
-    damping: 24,
-    mass: 0.6,
+    stiffness: 50,
+    damping: 28,
+    mass: 0.9,
   });
 
-  // Subtle scale 1.08 -> 1.00
-  const scale = useTransform(smooth, [0, 1], [1.08, 1.0]);
-  const y = useTransform(smooth, [0, 1], ["0%", "-8%"]);
-  const heroOpacity = useTransform(smooth, [0, 0.85, 1], [1, 1, 0.55]);
-  const textY = useTransform(smooth, [0, 1], ["0%", "-40%"]);
-  const textOpacity = useTransform(smooth, [0, 0.5], [1, 0]);
+  // Very subtle scale 1.03 -> 1.00
+  const scale = useTransform(smooth, [0, 1], [1.03, 1.0]);
+  const y = useTransform(smooth, [0, 1], ["0%", "-4%"]);
+  const heroOpacity = useTransform(smooth, [0, 0.9, 1], [1, 1, 0.6]);
+  const textY = useTransform(smooth, [0, 1], ["0%", "-30%"]);
+  const textOpacity = useTransform(smooth, [0, 0.4], [1, 0]);
 
   return (
     <section
       id="home"
       ref={heroRef}
-      className="relative h-screen w-full overflow-hidden"
+      className="relative w-full"
+      style={{ height: "300vh" }}
     >
-      <motion.div
-        style={{
-          scale,
-          y,
-          opacity: heroOpacity,
-          willChange: "transform, opacity",
-          backfaceVisibility: "hidden",
-        }}
-        className="absolute inset-0"
-      >
-        <img
-          src={heroImg}
-          alt="HubMC Minecraft world"
-          className="h-full w-full select-none object-cover object-center"
-          style={{ objectPosition: "center center" }}
-          draggable={false}
-        />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-b from-transparent to-[#050505]" />
-      </motion.div>
+      <div className="sticky top-0 h-screen w-full overflow-hidden bg-[#050505]">
+        <motion.div
+          style={{
+            scale,
+            y,
+            opacity: heroOpacity,
+            willChange: "transform, opacity",
+            backfaceVisibility: "hidden",
+          }}
+          className="absolute inset-0 flex items-center justify-center pt-[72px]"
+        >
+          <img
+            src={heroImg}
+            alt="HubMC Minecraft world"
+            className="max-h-full max-w-full select-none object-contain"
+            draggable={false}
+          />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-b from-transparent to-[#050505]" />
+        </motion.div>
 
-      <motion.div
-        style={{
-          y: textY,
-          opacity: textOpacity,
-          willChange: "transform, opacity",
-        }}
-        className="relative z-10 flex h-full flex-col items-center justify-end pb-16 px-6 text-center"
-      >
+        <motion.div
+          style={{
+            y: textY,
+            opacity: textOpacity,
+            willChange: "transform, opacity",
+          }}
+          className="relative z-10 flex h-full flex-col items-center justify-end pb-16 px-6 text-center pointer-events-none"
+        >
         <p className="text-[10px] md:text-xs font-medium uppercase tracking-[0.6em] text-white/85">
           Scroll to enter
         </p>
@@ -138,7 +140,8 @@ function Hero() {
           style={{ originY: 0 }}
           className="mt-4 h-12 w-px bg-gradient-to-b from-white/90 to-transparent"
         />
-      </motion.div>
+        </motion.div>
+      </div>
     </section>
   );
 }
@@ -189,21 +192,21 @@ function AboutSection() {
         className="pointer-events-none absolute -top-40 -left-32 h-[600px] w-[600px] rounded-full opacity-40 blur-[160px]"
         style={{
           background:
-            "radial-gradient(circle, rgba(80,140,255,0.55), transparent 60%)",
+            "radial-gradient(circle, rgba(60,140,255,0.55), transparent 60%)",
         }}
       />
       <div
         className="pointer-events-none absolute bottom-0 right-0 h-[500px] w-[500px] rounded-full opacity-35 blur-[160px]"
         style={{
           background:
-            "radial-gradient(circle, rgba(255,140,40,0.45), transparent 60%)",
+            "radial-gradient(circle, rgba(255,140,40,0.5), transparent 60%)",
         }}
       />
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.18]"
         style={{
           background:
-            "radial-gradient(1200px 600px at 50% 20%, rgba(120,80,255,0.18), transparent 70%)",
+            "radial-gradient(1200px 600px at 50% 20%, rgba(60,140,255,0.18), transparent 70%)",
         }}
       />
 
@@ -218,12 +221,12 @@ function AboutSection() {
         <div>
           <p className="text-xs uppercase tracking-[0.4em] text-white/50">
             Home <span className="mx-2 text-white/30">›</span>{" "}
-            <span className="text-[var(--hub-purple-glow)]">About Us</span>
+            <span className="text-[var(--hub-orange)]">About Us</span>
           </p>
           <h2 className="mt-6 text-5xl md:text-7xl font-black leading-[0.95] tracking-tight text-white">
-            About <span className="text-[var(--hub-purple-glow)]">Us</span>
+            About <span className="text-[var(--hub-orange)]">Us</span>
           </h2>
-          <div className="mt-6 h-px w-24 bg-gradient-to-r from-[var(--hub-purple-glow)] to-transparent" />
+          <div className="mt-6 h-px w-24 bg-gradient-to-r from-[var(--hub-blue)] via-[var(--hub-orange)] to-transparent" />
           <p className="mt-8 text-base md:text-lg leading-relaxed text-white/70">
             HUBMC is a premium Minecraft network engineered for players who
             demand more from every block. Explore reimagined biomes, conquer
@@ -264,7 +267,7 @@ function AboutSection() {
               className="absolute inset-0 -z-10 rounded-full blur-[80px]"
               style={{
                 background:
-                  "radial-gradient(circle, rgba(120,80,255,0.55), rgba(255,140,40,0.25) 50%, transparent 70%)",
+                  "radial-gradient(circle, rgba(60,140,255,0.55), rgba(255,140,40,0.35) 55%, transparent 70%)",
               }}
             />
             <motion.img
@@ -276,7 +279,7 @@ function AboutSection() {
                 repeat: Infinity,
                 ease: "easeInOut",
               }}
-              className="relative h-[320px] w-[320px] md:h-[440px] md:w-[440px] object-contain drop-shadow-[0_30px_60px_rgba(80,40,180,0.55)]"
+              className="relative h-[320px] w-[320px] md:h-[440px] md:w-[440px] object-contain drop-shadow-[0_30px_60px_rgba(40,90,200,0.55)]"
               draggable={false}
             />
           </motion.div>
@@ -312,11 +315,11 @@ function Particles() {
               height: size,
               background:
                 i % 2 === 0
-                  ? "rgba(140,180,255,0.8)"
+                  ? "rgba(80,160,255,0.85)"
                   : "rgba(255,170,90,0.7)",
               boxShadow:
                 i % 2 === 0
-                  ? "0 0 8px rgba(140,180,255,0.9)"
+                  ? "0 0 8px rgba(80,160,255,0.95)"
                   : "0 0 8px rgba(255,170,90,0.8)",
             }}
             className="absolute rounded-full"

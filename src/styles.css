@@ -141,6 +141,8 @@
   --hub-green: oklch(0.78 0.22 145);
   --hub-text: oklch(0.97 0.01 280);
   --hub-muted: oklch(0.7 0.04 285);
+  --hub-blue: #3ea2ff;
+  --hub-orange: #ff8a2a;
 }
 
 @layer base {
