@@ -7,8 +7,11 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { Toaster } from "@/components/ui/sonner";
 
 import appCss from "../styles.css?url";
+import logoPng from "@/assets/hubmc-logo.png";
+import heroJpeg from "@/assets/hubmc-hero.jpeg";
 
 function NotFoundComponent() {
   return (
@@ -67,25 +70,40 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+const siteUrl = process.env.BASE_URL || "https://hubmc.net";
+const siteName = "HUBMC";
+const ogImage = heroJpeg;
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "HUBMC — The World You Love" },
+      { name: "description", content: "Premium Minecraft server with tournaments, livestreams, store, community and events." },
+      { name: "author", content: "HUBMC" },
+      { name: "keywords", content: "Minecraft, HUBMC, Minecraft server, tournaments, PvP, community" },
+      { name: "theme-color", content: "#050505" },
+      { name: "application-name", content: siteName },
+      { property: "og:title", content: "HUBMC — The World You Love" },
+      { property: "og:description", content: "Premium Minecraft server with tournaments, livestreams, store, community and events." },
+      { property: "og:image", content: ogImage },
+      { property: "og:image:width", content: "1920" },
+      { property: "og:image:height", content: "1080" },
+      { property: "og:url", content: siteUrl },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { property: "og:site_name", content: siteName },
+      { property: "og:locale", content: "en_US" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@HUBMC" },
+      { name: "twitter:title", content: "HUBMC — The World You Love" },
+      { name: "twitter:description", content: "Premium Minecraft server with tournaments, livestreams, store, community and events." },
+      { name: "twitter:image", content: ogImage },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", type: "image/png", href: logoPng },
+      { rel: "apple-touch-icon", href: logoPng },
     ],
   }),
   shellComponent: RootShell,
@@ -114,6 +132,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
+      <Toaster position="top-right" />
     </QueryClientProvider>
   );
 }

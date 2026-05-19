@@ -9,38 +9,534 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TournamentsRouteImport } from './routes/tournaments'
+import { Route as PurchasesRouteImport } from './routes/purchases'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PaymentSuccessRouteImport } from './routes/payment-success'
+import { Route as PaymentFailedRouteImport } from './routes/payment-failed'
+import { Route as PackagesRouteImport } from './routes/packages'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as LivestreamRouteImport } from './routes/livestream'
+import { Route as EmployeeLoginRouteImport } from './routes/employee-login'
+import { Route as EmployeeRouteImport } from './routes/employee'
+import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as CartRouteImport } from './routes/cart'
+import { Route as AdminLoginRouteImport } from './routes/admin-login'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EmployeeIndexRouteImport } from './routes/employee.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as TournamentsIdRouteImport } from './routes/tournaments.$id'
+import { Route as EmployeeTournamentsRouteImport } from './routes/employee.tournaments'
+import { Route as EmployeeSupportRouteImport } from './routes/employee.support'
+import { Route as EmployeeProductsRouteImport } from './routes/employee.products'
+import { Route as EmployeePlayersRouteImport } from './routes/employee.players'
+import { Route as EmployeeOrdersRouteImport } from './routes/employee.orders'
+import { Route as EmployeeNotificationsRouteImport } from './routes/employee.notifications'
+import { Route as AdminTournamentsRouteImport } from './routes/admin.tournaments'
+import { Route as AdminStreamsRouteImport } from './routes/admin.streams'
+import { Route as AdminPlayersRouteImport } from './routes/admin.players'
+import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
+import { Route as AdminLogsRouteImport } from './routes/admin.logs'
+import { Route as AdminEmployeesMonitorRouteImport } from './routes/admin.employees-monitor'
+import { Route as AdminEmployeesRouteImport } from './routes/admin.employees'
+import { Route as AdminDeliveryRouteImport } from './routes/admin.delivery'
+import { Route as AdminCustomersRouteImport } from './routes/admin.customers'
 
+const TournamentsRoute = TournamentsRouteImport.update({
+  id: '/tournaments',
+  path: '/tournaments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PurchasesRoute = PurchasesRouteImport.update({
+  id: '/purchases',
+  path: '/purchases',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentSuccessRoute = PaymentSuccessRouteImport.update({
+  id: '/payment-success',
+  path: '/payment-success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentFailedRoute = PaymentFailedRouteImport.update({
+  id: '/payment-failed',
+  path: '/payment-failed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PackagesRoute = PackagesRouteImport.update({
+  id: '/packages',
+  path: '/packages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LivestreamRoute = LivestreamRouteImport.update({
+  id: '/livestream',
+  path: '/livestream',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmployeeLoginRoute = EmployeeLoginRouteImport.update({
+  id: '/employee-login',
+  path: '/employee-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmployeeRoute = EmployeeRouteImport.update({
+  id: '/employee',
+  path: '/employee',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin-login',
+  path: '/admin-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmployeeIndexRoute = EmployeeIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EmployeeRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const TournamentsIdRoute = TournamentsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => TournamentsRoute,
+} as any)
+const EmployeeTournamentsRoute = EmployeeTournamentsRouteImport.update({
+  id: '/tournaments',
+  path: '/tournaments',
+  getParentRoute: () => EmployeeRoute,
+} as any)
+const EmployeeSupportRoute = EmployeeSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => EmployeeRoute,
+} as any)
+const EmployeeProductsRoute = EmployeeProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => EmployeeRoute,
+} as any)
+const EmployeePlayersRoute = EmployeePlayersRouteImport.update({
+  id: '/players',
+  path: '/players',
+  getParentRoute: () => EmployeeRoute,
+} as any)
+const EmployeeOrdersRoute = EmployeeOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => EmployeeRoute,
+} as any)
+const EmployeeNotificationsRoute = EmployeeNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => EmployeeRoute,
+} as any)
+const AdminTournamentsRoute = AdminTournamentsRouteImport.update({
+  id: '/tournaments',
+  path: '/tournaments',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminStreamsRoute = AdminStreamsRouteImport.update({
+  id: '/streams',
+  path: '/streams',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPlayersRoute = AdminPlayersRouteImport.update({
+  id: '/players',
+  path: '/players',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLogsRoute = AdminLogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEmployeesMonitorRoute = AdminEmployeesMonitorRouteImport.update({
+  id: '/employees-monitor',
+  path: '/employees-monitor',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEmployeesRoute = AdminEmployeesRouteImport.update({
+  id: '/employees',
+  path: '/employees',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDeliveryRoute = AdminDeliveryRouteImport.update({
+  id: '/delivery',
+  path: '/delivery',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCustomersRoute = AdminCustomersRouteImport.update({
+  id: '/customers',
+  path: '/customers',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/admin-login': typeof AdminLoginRoute
+  '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRoute
+  '/employee': typeof EmployeeRouteWithChildren
+  '/employee-login': typeof EmployeeLoginRoute
+  '/livestream': typeof LivestreamRoute
+  '/login': typeof LoginRoute
+  '/packages': typeof PackagesRoute
+  '/payment-failed': typeof PaymentFailedRoute
+  '/payment-success': typeof PaymentSuccessRoute
+  '/profile': typeof ProfileRoute
+  '/purchases': typeof PurchasesRoute
+  '/tournaments': typeof TournamentsRouteWithChildren
+  '/admin/customers': typeof AdminCustomersRoute
+  '/admin/delivery': typeof AdminDeliveryRoute
+  '/admin/employees': typeof AdminEmployeesRoute
+  '/admin/employees-monitor': typeof AdminEmployeesMonitorRoute
+  '/admin/logs': typeof AdminLogsRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/players': typeof AdminPlayersRoute
+  '/admin/streams': typeof AdminStreamsRoute
+  '/admin/tournaments': typeof AdminTournamentsRoute
+  '/employee/notifications': typeof EmployeeNotificationsRoute
+  '/employee/orders': typeof EmployeeOrdersRoute
+  '/employee/players': typeof EmployeePlayersRoute
+  '/employee/products': typeof EmployeeProductsRoute
+  '/employee/support': typeof EmployeeSupportRoute
+  '/employee/tournaments': typeof EmployeeTournamentsRoute
+  '/tournaments/$id': typeof TournamentsIdRoute
+  '/admin/': typeof AdminIndexRoute
+  '/employee/': typeof EmployeeIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin-login': typeof AdminLoginRoute
+  '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRoute
+  '/employee-login': typeof EmployeeLoginRoute
+  '/livestream': typeof LivestreamRoute
+  '/login': typeof LoginRoute
+  '/packages': typeof PackagesRoute
+  '/payment-failed': typeof PaymentFailedRoute
+  '/payment-success': typeof PaymentSuccessRoute
+  '/profile': typeof ProfileRoute
+  '/purchases': typeof PurchasesRoute
+  '/tournaments': typeof TournamentsRouteWithChildren
+  '/admin/customers': typeof AdminCustomersRoute
+  '/admin/delivery': typeof AdminDeliveryRoute
+  '/admin/employees': typeof AdminEmployeesRoute
+  '/admin/employees-monitor': typeof AdminEmployeesMonitorRoute
+  '/admin/logs': typeof AdminLogsRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/players': typeof AdminPlayersRoute
+  '/admin/streams': typeof AdminStreamsRoute
+  '/admin/tournaments': typeof AdminTournamentsRoute
+  '/employee/notifications': typeof EmployeeNotificationsRoute
+  '/employee/orders': typeof EmployeeOrdersRoute
+  '/employee/players': typeof EmployeePlayersRoute
+  '/employee/products': typeof EmployeeProductsRoute
+  '/employee/support': typeof EmployeeSupportRoute
+  '/employee/tournaments': typeof EmployeeTournamentsRoute
+  '/tournaments/$id': typeof TournamentsIdRoute
+  '/admin': typeof AdminIndexRoute
+  '/employee': typeof EmployeeIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/admin-login': typeof AdminLoginRoute
+  '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRoute
+  '/employee': typeof EmployeeRouteWithChildren
+  '/employee-login': typeof EmployeeLoginRoute
+  '/livestream': typeof LivestreamRoute
+  '/login': typeof LoginRoute
+  '/packages': typeof PackagesRoute
+  '/payment-failed': typeof PaymentFailedRoute
+  '/payment-success': typeof PaymentSuccessRoute
+  '/profile': typeof ProfileRoute
+  '/purchases': typeof PurchasesRoute
+  '/tournaments': typeof TournamentsRouteWithChildren
+  '/admin/customers': typeof AdminCustomersRoute
+  '/admin/delivery': typeof AdminDeliveryRoute
+  '/admin/employees': typeof AdminEmployeesRoute
+  '/admin/employees-monitor': typeof AdminEmployeesMonitorRoute
+  '/admin/logs': typeof AdminLogsRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/players': typeof AdminPlayersRoute
+  '/admin/streams': typeof AdminStreamsRoute
+  '/admin/tournaments': typeof AdminTournamentsRoute
+  '/employee/notifications': typeof EmployeeNotificationsRoute
+  '/employee/orders': typeof EmployeeOrdersRoute
+  '/employee/players': typeof EmployeePlayersRoute
+  '/employee/products': typeof EmployeeProductsRoute
+  '/employee/support': typeof EmployeeSupportRoute
+  '/employee/tournaments': typeof EmployeeTournamentsRoute
+  '/tournaments/$id': typeof TournamentsIdRoute
+  '/admin/': typeof AdminIndexRoute
+  '/employee/': typeof EmployeeIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/admin-login'
+    | '/cart'
+    | '/checkout'
+    | '/employee'
+    | '/employee-login'
+    | '/livestream'
+    | '/login'
+    | '/packages'
+    | '/payment-failed'
+    | '/payment-success'
+    | '/profile'
+    | '/purchases'
+    | '/tournaments'
+    | '/admin/customers'
+    | '/admin/delivery'
+    | '/admin/employees'
+    | '/admin/employees-monitor'
+    | '/admin/logs'
+    | '/admin/notifications'
+    | '/admin/players'
+    | '/admin/streams'
+    | '/admin/tournaments'
+    | '/employee/notifications'
+    | '/employee/orders'
+    | '/employee/players'
+    | '/employee/products'
+    | '/employee/support'
+    | '/employee/tournaments'
+    | '/tournaments/$id'
+    | '/admin/'
+    | '/employee/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admin-login'
+    | '/cart'
+    | '/checkout'
+    | '/employee-login'
+    | '/livestream'
+    | '/login'
+    | '/packages'
+    | '/payment-failed'
+    | '/payment-success'
+    | '/profile'
+    | '/purchases'
+    | '/tournaments'
+    | '/admin/customers'
+    | '/admin/delivery'
+    | '/admin/employees'
+    | '/admin/employees-monitor'
+    | '/admin/logs'
+    | '/admin/notifications'
+    | '/admin/players'
+    | '/admin/streams'
+    | '/admin/tournaments'
+    | '/employee/notifications'
+    | '/employee/orders'
+    | '/employee/players'
+    | '/employee/products'
+    | '/employee/support'
+    | '/employee/tournaments'
+    | '/tournaments/$id'
+    | '/admin'
+    | '/employee'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/admin-login'
+    | '/cart'
+    | '/checkout'
+    | '/employee'
+    | '/employee-login'
+    | '/livestream'
+    | '/login'
+    | '/packages'
+    | '/payment-failed'
+    | '/payment-success'
+    | '/profile'
+    | '/purchases'
+    | '/tournaments'
+    | '/admin/customers'
+    | '/admin/delivery'
+    | '/admin/employees'
+    | '/admin/employees-monitor'
+    | '/admin/logs'
+    | '/admin/notifications'
+    | '/admin/players'
+    | '/admin/streams'
+    | '/admin/tournaments'
+    | '/employee/notifications'
+    | '/employee/orders'
+    | '/employee/players'
+    | '/employee/products'
+    | '/employee/support'
+    | '/employee/tournaments'
+    | '/tournaments/$id'
+    | '/admin/'
+    | '/employee/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  AdminLoginRoute: typeof AdminLoginRoute
+  CartRoute: typeof CartRoute
+  CheckoutRoute: typeof CheckoutRoute
+  EmployeeRoute: typeof EmployeeRouteWithChildren
+  EmployeeLoginRoute: typeof EmployeeLoginRoute
+  LivestreamRoute: typeof LivestreamRoute
+  LoginRoute: typeof LoginRoute
+  PackagesRoute: typeof PackagesRoute
+  PaymentFailedRoute: typeof PaymentFailedRoute
+  PaymentSuccessRoute: typeof PaymentSuccessRoute
+  ProfileRoute: typeof ProfileRoute
+  PurchasesRoute: typeof PurchasesRoute
+  TournamentsRoute: typeof TournamentsRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tournaments': {
+      id: '/tournaments'
+      path: '/tournaments'
+      fullPath: '/tournaments'
+      preLoaderRoute: typeof TournamentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/purchases': {
+      id: '/purchases'
+      path: '/purchases'
+      fullPath: '/purchases'
+      preLoaderRoute: typeof PurchasesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment-success': {
+      id: '/payment-success'
+      path: '/payment-success'
+      fullPath: '/payment-success'
+      preLoaderRoute: typeof PaymentSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment-failed': {
+      id: '/payment-failed'
+      path: '/payment-failed'
+      fullPath: '/payment-failed'
+      preLoaderRoute: typeof PaymentFailedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/packages': {
+      id: '/packages'
+      path: '/packages'
+      fullPath: '/packages'
+      preLoaderRoute: typeof PackagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/livestream': {
+      id: '/livestream'
+      path: '/livestream'
+      fullPath: '/livestream'
+      preLoaderRoute: typeof LivestreamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/employee-login': {
+      id: '/employee-login'
+      path: '/employee-login'
+      fullPath: '/employee-login'
+      preLoaderRoute: typeof EmployeeLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/employee': {
+      id: '/employee'
+      path: '/employee'
+      fullPath: '/employee'
+      preLoaderRoute: typeof EmployeeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-login': {
+      id: '/admin-login'
+      path: '/admin-login'
+      fullPath: '/admin-login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,12 +544,226 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/employee/': {
+      id: '/employee/'
+      path: '/'
+      fullPath: '/employee/'
+      preLoaderRoute: typeof EmployeeIndexRouteImport
+      parentRoute: typeof EmployeeRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/tournaments/$id': {
+      id: '/tournaments/$id'
+      path: '/$id'
+      fullPath: '/tournaments/$id'
+      preLoaderRoute: typeof TournamentsIdRouteImport
+      parentRoute: typeof TournamentsRoute
+    }
+    '/employee/tournaments': {
+      id: '/employee/tournaments'
+      path: '/tournaments'
+      fullPath: '/employee/tournaments'
+      preLoaderRoute: typeof EmployeeTournamentsRouteImport
+      parentRoute: typeof EmployeeRoute
+    }
+    '/employee/support': {
+      id: '/employee/support'
+      path: '/support'
+      fullPath: '/employee/support'
+      preLoaderRoute: typeof EmployeeSupportRouteImport
+      parentRoute: typeof EmployeeRoute
+    }
+    '/employee/products': {
+      id: '/employee/products'
+      path: '/products'
+      fullPath: '/employee/products'
+      preLoaderRoute: typeof EmployeeProductsRouteImport
+      parentRoute: typeof EmployeeRoute
+    }
+    '/employee/players': {
+      id: '/employee/players'
+      path: '/players'
+      fullPath: '/employee/players'
+      preLoaderRoute: typeof EmployeePlayersRouteImport
+      parentRoute: typeof EmployeeRoute
+    }
+    '/employee/orders': {
+      id: '/employee/orders'
+      path: '/orders'
+      fullPath: '/employee/orders'
+      preLoaderRoute: typeof EmployeeOrdersRouteImport
+      parentRoute: typeof EmployeeRoute
+    }
+    '/employee/notifications': {
+      id: '/employee/notifications'
+      path: '/notifications'
+      fullPath: '/employee/notifications'
+      preLoaderRoute: typeof EmployeeNotificationsRouteImport
+      parentRoute: typeof EmployeeRoute
+    }
+    '/admin/tournaments': {
+      id: '/admin/tournaments'
+      path: '/tournaments'
+      fullPath: '/admin/tournaments'
+      preLoaderRoute: typeof AdminTournamentsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/streams': {
+      id: '/admin/streams'
+      path: '/streams'
+      fullPath: '/admin/streams'
+      preLoaderRoute: typeof AdminStreamsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/players': {
+      id: '/admin/players'
+      path: '/players'
+      fullPath: '/admin/players'
+      preLoaderRoute: typeof AdminPlayersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/notifications': {
+      id: '/admin/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AdminNotificationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/logs': {
+      id: '/admin/logs'
+      path: '/logs'
+      fullPath: '/admin/logs'
+      preLoaderRoute: typeof AdminLogsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/employees-monitor': {
+      id: '/admin/employees-monitor'
+      path: '/employees-monitor'
+      fullPath: '/admin/employees-monitor'
+      preLoaderRoute: typeof AdminEmployeesMonitorRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/employees': {
+      id: '/admin/employees'
+      path: '/employees'
+      fullPath: '/admin/employees'
+      preLoaderRoute: typeof AdminEmployeesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/delivery': {
+      id: '/admin/delivery'
+      path: '/delivery'
+      fullPath: '/admin/delivery'
+      preLoaderRoute: typeof AdminDeliveryRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/customers': {
+      id: '/admin/customers'
+      path: '/customers'
+      fullPath: '/admin/customers'
+      preLoaderRoute: typeof AdminCustomersRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminCustomersRoute: typeof AdminCustomersRoute
+  AdminDeliveryRoute: typeof AdminDeliveryRoute
+  AdminEmployeesRoute: typeof AdminEmployeesRoute
+  AdminEmployeesMonitorRoute: typeof AdminEmployeesMonitorRoute
+  AdminLogsRoute: typeof AdminLogsRoute
+  AdminNotificationsRoute: typeof AdminNotificationsRoute
+  AdminPlayersRoute: typeof AdminPlayersRoute
+  AdminStreamsRoute: typeof AdminStreamsRoute
+  AdminTournamentsRoute: typeof AdminTournamentsRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminCustomersRoute: AdminCustomersRoute,
+  AdminDeliveryRoute: AdminDeliveryRoute,
+  AdminEmployeesRoute: AdminEmployeesRoute,
+  AdminEmployeesMonitorRoute: AdminEmployeesMonitorRoute,
+  AdminLogsRoute: AdminLogsRoute,
+  AdminNotificationsRoute: AdminNotificationsRoute,
+  AdminPlayersRoute: AdminPlayersRoute,
+  AdminStreamsRoute: AdminStreamsRoute,
+  AdminTournamentsRoute: AdminTournamentsRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface EmployeeRouteChildren {
+  EmployeeNotificationsRoute: typeof EmployeeNotificationsRoute
+  EmployeeOrdersRoute: typeof EmployeeOrdersRoute
+  EmployeePlayersRoute: typeof EmployeePlayersRoute
+  EmployeeProductsRoute: typeof EmployeeProductsRoute
+  EmployeeSupportRoute: typeof EmployeeSupportRoute
+  EmployeeTournamentsRoute: typeof EmployeeTournamentsRoute
+  EmployeeIndexRoute: typeof EmployeeIndexRoute
+}
+
+const EmployeeRouteChildren: EmployeeRouteChildren = {
+  EmployeeNotificationsRoute: EmployeeNotificationsRoute,
+  EmployeeOrdersRoute: EmployeeOrdersRoute,
+  EmployeePlayersRoute: EmployeePlayersRoute,
+  EmployeeProductsRoute: EmployeeProductsRoute,
+  EmployeeSupportRoute: EmployeeSupportRoute,
+  EmployeeTournamentsRoute: EmployeeTournamentsRoute,
+  EmployeeIndexRoute: EmployeeIndexRoute,
+}
+
+const EmployeeRouteWithChildren = EmployeeRoute._addFileChildren(
+  EmployeeRouteChildren,
+)
+
+interface TournamentsRouteChildren {
+  TournamentsIdRoute: typeof TournamentsIdRoute
+}
+
+const TournamentsRouteChildren: TournamentsRouteChildren = {
+  TournamentsIdRoute: TournamentsIdRoute,
+}
+
+const TournamentsRouteWithChildren = TournamentsRoute._addFileChildren(
+  TournamentsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
+  AdminLoginRoute: AdminLoginRoute,
+  CartRoute: CartRoute,
+  CheckoutRoute: CheckoutRoute,
+  EmployeeRoute: EmployeeRouteWithChildren,
+  EmployeeLoginRoute: EmployeeLoginRoute,
+  LivestreamRoute: LivestreamRoute,
+  LoginRoute: LoginRoute,
+  PackagesRoute: PackagesRoute,
+  PaymentFailedRoute: PaymentFailedRoute,
+  PaymentSuccessRoute: PaymentSuccessRoute,
+  ProfileRoute: ProfileRoute,
+  PurchasesRoute: PurchasesRoute,
+  TournamentsRoute: TournamentsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

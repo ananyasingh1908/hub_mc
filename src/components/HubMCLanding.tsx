@@ -1,101 +1,103 @@
-import { useEffect, useRef, useState } from "react";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useSpring,
-  useMotionValue,
-} from "framer-motion";
+import { useEffect, useRef, useState, type RefObject } from "react";
+import { AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
+import { Send, CheckCircle, HelpCircle, MessageCircle, Mail, Clock } from "lucide-react";
 import heroImg from "@/assets/hubmc-hero.jpeg";
 import logoImg from "@/assets/hubmc-logo.png";
+import { HubMCNavbar } from "@/components/commerce/HubMCNavbar";
 
-const NAV_LINKS = [
-  { label: "Home", href: "#home" },
-  { label: "Packages", href: "#packages" },
-  { label: "Livestream", href: "#livestream" },
-  { label: "About", href: "#about" },
-  { label: "Contact Us", href: "#contact" },
-];
+function useElementHeight<T extends HTMLElement>(ref: RefObject<T | null>) {
+  const [height, setHeight] = useState(0);
 
-function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    const element = ref.current;
+    if (!element) return;
 
-  return (
-    <motion.header
-      initial={{ y: -30, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
-        scrolled
-          ? "backdrop-blur-xl bg-black/70 border-b border-white/10 shadow-[0_8px_40px_-12px_rgba(60,140,255,0.25)]"
-          : "backdrop-blur-md bg-black/40 border-b border-white/5"
-      }`}
-    >
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:py-5">
-        <a href="#home" className="flex items-center gap-3 group">
-          <img
-            src={logoImg}
-            alt="HubMC"
-            className="h-9 w-9 rounded-md object-contain transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_12px_rgba(60,140,255,0.5)]"
-          />
-          <span className="text-lg font-black tracking-widest">
-            <span className="text-[var(--hub-blue)]">HUB</span>
-            <span className="text-[var(--hub-orange)]">MC</span>
-          </span>
-        </a>
+    let frameId = 0;
 
-        <ul className="hidden md:flex items-center gap-1">
-          {NAV_LINKS.map((l) => (
-            <li key={l.label}>
-              <a
-                href={l.href}
-                className="group relative px-4 py-2 text-sm font-medium uppercase tracking-wider text-white/80 transition-colors duration-300 hover:text-white"
-              >
-                <span className="relative z-10">{l.label}</span>
-                <span className="pointer-events-none absolute left-4 right-4 -bottom-0.5 h-px origin-left scale-x-0 bg-gradient-to-r from-transparent via-[var(--hub-orange)] to-transparent transition-transform duration-500 group-hover:scale-x-100" />
-                <span className="pointer-events-none absolute inset-0 rounded-md opacity-0 blur-md transition-opacity duration-500 group-hover:opacity-100 bg-[var(--hub-blue)]/20" />
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </motion.header>
-  );
+    const updateHeight = () => {
+      frameId = 0;
+      setHeight(element.getBoundingClientRect().height);
+    };
+
+    const scheduleUpdate = () => {
+      if (frameId !== 0) return;
+      frameId = window.requestAnimationFrame(updateHeight);
+    };
+
+    scheduleUpdate();
+
+    const resizeObserver = new ResizeObserver(scheduleUpdate);
+    resizeObserver.observe(element);
+    window.addEventListener("resize", scheduleUpdate, { passive: true });
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", scheduleUpdate);
+      if (frameId !== 0) {
+        window.cancelAnimationFrame(frameId);
+      }
+    };
+  }, [ref]);
+
+  return height;
 }
 
-function Hero() {
+function Hero({ navHeight }: { navHeight: number }) {
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end end"],
   });
   const smooth = useSpring(scrollYProgress, {
-    stiffness: 50,
-    damping: 28,
-    mass: 0.9,
+    stiffness: 42,
+    damping: 24,
+    mass: 1,
   });
 
-  // Very subtle scale 1.03 -> 1.00
-  const scale = useTransform(smooth, [0, 1], [1.03, 1.0]);
-  const y = useTransform(smooth, [0, 1], ["0%", "-4%"]);
-  const heroOpacity = useTransform(smooth, [0, 0.9, 1], [1, 1, 0.6]);
-  const textY = useTransform(smooth, [0, 1], ["0%", "-30%"]);
-  const textOpacity = useTransform(smooth, [0, 0.4], [1, 0]);
+  const scale = useTransform(smooth, [0, 1], [1.0, 0.97]);
+  const y = useTransform(smooth, [0, 1], ["0%", "-6%"]);
+  const heroOpacity = useTransform(smooth, [0, 0.82, 1], [1, 1, 0.78]);
+  const textY = useTransform(smooth, [0, 1], ["0%", "-24%"]);
+  const textOpacity = useTransform(smooth, [0, 0.38], [1, 0]);
+
+  const [imgPos, setImgPos] = useState("center 38%");
+  const [heroVh, setHeroVh] = useState("85vh");
+
+  useEffect(() => {
+    function updateLayout() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const r = w / h;
+      if (r < 0.6) { setImgPos("center 38%"); setHeroVh("85vh"); }
+      else if (r < 0.8) { setImgPos("center 38%"); setHeroVh("82vh"); }
+      else if (r < 1.2) { setImgPos("center 38%"); setHeroVh("82vh"); }
+      else { setImgPos("center 38%"); setHeroVh("78vh"); }
+    }
+    updateLayout();
+    window.addEventListener("resize", updateLayout, { passive: true });
+    return () => window.removeEventListener("resize", updateLayout);
+  }, []);
+
+  const heroHeight = navHeight > 0 ? `${heroVh}` : heroVh;
+  const stageHeight = `calc(${heroVh} + 240vh)`;
 
   return (
     <section
       id="home"
       ref={heroRef}
-      className="relative w-full"
-      style={{ height: "300vh" }}
+      className="relative left-1/2 w-screen -translate-x-1/2"
+      style={{ height: stageHeight }}
     >
-      <div className="sticky top-0 h-screen w-full overflow-hidden bg-[#050505]">
+      <div
+        className="sticky w-full overflow-hidden bg-[#050505]"
+        style={{
+          top: navHeight,
+          height: heroHeight,
+          minHeight: "650px",
+          maxHeight: "850px",
+        }}
+      >
         <motion.div
           style={{
             scale,
@@ -104,16 +106,21 @@ function Hero() {
             willChange: "transform, opacity",
             backfaceVisibility: "hidden",
           }}
-          className="absolute inset-0 flex items-center justify-center pt-[72px]"
+          className="absolute inset-0 overflow-hidden"
         >
-          <img
-            src={heroImg}
-            alt="HubMC Minecraft world"
-            className="max-h-full max-w-full select-none object-contain"
-            draggable={false}
-          />
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute inset-0">
+              <img
+                src={heroImg}
+                alt="HubMC Minecraft world"
+                className="h-full w-full select-none object-cover"
+                style={{ objectPosition: imgPos, transform: "scale(0.91)" }}
+                draggable={false}
+              />
+            </div>
+          </div>
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-b from-transparent to-[#050505]" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent to-[#050505]" />
         </motion.div>
 
         <motion.div
@@ -124,22 +131,22 @@ function Hero() {
           }}
           className="relative z-10 flex h-full flex-col items-center justify-end pb-16 px-6 text-center pointer-events-none"
         >
-        <p className="text-[10px] md:text-xs font-medium uppercase tracking-[0.6em] text-white/85">
-          Scroll to enter
-        </p>
-        <motion.div
-          initial={{ scaleY: 0 }}
-          animate={{ scaleY: 1 }}
-          transition={{
-            duration: 1.6,
-            ease: [0.22, 1, 0.36, 1],
-            repeat: Infinity,
-            repeatType: "reverse",
-            repeatDelay: 0.2,
-          }}
-          style={{ originY: 0 }}
-          className="mt-4 h-12 w-px bg-gradient-to-b from-white/90 to-transparent"
-        />
+          <p className="text-[10px] md:text-xs font-medium uppercase tracking-[0.6em] text-white/85">
+            Scroll to enter
+          </p>
+          <motion.div
+            initial={{ scaleY: 0 }}
+            animate={{ scaleY: 1 }}
+            transition={{
+              duration: 1.6,
+              ease: [0.22, 1, 0.36, 1],
+              repeat: Infinity,
+              repeatType: "reverse",
+              repeatDelay: 0.2,
+            }}
+            style={{ originY: 0 }}
+            className="mt-4 h-12 w-px bg-gradient-to-b from-white/90 to-transparent"
+          />
         </motion.div>
       </div>
     </section>
@@ -289,6 +296,216 @@ function AboutSection() {
   );
 }
 
+function ContactSection() {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "center center"],
+  });
+  const smooth = useSpring(scrollYProgress, {
+    stiffness: 70,
+    damping: 22,
+    mass: 0.5,
+  });
+  const y = useTransform(smooth, [0, 1], [80, 0]);
+  const opacity = useTransform(smooth, [0, 1], [0, 1]);
+
+  const [form, setForm] = useState({ name: "", email: "", minecraftUsername: "", subject: "", message: "" });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  const handleChange = (field: string, value: string) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+    if (error) setError(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(false);
+    if (!form.name.trim()) { setError("Enter your name."); return; }
+    if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) { setError("Enter a valid email."); return; }
+    if (!form.subject.trim()) { setError("Enter a subject."); return; }
+    if (!form.message.trim()) { setError("Enter your message."); return; }
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) { setError(data.error || "Failed to send."); return; }
+      setSuccess(true);
+      setForm({ name: "", email: "", minecraftUsername: "", subject: "", message: "" });
+    } catch { setError("Network error. Try again."); }
+    finally { setSubmitting(false); }
+  };
+
+  return (
+    <section
+      id="contact"
+      ref={ref}
+      className="relative min-h-screen overflow-hidden py-24 md:py-32 px-6"
+      style={{ background: "#050505" }}
+    >
+      <div className="pointer-events-none absolute -top-40 -right-32 h-[600px] w-[600px] rounded-full opacity-40 blur-[160px]"
+        style={{ background: "radial-gradient(circle, rgba(255,140,40,0.55), transparent 60%)" }}
+      />
+      <div className="pointer-events-none absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full opacity-35 blur-[160px]"
+        style={{ background: "radial-gradient(circle, rgba(60,140,255,0.5), transparent 60%)" }}
+      />
+      <div className="pointer-events-none absolute inset-0 opacity-[0.18]"
+        style={{ background: "radial-gradient(1200px 600px at 50% 80%, rgba(255,140,40,0.18), transparent 70%)" }}
+      />
+
+      <Particles />
+
+      <motion.div
+        style={{ y, opacity, willChange: "transform, opacity" }}
+        className="relative z-10 mx-auto max-w-6xl"
+      >
+        <div className="text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.42em] text-[var(--hub-blue)]">
+            Home <span className="mx-2 text-white/30">›</span>{" "}
+            <span className="text-[var(--hub-orange)]">Contact Us</span>
+          </p>
+          <h2 className="mt-6 text-5xl md:text-7xl font-black leading-[0.95] tracking-tight text-white">
+            Contact <span className="text-[var(--hub-orange)]">HUBMC</span>
+          </h2>
+          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/60">
+            Need help? Reach out to our team.
+          </p>
+        </div>
+
+        <AnimatePresence mode="wait">
+          {success ? (
+            <motion.div
+              key="success"
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: -20 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="mx-auto mt-16 max-w-lg rounded-[32px] border border-[rgba(62,162,255,0.2)] bg-[rgba(11,11,11,0.92)] p-10 text-center"
+            >
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-[24px] border border-[rgba(62,162,255,0.22)] bg-black/65">
+                <CheckCircle className="h-10 w-10 text-[var(--hub-blue)]" />
+              </div>
+              <h2 className="mt-6 text-3xl font-black text-white">Message Sent!</h2>
+              <p className="mt-4 text-base leading-7 text-white/60">Thank you for reaching out. Our team will get back to you within 24 hours.</p>
+              <button onClick={() => setSuccess(false)} className="mx-auto mt-8 inline-flex items-center gap-2 rounded-2xl border border-white/10 px-6 py-3 text-sm font-medium text-white/70 transition-all hover:bg-white/[0.05] hover:text-white">
+                Send Another Message
+              </button>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="form"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="mx-auto mt-16 grid gap-8 lg:grid-cols-[1fr_340px]"
+            >
+              <div className="rounded-[32px] border border-white/10 bg-[rgba(11,11,11,0.92)] p-8 md:p-10">
+                <h2 className="text-2xl font-black text-white">Send us a Message</h2>
+                <p className="mt-2 text-sm text-white/50">Fill out the form and we'll respond promptly.</p>
+
+                <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+                  <div className="grid gap-5 md:grid-cols-2">
+                    <div>
+                      <label className="block text-sm font-medium text-white/70">Name *</label>
+                      <input type="text" value={form.name} onChange={(e) => handleChange("name", e.target.value)} placeholder="Your name" disabled={submitting}
+                        className="mt-1.5 h-12 w-full rounded-2xl border border-white/10 bg-black/60 px-4 text-sm text-white outline-none transition-colors placeholder:text-white/25 focus:border-[rgba(62,162,255,0.4)] focus:ring-1 focus:ring-[rgba(62,162,255,0.25)] disabled:opacity-50" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-white/70">Email *</label>
+                      <input type="email" value={form.email} onChange={(e) => handleChange("email", e.target.value)} placeholder="your@email.com" disabled={submitting}
+                        className="mt-1.5 h-12 w-full rounded-2xl border border-white/10 bg-black/60 px-4 text-sm text-white outline-none transition-colors placeholder:text-white/25 focus:border-[rgba(62,162,255,0.4)] focus:ring-1 focus:ring-[rgba(62,162,255,0.25)] disabled:opacity-50" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white/70">Minecraft Username</label>
+                    <input type="text" value={form.minecraftUsername} onChange={(e) => handleChange("minecraftUsername", e.target.value)} placeholder="e.g. Notch" disabled={submitting}
+                      className="mt-1.5 h-12 w-full rounded-2xl border border-white/10 bg-black/60 px-4 text-sm text-white outline-none transition-colors placeholder:text-white/25 focus:border-[rgba(62,162,255,0.4)] focus:ring-1 focus:ring-[rgba(62,162,255,0.25)] disabled:opacity-50" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white/70">Subject *</label>
+                    <input type="text" value={form.subject} onChange={(e) => handleChange("subject", e.target.value)} placeholder="What is this about?" disabled={submitting}
+                      className="mt-1.5 h-12 w-full rounded-2xl border border-white/10 bg-black/60 px-4 text-sm text-white outline-none transition-colors placeholder:text-white/25 focus:border-[rgba(62,162,255,0.4)] focus:ring-1 focus:ring-[rgba(62,162,255,0.25)] disabled:opacity-50" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white/70">Message *</label>
+                    <textarea value={form.message} onChange={(e) => handleChange("message", e.target.value)} placeholder="Describe your issue..." rows={5} disabled={submitting}
+                      className="mt-1.5 w-full rounded-2xl border border-white/10 bg-black/60 px-4 py-3 text-sm text-white outline-none transition-colors placeholder:text-white/25 focus:border-[rgba(62,162,255,0.4)] focus:ring-1 focus:ring-[rgba(62,162,255,0.25)] disabled:opacity-50 resize-y" />
+                  </div>
+
+                  {error && (
+                    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex items-start gap-3 rounded-2xl border border-[rgba(255,138,42,0.25)] bg-[rgba(255,138,42,0.08)] px-4 py-3 text-sm leading-6 text-white/80">
+                      <HelpCircle className="mt-0.5 h-4 w-4 shrink-0 text-[var(--hub-orange)]" />
+                      <span>{error}</span>
+                    </motion.div>
+                  )}
+
+                  <button type="submit" disabled={submitting}
+                    className={`flex h-13 w-full items-center justify-center gap-2 rounded-2xl text-base font-semibold transition-all duration-300 ${
+                      submitting
+                        ? "cursor-not-allowed bg-white/8 text-white/40"
+                        : "bg-[var(--hub-blue)] text-white hover:-translate-y-0.5 hover:bg-[#51adff] shadow-[0_0_25px_rgba(62,162,255,0.3)]"
+                    }`}>
+                    {submitting ? (
+                      <span className="inline-flex items-center gap-2">
+                        <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" /></svg>
+                        Sending...
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-2"><Send className="h-4 w-4" /> Send Message</span>
+                    )}
+                  </button>
+                </form>
+              </div>
+
+              <div className="space-y-5">
+                <div className="rounded-[32px] border border-white/10 bg-[rgba(11,11,11,0.92)] p-7">
+                  <h3 className="text-lg font-black text-white">Support Channels</h3>
+                  <div className="mt-6 space-y-5">
+                    <div className="flex items-start gap-4">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[rgba(62,162,255,0.2)] bg-[rgba(62,162,255,0.08)]">
+                        <MessageCircle className="h-5 w-5 text-[var(--hub-blue)]" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-white">Discord Support</p>
+                        <p className="mt-1 text-sm leading-6 text-white/50">Join our Discord for live chat support.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[rgba(255,138,42,0.2)] bg-[rgba(255,138,42,0.08)]">
+                        <Mail className="h-5 w-5 text-[var(--hub-orange)]" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-white">Email Support</p>
+                        <p className="mt-1 text-sm leading-6 text-white/50">support@hubmc.net — we respond within 24h.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[rgba(62,162,255,0.2)] bg-[rgba(62,162,255,0.08)]">
+                        <Clock className="h-5 w-5 text-[var(--hub-blue)]" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-white">Store Hours</p>
+                        <p className="mt-1 text-sm leading-6 text-white/50">Support available 24/7. Response times may vary.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </section>
+  );
+}
+
 function Particles() {
   const particles = Array.from({ length: 28 });
   return (
@@ -331,11 +548,16 @@ function Particles() {
 }
 
 export default function HubMCLanding() {
+  const navRef = useRef<HTMLElement>(null);
+  const navHeight = useElementHeight(navRef);
+
   return (
     <main className="hubmc bg-[#050505] text-white">
-      <Navbar />
-      <Hero />
+      <HubMCNavbar ref={navRef} />
+      <div aria-hidden="true" style={{ height: navHeight }} />
+      <Hero navHeight={navHeight} />
       <AboutSection />
+      <ContactSection />
     </main>
   );
 }

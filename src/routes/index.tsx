@@ -1,14 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
 import HubMCLanding from "@/components/HubMCLanding";
+import heroJpeg from "@/assets/hubmc-hero.jpeg";
+
+const siteUrl = process.env.BASE_URL || "https://hubmc.net";
 
 export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "HubMC — The World You Love. Evolved." },
-      { name: "description", content: "Enter the premium Minecraft server universe. New biomes, new mobs, new adventures. Endless possibilities." },
-      { property: "og:title", content: "HubMC — The World You Love. Evolved." },
-      { property: "og:description", content: "A premium Minecraft server experience. New biomes, new mobs, endless adventures." },
+      { title: "HUBMC — The World You Love" },
+      { name: "description", content: "Premium Minecraft server with tournaments, livestreams, store, community and events." },
+      { property: "og:title", content: "HUBMC — The World You Love" },
+      { property: "og:description", content: "Premium Minecraft server with tournaments, livestreams, store, community and events." },
+      { property: "og:image", content: heroJpeg },
+      { property: "og:image:width", content: "1920" },
+      { property: "og:image:height", content: "1080" },
+      { property: "og:url", content: siteUrl },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "HUBMC — The World You Love" },
+      { name: "twitter:description", content: "Premium Minecraft server with tournaments, livestreams, store, community and events." },
+      { name: "twitter:image", content: heroJpeg },
     ],
   }),
 });

@@ -134,13 +134,10 @@
 
 /* HubMC theme */
 .hubmc {
-  --hub-bg: oklch(0.13 0.03 295);
-  --hub-bg-deep: oklch(0.08 0.02 290);
-  --hub-purple: oklch(0.62 0.24 300);
-  --hub-purple-glow: oklch(0.7 0.28 305);
-  --hub-green: oklch(0.78 0.22 145);
-  --hub-text: oklch(0.97 0.01 280);
-  --hub-muted: oklch(0.7 0.04 285);
+  --hub-bg: oklch(0.14 0.01 255);
+  --hub-bg-deep: oklch(0.09 0.01 255);
+  --hub-text: oklch(0.97 0.01 255);
+  --hub-muted: oklch(0.7 0.02 255);
   --hub-blue: #3ea2ff;
   --hub-orange: #ff8a2a;
 }
