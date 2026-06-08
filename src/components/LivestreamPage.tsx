@@ -158,7 +158,8 @@ export default function LivestreamPage() {
   useEffect(() => { fetchYouTube(); fetchCommunityStreams(); fetchDiscord(); fetchReviews(); }, []);
 
   useEffect(() => {
-    const interval = setInterval(fetchCommunityStreams, 60_000);
+    // Server cache refreshes every 10-15 min, so no need for aggressive polling
+    const interval = setInterval(fetchCommunityStreams, 120_000);
     return () => clearInterval(interval);
   }, []);
 

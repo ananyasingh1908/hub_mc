@@ -305,6 +305,15 @@ model YouTubeContent {
   updatedAt    DateTime  @updatedAt
 }
 
+model YouTubeCache {
+  id        String   @id @default(cuid())
+  cacheKey  String   @unique
+  data      Json     @db.Json
+  cachedAt  DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model FeaturedStream {
   id            String    @id @default(cuid())
   videoId       String    @unique

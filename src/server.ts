@@ -116,6 +116,7 @@ import {
   handleEmployeeDashboardStats,
 } from "@/lib/employee/employee-handlers";
 import { handleYouTubeStatus, handleYouTubeVideos, handleYouTubeLivestream, handleYouTubeCommunityStreams, handleAdminApproveStream, handleAdminRemoveStream, handleAdminBlacklistChannel, handleAdminGetFeaturedStreams } from "@/lib/youtube/youtube-handler";
+import { scheduleRefresh } from "@/lib/youtube/youtube-cache";
 import { handleDiscordStatus, handleDiscordEvents } from "@/lib/discord/discord-handler";
 import { handleGetNotifications, handleUnreadCount, handleMarkRead, handleMarkAllRead } from "@/lib/notifications/notification-handler";
 import { handleGetProfile } from "@/lib/profile/profile-handlers";
@@ -323,6 +324,9 @@ export default {
 
       // YouTube API routes
       if (url.pathname.startsWith("/api/youtube/")) {
+        // Trigger background cache refresh if data is stale (never blocks the response)
+        scheduleRefresh(ctx as { waitUntil: (p: Promise<unknown>) => void });
+
         if (url.pathname === "/api/youtube/status" && request.method === "GET") return await handleYouTubeStatus();
         if (url.pathname === "/api/youtube/videos" && request.method === "GET") return await handleYouTubeVideos();
         if (url.pathname === "/api/youtube/livestream" && request.method === "GET") return await handleYouTubeLivestream();

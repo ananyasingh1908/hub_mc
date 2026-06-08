@@ -11,7 +11,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 import appCss from "../styles.css?url";
 import logoPng from "@/assets/hubmc-logo.png";
-import heroJpeg from "@/assets/hubmc-hero.jpeg";
+import heroPng from "@/assets/last_home_hub.png";
 
 function NotFoundComponent() {
   return (
@@ -72,7 +72,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 
 const siteUrl = process.env.BASE_URL || "https://hubmc.net";
 const siteName = "HUBMC";
-const ogImage = heroJpeg;
+const ogImage = heroPng;
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
@@ -104,6 +104,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "icon", type: "image/png", href: logoPng },
       { rel: "apple-touch-icon", href: logoPng },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" },
     ],
   }),
   shellComponent: RootShell,

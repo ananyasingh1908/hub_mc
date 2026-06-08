@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { AnimatePresence } from "framer-motion";
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
-import { Send, CheckCircle, HelpCircle, MessageCircle, Mail, Clock } from "lucide-react";
-import heroImg from "@/assets/hubmc-hero.jpeg";
+import { Send, CheckCircle, HelpCircle, MessageCircle, Mail, Clock, Sword, Package, Trophy, Users, Shield, Settings } from "lucide-react";
+import heroImg from "@/assets/last_home_hub.png";
 import logoImg from "@/assets/hubmc-logo.png";
 import { HubMCNavbar } from "@/components/commerce/HubMCNavbar";
 
@@ -61,7 +61,7 @@ function Hero({ navHeight }: { navHeight: number }) {
   const textY = useTransform(smooth, [0, 1], ["0%", "-24%"]);
   const textOpacity = useTransform(smooth, [0, 0.38], [1, 0]);
 
-  const [imgPos, setImgPos] = useState("center 38%");
+  const [imgPos, setImgPos] = useState("center center");
   const [heroVh, setHeroVh] = useState("85vh");
 
   useEffect(() => {
@@ -69,10 +69,9 @@ function Hero({ navHeight }: { navHeight: number }) {
       const w = window.innerWidth;
       const h = window.innerHeight;
       const r = w / h;
-      if (r < 0.6) { setImgPos("center 38%"); setHeroVh("85vh"); }
-      else if (r < 0.8) { setImgPos("center 38%"); setHeroVh("82vh"); }
-      else if (r < 1.2) { setImgPos("center 38%"); setHeroVh("82vh"); }
-      else { setImgPos("center 38%"); setHeroVh("78vh"); }
+      if (r < 0.6) { setImgPos("center 45%"); setHeroVh("85vh"); }
+      else if (r < 0.8) { setImgPos("center 48%"); setHeroVh("82vh"); }
+      else { setImgPos("center center"); setHeroVh("78vh"); }
     }
     updateLayout();
     window.addEventListener("resize", updateLayout, { passive: true });
@@ -114,13 +113,17 @@ function Hero({ navHeight }: { navHeight: number }) {
                 src={heroImg}
                 alt="HubMC Minecraft world"
                 className="h-full w-full select-none object-cover"
-                style={{ objectPosition: imgPos, transform: "scale(0.91)" }}
+                style={{ objectPosition: imgPos, transform: "scale(0.91)", imageRendering: "auto" }}
                 draggable={false}
+                fetchPriority="high"
+                loading="eager"
               />
             </div>
           </div>
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent to-[#050505]" />
+          {/* Subtle blur overlay behind navbar */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-28 bg-gradient-to-b from-black/25 to-transparent backdrop-blur-[3px]" />
         </motion.div>
 
         <motion.div
@@ -129,24 +132,115 @@ function Hero({ navHeight }: { navHeight: number }) {
             opacity: textOpacity,
             willChange: "transform, opacity",
           }}
-          className="relative z-10 flex h-full flex-col items-center justify-end pb-16 px-6 text-center pointer-events-none"
+          className="relative z-10 h-full pointer-events-none"
         >
-          <p className="text-[10px] md:text-xs font-medium uppercase tracking-[0.6em] text-white/85">
-            Scroll to enter
-          </p>
-          <motion.div
-            initial={{ scaleY: 0 }}
-            animate={{ scaleY: 1 }}
-            transition={{
-              duration: 1.6,
-              ease: [0.22, 1, 0.36, 1],
-              repeat: Infinity,
-              repeatType: "reverse",
-              repeatDelay: 0.2,
-            }}
-            style={{ originY: 0 }}
-            className="mt-4 h-12 w-px bg-gradient-to-b from-white/90 to-transparent"
-          />
+          {/* ─── FEATURE CARDS ─── */}
+          <div
+            className="pointer-events-auto absolute left-1/2 -translate-x-1/2 w-full px-4"
+            style={{ bottom: "clamp(170px, 27vh, 240px)" }}
+          >
+            <div className="mx-auto max-w-6xl">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5 md:gap-3">
+                {[
+                  { icon: Sword, label: "SURVIVAL", subtitle: "EPIC ADVENTURES" },
+                  { icon: Package, label: "EXCLUSIVE", subtitle: "CRATES" },
+                  { icon: Trophy, label: "TOURNAMENTS", subtitle: "COMPETE & WIN" },
+                  { icon: Users, label: "ACTIVE COMMUNITY", subtitle: "PLAY. CHAT. GROW." },
+                  { icon: Shield, label: "FAIR PLAY", subtitle: "ZERO TOLERANCE" },
+                  { icon: Settings, label: "CUSTOM FEATURES", subtitle: "UNIQUE EXPERIENCE" },
+                ].map((item) => (
+                  <a
+                    key={item.label}
+                    href={`/#${item.label.toLowerCase().replace(/\s+/g, "-")}`}
+                    className="group relative flex flex-col items-center justify-center rounded-xl px-1.5 py-3 md:py-4 text-center transition-all duration-300 hover:-translate-y-2 hover:scale-105"
+                    style={{
+                      background: "linear-gradient(to bottom, rgba(35,35,35,.82), rgba(0,0,0,.9))",
+                      border: "1px solid rgba(255,180,50,.5)",
+                      boxShadow: "0 10px 35px rgba(0,0,0,.65), 0 0 18px rgba(255,160,0,.15)",
+                      backdropFilter: "blur(12px)",
+                      WebkitBackdropFilter: "blur(12px)",
+                    }}
+                  >
+                    {/* Bevel shine */}
+                    <div className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-b from-white/[0.08] to-transparent" />
+                    {/* Gold inner glow on hover */}
+                    <div
+                      className="pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                      style={{
+                        boxShadow: "inset 0 0 25px -6px rgba(255,180,50,0.5)",
+                      }}
+                    />
+                    {/* Hover outer glow */}
+                    <div
+                      className="pointer-events-none absolute -inset-[1px] rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                      style={{ boxShadow: "0 0 40px -4px rgba(255,180,50,0.35)" }}
+                    />
+                    <item.icon className="relative z-10 h-5 w-5 md:h-6 md:w-6 text-[var(--hub-orange)] drop-shadow-[0_0_10px_rgba(255,138,42,0.5)]" />
+                    <span className="relative z-10 mt-1.5 text-[10px] md:text-xs font-black tracking-wider text-white">
+                      {item.label}
+                    </span>
+                    <span className="relative z-10 mt-0.5 text-[8px] md:text-[10px] font-semibold uppercase tracking-[0.15em]" style={{ color: "rgba(255,255,255,.75)" }}>
+                      {item.subtitle}
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* ─── COMMUNITY BANNER ─── */}
+          <div
+            className="pointer-events-auto absolute left-1/2 -translate-x-1/2 w-full px-4"
+            style={{ bottom: "clamp(95px, 17vh, 155px)" }}
+          >
+            <a
+              href="/#community"
+              className="group relative mx-auto block max-w-3xl overflow-hidden rounded-xl px-6 py-3 md:py-4 text-center transition-all duration-300 hover:-translate-y-1"
+              style={{
+                background: "linear-gradient(to bottom, rgba(30,30,30,.88), rgba(0,0,0,.95))",
+                border: "1px solid rgba(255,180,50,.45)",
+                boxShadow: "0 8px 30px rgba(0,0,0,.6), 0 0 20px rgba(255,160,0,.1)",
+                backdropFilter: "blur(8px)",
+                WebkitBackdropFilter: "blur(8px)",
+              }}
+            >
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-[var(--hub-orange)]/6 to-transparent" />
+              <motion.div
+                animate={{ opacity: [0.3, 0.7, 0.3] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                className="pointer-events-none absolute inset-0 rounded-xl"
+                style={{ boxShadow: "inset 0 0 35px -10px rgba(255,180,50,0.2)" }}
+              />
+              <div
+                className="pointer-events-none absolute -inset-[1px] rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                style={{ boxShadow: "0 0 50px -6px rgba(255,180,50,0.3)" }}
+              />
+              <p className="relative z-10 text-[11px] md:text-sm font-bold uppercase tracking-[0.25em] text-white/95">
+                JOIN THE COMMUNITY & BE PART OF THE{" "}
+                <span className="text-[var(--hub-orange)] drop-shadow-[0_0_12px_rgba(255,138,42,0.55)]">LEGACY</span>
+              </p>
+            </a>
+          </div>
+
+          {/* ─── SCROLL INDICATOR ─── */}
+          <div className="absolute left-1/2 -translate-x-1/2 bottom-0 pb-8 md:pb-10 px-6 text-center">
+            <p className="text-[10px] md:text-xs font-medium uppercase tracking-[0.6em] text-white/85">
+              Scroll to enter
+            </p>
+            <motion.div
+              initial={{ scaleY: 0 }}
+              animate={{ scaleY: 1 }}
+              transition={{
+                duration: 1.6,
+                ease: [0.22, 1, 0.36, 1],
+                repeat: Infinity,
+                repeatType: "reverse",
+                repeatDelay: 0.2,
+              }}
+              style={{ originY: 0 }}
+              className="mt-4 h-12 w-px bg-gradient-to-b from-white/90 to-transparent"
+            />
+          </div>
         </motion.div>
       </div>
     </section>
