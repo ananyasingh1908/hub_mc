@@ -323,11 +323,11 @@ export default function PurchasesPage() {
                           {order.items.map((item, i) => (
                             <div key={i} className="flex items-center gap-3 rounded-2xl bg-white/[0.03] px-4 py-3">
                               {item.product.image && (
-                                <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl">
+                                <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-[rgba(11,11,11,0.96)]">
                                   <img
                                     src={item.product.image}
                                     alt={item.product.name}
-                                    className="h-full w-full object-cover"
+                                    className="h-full w-full object-contain"
                                   />
                                 </div>
                               )}

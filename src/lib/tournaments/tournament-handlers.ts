@@ -34,7 +34,7 @@ async function requireStaffRole(request: Request, roles: string[]): Promise<Resp
   return null;
 }
 
-async function autoUpdateStatuses() {
+export async function autoUpdateStatuses() {
   try {
     const prisma = await getPrismaClient();
     const now = new Date();
@@ -166,7 +166,7 @@ export async function handleRegisterForTournament(request: Request) {
   const registration = await prisma.tournamentRegistration.create({
     data: {
       tournamentId,
-      userId: session.user.customerId ? undefined : undefined,
+      userId: session.user.customerId ?? undefined,
       minecraftUsername: session.user.minecraftUsername,
       minecraftUuid: session.user.minecraftUuid ?? undefined,
       discordUsername,
@@ -180,14 +180,7 @@ export async function handleRegisterForTournament(request: Request) {
     },
   });
 
-  if (session.user.customerId) {
-    await prisma.tournamentRegistration.update({
-      where: { id: registration.id },
-      data: { userId: session.user.customerId },
-    });
-  }
-
-  return json({ ok: true, registration: { id: registration.id } }, 201);
+  return json({ ok: true, registration }, 201);
 }
 
 export async function handleGetTournamentRegistrations(request: Request) {
@@ -198,13 +191,27 @@ export async function handleGetTournamentRegistrations(request: Request) {
   const tournamentId = url.searchParams.get("tournamentId");
   if (!tournamentId) return error("Missing tournamentId", 400);
 
-  const prisma = await getPrismaClient();
-  const registrations = await prisma.tournamentRegistration.findMany({
-    where: { tournamentId },
-    orderBy: { createdAt: "desc" },
-  });
+  const page = parseInt(url.searchParams.get("page") ?? "1");
+  const limit = 20;
+  const skip = (page - 1) * limit;
 
-  return json({ registrations });
+  const prisma = await getPrismaClient();
+  const where = { tournamentId };
+
+  const [registrations, total] = await Promise.all([
+    prisma.tournamentRegistration.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+    }),
+    prisma.tournamentRegistration.count({ where }),
+  ]);
+
+  return json({
+    registrations,
+    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+  });
 }
 
 export async function handleStaffGetTournaments(request: Request) {

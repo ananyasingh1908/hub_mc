@@ -9,6 +9,12 @@ export const Route = createFileRoute("/profile")({
       throw redirect({ to: "/login" });
     }
   },
+  head: () => ({
+    meta: [
+      { title: "My Profile - HUBMC" },
+      { name: "description", content: "View your HUBMC profile, owned packages, purchase history, and player details." },
+    ],
+  }),
 });
 
 function ProfileRoute() {

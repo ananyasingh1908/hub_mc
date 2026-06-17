@@ -5,6 +5,7 @@ import {
   Sword, LoaderCircle, X, CheckCircle, AlertCircle, Award, Search,
 } from "lucide-react";
 import { toast } from "sonner";
+import ImageUpload from "@/components/ui/ImageUpload";
 
 type Tournament = {
   id: string;
@@ -54,6 +55,9 @@ export default function AdminTournaments() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [registrationsLoading, setRegistrationsLoading] = useState(false);
   const [filter, setFilter] = useState<string>("ALL");
+  const [regPage, setRegPage] = useState(1);
+  const [regTotalPages, setRegTotalPages] = useState(1);
+  const [regTotal, setRegTotal] = useState(0);
 
   const load = async () => {
     try {
@@ -98,17 +102,33 @@ export default function AdminTournaments() {
     setShowModal(true);
   };
 
-  const loadRegistrations = async (tournamentId: string) => {
+  const toggleRegistrations = async (tournamentId: string) => {
     if (showRegistrations === tournamentId) {
       setShowRegistrations(null);
       return;
     }
     setShowRegistrations(tournamentId);
+    setRegPage(1);
     setRegistrationsLoading(true);
     try {
-      const res = await fetch(`/api/tournaments/registrations?tournamentId=${tournamentId}`, { credentials: "include" });
+      const res = await fetch(`/api/tournaments/registrations?tournamentId=${tournamentId}&page=1&limit=20`, { credentials: "include" });
       const d = await res.json();
       if (d.registrations) setRegistrations(d.registrations);
+      setRegTotalPages(d.pagination?.totalPages ?? 1);
+      setRegTotal(d.pagination?.total ?? 0);
+    } catch {}
+    setRegistrationsLoading(false);
+  };
+
+  const loadRegistrationsPage = async (tournamentId: string, p: number) => {
+    setRegPage(p);
+    setRegistrationsLoading(true);
+    try {
+      const res = await fetch(`/api/tournaments/registrations?tournamentId=${tournamentId}&page=${p}&limit=20`, { credentials: "include" });
+      const d = await res.json();
+      if (d.registrations) setRegistrations(d.registrations);
+      setRegTotalPages(d.pagination?.totalPages ?? 1);
+      setRegTotal(d.pagination?.total ?? 0);
     } catch {}
     setRegistrationsLoading(false);
   };
@@ -204,7 +224,7 @@ export default function AdminTournaments() {
       if (d.ok) {
         toast.success("Registration removed.");
         load();
-        if (showRegistrations) loadRegistrations(showRegistrations);
+        if (showRegistrations) loadRegistrationsPage(showRegistrations, regPage);
       } else {
         toast.error(d.error || "Failed to remove registration.");
       }
@@ -308,7 +328,7 @@ export default function AdminTournaments() {
                   </div>
                 </div>
                 <button
-                  onClick={() => loadRegistrations(t.id)}
+                  onClick={() => toggleRegistrations(t.id)}
                   className="mt-3 flex items-center gap-1.5 text-xs text-white/40 transition-colors hover:text-[var(--hub-blue)]"
                 >
                   <Users className="h-3.5 w-3.5" />
@@ -321,26 +341,35 @@ export default function AdminTournaments() {
                     ) : registrations.length === 0 ? (
                       <p className="text-sm text-white/30">No registrations yet.</p>
                     ) : (
-                      <div className="max-h-64 space-y-2 overflow-y-auto">
-                        {registrations.map((r) => (
-                          <div key={r.id} className="flex items-center justify-between rounded-xl bg-white/5 px-3 py-2">
-                            <div>
-                              <span className="text-sm font-medium text-white">{r.minecraftUsername}</span>
-                              <span className="ml-2 text-xs text-white/40">{r.discordUsername}</span>
-                              {r.teamName && <span className="ml-2 text-xs text-white/30">[{r.teamName}]</span>}
-                              <div className="mt-0.5 text-[11px] text-white/30">
-                                {r.email} &middot; {r.region}
+                      <>
+                        <div className="max-h-64 space-y-2 overflow-y-auto">
+                          {registrations.map((r) => (
+                            <div key={r.id} className="flex items-center justify-between rounded-xl bg-white/5 px-3 py-2">
+                              <div>
+                                <span className="text-sm font-medium text-white">{r.minecraftUsername}</span>
+                                <span className="ml-2 text-xs text-white/40">{r.discordUsername}</span>
+                                {r.teamName && <span className="ml-2 text-xs text-white/30">[{r.teamName}]</span>}
+                                <div className="mt-0.5 text-[11px] text-white/30">
+                                  {r.email} &middot; {r.region}
+                                </div>
                               </div>
+                              <button
+                                onClick={() => handleDeleteRegistration(r.id)}
+                                className="rounded p-1 text-red-400/40 transition-colors hover:bg-red-500/10 hover:text-red-400"
+                              >
+                                <X className="h-3.5 w-3.5" />
+                              </button>
                             </div>
-                            <button
-                              onClick={() => handleDeleteRegistration(r.id)}
-                              className="rounded p-1 text-red-400/40 transition-colors hover:bg-red-500/10 hover:text-red-400"
-                            >
-                              <X className="h-3.5 w-3.5" />
-                            </button>
+                          ))}
+                        </div>
+                        {regTotalPages > 1 && (
+                          <div className="flex items-center justify-center gap-3 pt-3">
+                            <button disabled={regPage <= 1} onClick={() => loadRegistrationsPage(t.id, regPage - 1)} className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-white/60 disabled:opacity-30 hover:bg-white/[0.05]">Previous</button>
+                            <span className="text-xs text-white/40">Page {regPage} of {regTotalPages} ({regTotal} total)</span>
+                            <button disabled={regPage >= regTotalPages} onClick={() => loadRegistrationsPage(t.id, regPage + 1)} className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-white/60 disabled:opacity-30 hover:bg-white/[0.05]">Next</button>
                           </div>
-                        ))}
-                      </div>
+                        )}
+                      </>
                     )}
                   </div>
                 )}
@@ -415,8 +444,7 @@ export default function AdminTournaments() {
                     <input type="text" name="prizePool" value={form.prizePool} onChange={handleInputChange} placeholder="₹50,000" className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-[var(--hub-blue)]" />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="text-xs font-medium text-white/50">Banner Image URL</label>
-                    <input type="url" name="bannerUrl" value={form.bannerUrl} onChange={handleInputChange} placeholder="https://example.com/banner.png" className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-[var(--hub-blue)]" />
+                    <ImageUpload value={form.bannerUrl} onChange={(url) => setForm({ ...form, bannerUrl: url ?? "" })} label="Banner Image" />
                   </div>
                   <div className="sm:col-span-2">
                     <label className="text-xs font-medium text-white/50">Discord Link</label>

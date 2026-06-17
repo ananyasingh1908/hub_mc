@@ -45,6 +45,9 @@ export default function EmployeeNotifications() {
   const [editNotif, setEditNotif] = useState<SiteNotification | null>(null);
   const [notifForm, setNotifForm] = useState(emptyNotif);
   const [submitting, setSubmitting] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
   const [announcements, setAnnouncements] = useState<TournamentAnnouncement[]>([]);
   const [announceLoading, setAnnounceLoading] = useState(false);
@@ -52,11 +55,14 @@ export default function EmployeeNotifications() {
   const [announceForm, setAnnounceForm] = useState(emptyAnnounce);
   const [tournaments, setTournaments] = useState<Array<{ id: string; title: string; status: string }>>([]);
 
-  const loadNotifications = async () => {
+  const loadNotifications = async (p: number) => {
+    setLoading(true);
     try {
-      const res = await fetch("/api/employee/notifications", { credentials: "include" });
+      const res = await fetch(`/api/employee/notifications?page=${p}&limit=20`, { credentials: "include" });
       const d = await res.json();
       if (d.notifications) setNotifications(d.notifications);
+      setTotalPages(d.pagination?.totalPages ?? 1);
+      setTotal(d.pagination?.total ?? 0);
     } catch {}
     setLoading(false);
   };
@@ -71,9 +77,7 @@ export default function EmployeeNotifications() {
       const ad = await announceRes.json();
       const td = await tournRes.json();
       if (ad.announcements) {
-        const res = await fetch("/api/tournaments/staff", { credentials: "include" });
-        const tournData = await res.json();
-        const tournMap = new Map((tournData.tournaments || []).map((t: any) => [t.id, t]));
+        const tournMap = new Map((td.tournaments || []).map((t: any) => [t.id, t]));
         setAnnouncements(ad.announcements.map((a: any) => ({ ...a, tournament: tournMap.get(a.tournamentId) })));
       }
       if (td.tournaments) setTournaments(td.tournaments);
@@ -82,9 +86,9 @@ export default function EmployeeNotifications() {
   };
 
   useEffect(() => {
-    loadNotifications();
+    loadNotifications(page);
     loadAnnouncements();
-  }, []);
+  }, [page]);
 
   const openCreateNotif = () => {
     setEditNotif(null);
@@ -132,7 +136,8 @@ export default function EmployeeNotifications() {
       if (d.ok) {
         toast.success(editNotif ? "Notification updated!" : "Notification created!");
         setShowNotifModal(false);
-        loadNotifications();
+        setPage(1);
+        loadNotifications(1);
       } else {
         toast.error(d.error || "Failed.");
       }
@@ -147,7 +152,7 @@ export default function EmployeeNotifications() {
       body: JSON.stringify({ id }),
     });
     const d = await res.json();
-    if (d.ok) { toast.success("Deleted."); loadNotifications(); }
+    if (d.ok) { toast.success("Deleted."); loadNotifications(page); }
     else toast.error(d.error || "Failed.");
   };
 
@@ -157,7 +162,7 @@ export default function EmployeeNotifications() {
       body: JSON.stringify({ id: n.id, active: !n.active }),
     });
     const d = await res.json();
-    if (d.ok) { toast.success(!n.active ? "Notification enabled." : "Notification disabled."); loadNotifications(); }
+    if (d.ok) { toast.success(!n.active ? "Notification enabled." : "Notification disabled."); loadNotifications(page); }
     else toast.error(d.error || "Failed.");
   };
 
@@ -270,6 +275,13 @@ export default function EmployeeNotifications() {
                   </div>
                 </motion.div>
               ))}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-3 pt-4">
+                  <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/60 disabled:opacity-30 hover:bg-white/[0.05]">Previous</button>
+                  <span className="text-sm text-white/40">Page {page} of {totalPages} ({total} total)</span>
+                  <button disabled={page >= totalPages} onClick={() => setPage(page + 1)} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/60 disabled:opacity-30 hover:bg-white/[0.05]">Next</button>
+                </div>
+              )}
             </div>
           )}
         </>

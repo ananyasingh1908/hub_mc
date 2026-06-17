@@ -18,7 +18,7 @@ export default function EmployeeSupport() {
     try {
       const params = new URLSearchParams();
       if (statusFilter) params.set("status", statusFilter);
-      const res = await fetch(`/api/admin/tickets?${params}`, { credentials: "include" });
+      const res = await fetch(`/api/employee/tickets?${params}`, { credentials: "include" });
       const data = await res.json();
       setTickets(data.tickets ?? []);
     } catch { toast.error("Failed to load tickets"); }
@@ -30,7 +30,7 @@ export default function EmployeeSupport() {
   const sendReply = async (ticketId: string) => {
     if (!replyText.trim()) return;
     try {
-      const res = await fetch("/api/admin/tickets/reply", {
+      const res = await fetch("/api/employee/tickets/reply", {
         method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ticketId, message: replyText }),
@@ -44,7 +44,7 @@ export default function EmployeeSupport() {
 
   const resolveTicket = async (ticketId: string, status: string) => {
     try {
-      await fetch("/api/admin/tickets/resolve", {
+      await fetch("/api/employee/tickets/resolve", {
         method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ticketId, status }),

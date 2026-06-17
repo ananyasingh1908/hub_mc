@@ -42,7 +42,7 @@ function StarRating({ rating, size = 20 }: { rating: number; size?: number }) {
   return (
     <div className="flex items-center gap-0.5">
       {[1, 2, 3, 4, 5].map((i) => (
-        <Star key={i} className={`${i <= rating ? "fill-[var(--hub-orange)] text-[var(--hub-orange)]" : "text-white/20]"}`} width={size} height={size} />
+        <Star key={i} className={`${i <= rating ? "fill-[var(--hub-orange)] text-[var(--hub-orange)]" : "text-white/20"}`} width={size} height={size} />
       ))}
     </div>
   );
@@ -54,7 +54,7 @@ function InteractiveStarRating({ value, onChange }: { value: number; onChange: (
     <div className="flex items-center gap-1">
       {[1, 2, 3, 4, 5].map((i) => (
         <button key={i} type="button" onClick={() => onChange(i)} onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(0)} className="transition-transform duration-150 hover:scale-125">
-          <Star className={i <= (hover || value) ? "fill-[var(--hub-orange)] text-[var(--hub-orange)]" : "text-white/20]"} width={28} height={28} />
+          <Star className={i <= (hover || value) ? "fill-[var(--hub-orange)] text-[var(--hub-orange)]" : "text-white/20"} width={28} height={28} />
         </button>
       ))}
     </div>
@@ -403,7 +403,7 @@ export default function LivestreamPage() {
                   <div className="min-w-0 flex-1">
                     <h3 className="text-xl font-black text-white">{discordStatus?.serverName ?? "Discord Server"}</h3>
                     <div className="mt-1 flex items-center gap-2 text-xs text-white/50">
-                      <span className="inline-flex items-center gap-1"><Dot className={`h-4 w-4 ${(discordStatus?.onlineCount ?? 0) > 0 ? "text-green-400" : "text-white/30]"}`} />{(discordStatus?.onlineCount ?? 0).toLocaleString()} online</span>
+                      <span className="inline-flex items-center gap-1"><Dot className={`h-4 w-4 ${(discordStatus?.onlineCount ?? 0) > 0 ? "text-green-400" : "text-white/30"}`} />{(discordStatus?.onlineCount ?? 0).toLocaleString()} online</span>
                     </div>
                   </div>
                   {discordStatus?.invite && (
@@ -421,7 +421,7 @@ export default function LivestreamPage() {
                         <div key={member.id} className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/70">
                           {member.avatar ? <img src={member.avatar} alt="" className="h-6 w-6 rounded-full" /> : <div className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-500/20 text-indigo-400"><User className="h-3 w-3" /></div>}
                           <span>{member.username}</span>
-                          <Dot className={`h-4 w-4 ${member.status === "online" ? "text-green-400" : "text-white/20]"}`} />
+                          <Dot className={`h-4 w-4 ${member.status === "online" ? "text-green-400" : "text-white/20"}`} />
                         </div>
                       ))}
                       {(discordStatus.members.length > 12) && <div className="flex items-center rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/40">+{discordStatus.members.length - 12} more</div>}

@@ -34,7 +34,7 @@ export default function EmployeeLayout({ children }: { children: React.ReactNode
   const handleLogout = async () => {
     await beginEmployeeSignOut();
     await invalidate();
-    await navigate({ to: "/login" });
+    await navigate({ to: "/employee-login" });
   };
 
   if (isPending || !session?.authenticated) {

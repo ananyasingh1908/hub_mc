@@ -26,6 +26,7 @@ export function getCached<T>(key: string): { data: T; age: number } | null {
 
 function setCache(key: string, data: unknown): void {
   responseCache.set(key, { data, fetchedAt: Date.now() });
+  clearStaleCache();
 }
 
 export async function dedupedFetch<T>(
@@ -97,5 +98,5 @@ export function clearStaleCache(): void {
   }
 }
 
-const cleanupInterval = setInterval(clearStaleCache, DEFAULT_TTL);
-if (cleanupInterval.unref) cleanupInterval.unref();
+// No global setInterval — Cloudflare Workers forbid I/O/timers at module scope.
+// Clear stale entries lazily on each cache write instead.

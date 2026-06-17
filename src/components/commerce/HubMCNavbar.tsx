@@ -2,6 +2,7 @@ import { forwardRef, useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import {
+  Bell,
   Headset,
   LoaderCircle,
   LogOut,
@@ -9,8 +10,6 @@ import {
   ShoppingCart,
   UserRound,
   WalletCards,
-  Shield,
-  ShieldCheck,
   X,
 } from "lucide-react";
 import logoImg from "@/assets/hubmc-logo.png";
@@ -24,6 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { beginSignOut, useAllSessions, useInvalidateAllSessions } from "@/lib/auth/client";
 import { useCartCount } from "@/store/cart-store";
+import { NotificationBell } from "@/components/commerce/NotificationBell";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
@@ -31,7 +31,7 @@ const NAV_LINKS = [
   { label: "Tournaments", href: "/tournaments" },
   { label: "Livestream", href: "/livestream" },
   { label: "About", href: "/#about" },
-  { label: "Contact Us", href: "/#contact" },
+  { label: "Contact Us", href: "/contact" },
 ];
 
 export const HubMCNavbar = forwardRef<HTMLElement>(function HubMCNavbar(
@@ -175,36 +175,14 @@ export const HubMCNavbar = forwardRef<HTMLElement>(function HubMCNavbar(
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <a
-                    href="/#contact"
+                  <Link
+                    to="/contact"
                     className="flex cursor-pointer items-center gap-3 rounded-2xl px-3 py-3 text-sm text-white/82 outline-none transition-colors hover:bg-[rgba(62,162,255,0.12)] hover:text-white"
                   >
                     <Headset className="h-4 w-4 text-[var(--hub-blue)]" />
                     <span>Support</span>
-                  </a>
+                  </Link>
                 </DropdownMenuItem>
-                {(employeeSession?.authenticated || adminSession?.authenticated) && (
-                  <DropdownMenuItem asChild>
-                    <Link
-                      to="/employee"
-                      className="flex cursor-pointer items-center gap-3 rounded-2xl px-3 py-3 text-sm text-white/82 outline-none transition-colors hover:bg-[rgba(62,162,255,0.12)] hover:text-white"
-                    >
-                      <Shield className="h-4 w-4 text-[var(--hub-blue)]" />
-                      <span>Staff Panel</span>
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-                {adminSession?.authenticated && (
-                  <DropdownMenuItem asChild>
-                    <Link
-                      to="/admin"
-                      className="flex cursor-pointer items-center gap-3 rounded-2xl px-3 py-3 text-sm text-white/82 outline-none transition-colors hover:bg-[rgba(255,138,42,0.14)] hover:text-white"
-                    >
-                      <ShieldCheck className="h-4 w-4 text-[var(--hub-orange)]" />
-                      <span>Admin Panel</span>
-                    </Link>
-                  </DropdownMenuItem>
-                )}
                 <DropdownMenuSeparator className="bg-white/8" />
                 <DropdownMenuItem
                   onSelect={(event) => {
@@ -228,6 +206,8 @@ export const HubMCNavbar = forwardRef<HTMLElement>(function HubMCNavbar(
               <span className="relative z-10">Login</span>
             </Link>
           )}
+
+          {hubUser?.minecraftUsername && <NotificationBell />}
 
           <Link
             to="/cart"
@@ -338,34 +318,22 @@ export const HubMCNavbar = forwardRef<HTMLElement>(function HubMCNavbar(
                         <WalletCards className="h-4 w-4 text-[var(--hub-blue)]" />
                         My Purchases
                       </Link>
-                      <a
-                        href="/#contact"
+                      <Link
+                        to="/contact"
                         onClick={() => setMobileMenuOpen(false)}
                         className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm text-white/72 transition-colors hover:bg-[rgba(62,162,255,0.1)] hover:text-white"
                       >
                         <Headset className="h-4 w-4 text-[var(--hub-blue)]" />
                         Support
-                      </a>
-                      {(employeeSession?.authenticated || adminSession?.authenticated) && (
-                        <Link
-                          to="/employee"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm text-white/72 transition-colors hover:bg-[rgba(62,162,255,0.1)] hover:text-white"
-                        >
-                          <Shield className="h-4 w-4 text-[var(--hub-blue)]" />
-                          Staff Panel
-                        </Link>
-                      )}
-                      {adminSession?.authenticated && (
-                        <Link
-                          to="/admin"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm text-white/72 transition-colors hover:bg-[rgba(255,138,42,0.14)] hover:text-white"
-                        >
-                          <ShieldCheck className="h-4 w-4 text-[var(--hub-orange)]" />
-                          Admin Panel
-                        </Link>
-                      )}
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-sm text-white/72 transition-colors hover:bg-[rgba(62,162,255,0.1)] hover:text-white"
+                      >
+                        <Bell className="h-4 w-4 text-[var(--hub-blue)]" />
+                        Notifications
+                      </button>
                     </div>
                   </>
                 )}

@@ -22,32 +22,35 @@ export default function AdminPlayers() {
   const [loading, setLoading] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [error, setError] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
-  const searchPlayers = useCallback(async (q: string) => {
+  const searchPlayers = useCallback(async (q: string, p = 1) => {
     if (!q.trim()) return;
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(`/api/admin/platform/players?search=${encodeURIComponent(q)}`, { credentials: "include" });
+      const res = await fetch(`/api/admin/platform/players?search=${encodeURIComponent(q)}&page=${p}&limit=20`, { credentials: "include" });
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Search failed"); setPlayers([]); }
-      else setPlayers(data.players || []);
+      else { setPlayers(data.players || []); setPage(p); setTotalPages(data.pagination?.totalPages ?? 1); setTotal(data.pagination?.total ?? 0); }
     } catch { setError("Network error"); setPlayers([]); }
     finally { setLoading(false); }
   }, []);
 
-  const allPlayers = useCallback(async () => {
+  const allPlayers = useCallback(async (p = 1) => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/platform/players", { credentials: "include" });
+      const res = await fetch(`/api/admin/platform/players?page=${p}&limit=20`, { credentials: "include" });
       const data = await res.json();
-      if (res.ok) setPlayers(data.players || []);
+      if (res.ok) { setPlayers(data.players || []); setPage(p); setTotalPages(data.pagination?.totalPages ?? 1); setTotal(data.pagination?.total ?? 0); }
       else setError(data.error || "Failed to load");
     } catch { setError("Network error"); }
     finally { setLoading(false); }
   }, []);
 
-  useEffect(() => { allPlayers(); }, [allPlayers]);
+  useEffect(() => { allPlayers(1); }, []);
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -64,8 +67,8 @@ export default function AdminPlayers() {
             className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-sm text-white outline-none placeholder:text-white/30 focus:border-[var(--hub-blue)]/40"
           />
         </div>
-        <button onClick={() => searchPlayers(query)} className="rounded-xl bg-[var(--hub-blue)] px-6 py-3 text-sm font-bold text-black transition-all hover:shadow-[0_0_16px_rgba(62,162,255,0.3)]">Search</button>
-        <button onClick={allPlayers} className="rounded-xl border border-white/10 px-4 py-3 text-sm text-white/60 hover:bg-white/5">All</button>
+        <button onClick={() => { setPage(1); searchPlayers(query, 1); }} className="rounded-xl bg-[var(--hub-blue)] px-6 py-3 text-sm font-bold text-black transition-all hover:shadow-[0_0_16px_rgba(62,162,255,0.3)]">Search</button>
+        <button onClick={() => allPlayers(1)} className="rounded-xl border border-white/10 px-4 py-3 text-sm text-white/60 hover:bg-white/5">All</button>
       </div>
 
       {error && <div className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-400">{error}</div>}
@@ -99,6 +102,14 @@ export default function AdminPlayers() {
               </div>
             </motion.button>
           ))}
+        </div>
+      )}
+
+      {!loading && players.length > 0 && totalPages > 1 && (
+        <div className="mt-6 flex items-center justify-center gap-3">
+          <button disabled={page <= 1} onClick={() => allPlayers(page - 1)} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/60 disabled:opacity-30 hover:bg-white/[0.05]">Previous</button>
+          <span className="text-sm text-white/40">Page {page} of {totalPages} ({total} total)</span>
+          <button disabled={page >= totalPages} onClick={() => allPlayers(page + 1)} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/60 disabled:opacity-30 hover:bg-white/[0.05]">Next</button>
         </div>
       )}
 

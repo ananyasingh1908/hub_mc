@@ -1,5 +1,8 @@
-import { devlog } from "@/lib/dev-log";
+import { devlog } from "@/lib/dev-log"; 
 import "./lib/error-capture";
+import { handleUpload } from "@/lib/upload/upload-handler";
+import { checkRateLimit } from "@/lib/rate-limiter";
+import { cachedJson } from "@/lib/response-cache";
 
 const _GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
 const _GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || "";
@@ -75,6 +78,7 @@ import { renderErrorPage } from "./lib/error-page";
 import { handleContactRequest } from "@/lib/contact/contact-handler";
 import {
   handleGetPublicTournaments,
+  autoUpdateStatuses,
   handleGetTournamentById,
   handleRegisterForTournament,
   handleGetTournamentRegistrations,
@@ -213,9 +217,13 @@ export default {
           return Response.json(getClientVisibleAuthState());
         }
         if (url.pathname === "/api/auth/employee-login" && request.method === "POST") {
+          const rl = checkRateLimit(request, { limit: 10, label: "employee-login" });
+          if (rl) return rl;
           return await handleEmployeeLoginRequest(request);
         }
         if (url.pathname === "/api/auth/admin-login" && request.method === "POST") {
+          const rl = checkRateLimit(request, { limit: 5, label: "admin-login" });
+          if (rl) return rl;
           return await handleAdminLoginRequest(request);
         }
         if (url.pathname === "/api/auth/google-client-id" && request.method === "GET") {
@@ -239,12 +247,16 @@ export default {
         return new Response("Not found", { status: 404 });
       }
 
-      // Payment API routes
+      // Payment API routes (disabled — purchases are now manual via Discord)
       if (url.pathname === "/api/payment/create-order" && request.method === "POST") {
-        return await handleCreateOrder(request);
+        return new Response(JSON.stringify({ error: "Online payments are currently disabled. Please use Discord." }), {
+          status: 503, headers: { "content-type": "application/json" },
+        });
       }
       if (url.pathname === "/api/payment/verify" && request.method === "POST") {
-        return await handleVerifyPayment(request);
+        return new Response(JSON.stringify({ error: "Online payments are currently disabled. Please use Discord." }), {
+          status: 503, headers: { "content-type": "application/json" },
+        });
       }
 
       // Order & Delivery API routes
@@ -266,12 +278,19 @@ export default {
         return await handleGetProfile(request);
       }
 
+      // Upload API route
+      if (url.pathname === "/api/upload" && request.method === "POST") {
+        const rl = checkRateLimit(request, { limit: 20, label: "upload" });
+        if (rl) return rl;
+        return await handleUpload(request);
+      }
+
       // Admin & Employee API routes
       if (url.pathname.startsWith("/api/admin/")) {
         const route = url.pathname;
         const method = request.method;
         if (route === "/api/admin/stats" && method === "GET") return await handleAdminDashboardStats(request);
-        if (route === "/api/admin/products" && method === "GET") return await handleAdminGetProducts();
+        if (route === "/api/admin/products" && method === "GET") return await handleAdminGetProducts(request);
         if (route === "/api/admin/products/create" && method === "POST") return await handleAdminCreateProduct(request);
         if (route === "/api/admin/products/update" && method === "POST") return await handleAdminUpdateProduct(request);
         if (route === "/api/admin/products/delete" && method === "POST") return await handleAdminDeleteProduct(request);
@@ -311,12 +330,14 @@ export default {
 
       // Contact API route
       if (url.pathname === "/api/contact" && request.method === "POST") {
+        const rl = checkRateLimit(request, { limit: 5, label: "contact" });
+        if (rl) return rl;
         return await handleContactRequest(request);
       }
 
-      // Server Reviews API routes
+      // Server Reviews API routes — cached 120s
       if (url.pathname === "/api/server-reviews" && request.method === "GET") {
-        return await handleGetServerReviews();
+        return cachedJson(request, 120, () => handleGetServerReviews());
       }
       if (url.pathname === "/api/server-reviews/submit" && request.method === "POST") {
         return await handleSubmitServerReview(request);
@@ -342,8 +363,8 @@ export default {
       }
 
       // Notification API routes
-      if (url.pathname.startsWith("/api/notifications/")) {
-        if (url.pathname === "/api/notifications" && request.method === "GET") return await handleGetNotifications(request);
+      if (url.pathname === "/api/notifications" || url.pathname.startsWith("/api/notifications/")) {
+        if (url.pathname === "/api/notifications" && request.method === "GET") return cachedJson(request, 30, () => handleGetNotifications(request));
         if (url.pathname === "/api/notifications/unread-count" && request.method === "GET") return await handleUnreadCount(request);
         if (url.pathname === "/api/notifications/mark-read" && request.method === "POST") return await handleMarkRead(request);
         if (url.pathname === "/api/notifications/mark-all-read" && request.method === "POST") return await handleMarkAllRead(request);
@@ -355,9 +376,16 @@ export default {
         const route = url.pathname;
         const method = request.method;
 
-        if (route === "/api/tournaments/public" && method === "GET") return await handleGetPublicTournaments();
+        if (route === "/api/tournaments/public" && method === "GET") {
+          await autoUpdateStatuses();
+          return cachedJson(request, 60, () => handleGetPublicTournaments());
+        }
         if (route === "/api/tournaments/detail" && method === "GET") return await handleGetTournamentById(request);
-        if (route === "/api/tournaments/register" && method === "POST") return await handleRegisterForTournament(request);
+        if (route === "/api/tournaments/register" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 10, label: "tournament-register" });
+          if (rl) return rl;
+          return await handleRegisterForTournament(request);
+        }
         if (route === "/api/tournaments/registrations" && method === "GET") return await handleGetTournamentRegistrations(request);
         if (route === "/api/tournaments/brackets" && method === "GET") return await handleGetTournamentBrackets(request);
 
@@ -394,7 +422,7 @@ export default {
         if (route === "/api/employee/announcements/update" && method === "POST") return await handleUpdateAnnouncement(request);
         if (route === "/api/employee/announcements/delete" && method === "POST") return await handleDeleteAnnouncement(request);
 
-        if (route === "/api/employee/notifications" && method === "GET") return await handleGetSiteNotifications();
+        if (route === "/api/employee/notifications" && method === "GET") return await handleGetSiteNotifications(request);
         if (route === "/api/employee/notifications/active" && method === "GET") return await handleGetActiveSiteNotifications();
         if (route === "/api/employee/notifications/create" && method === "POST") return await handleCreateSiteNotification(request);
         if (route === "/api/employee/notifications/update" && method === "POST") return await handleUpdateSiteNotification(request);
@@ -409,7 +437,27 @@ export default {
         if (route === "/api/employee/players/assign-rank" && method === "POST") return await handleAssignRank(request);
         if (route === "/api/employee/players/remove-rank" && method === "POST") return await handleRemoveRank(request);
 
+        if (route === "/api/employee/products" && method === "GET") return await handleAdminGetProducts(request);
+        if (route === "/api/employee/products/create" && method === "POST") return await handleAdminCreateProduct(request);
+        if (route === "/api/employee/products/update" && method === "POST") return await handleAdminUpdateProduct(request);
+        if (route === "/api/employee/products/delete" && method === "POST") return await handleAdminDeleteProduct(request);
+
+        if (route === "/api/employee/orders" && method === "GET") return await handleAdminGetOrders(request);
+        if (route === "/api/employee/orders/update" && method === "POST") return await handleAdminUpdateOrderStatus(request);
+        if (route === "/api/employee/orders/refund" && method === "POST") return await handleRefundOrder(request);
+
+        if (route === "/api/employee/tickets" && method === "GET") return await handleAdminGetTickets(request);
+        if (route === "/api/employee/tickets/reply" && method === "POST") return await handleAdminReplyTicket(request);
+        if (route === "/api/employee/tickets/resolve" && method === "POST") return await handleAdminResolveTicket(request);
+
         return new Response("Not found", { status: 404 });
+      }
+
+      // Public products — cached 5 min
+      if (url.pathname === "/api/products" && request.method === "GET") {
+        return cachedJson(request, 300, () =>
+          commerceApiHandlers["/api/products"]!.GET!(request),
+        );
       }
 
       const apiHandler = commerceApiHandlers[url.pathname]?.[request.method];

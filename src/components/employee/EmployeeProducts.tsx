@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Plus, Pencil, Trash2, Save, X, Package } from "lucide-react";
 import { toast } from "sonner";
+import ImageUpload from "@/components/ui/ImageUpload";
 
-type Product = { id: string; slug: string; name: string; description: string; imageUrl: string; price: number; active: boolean; badge?: string };
+type Product = { id: string; slug: string; name: string; description: string; imageUrl: string; category: string; price: number; active: boolean; badge?: string };
+
+const CATEGORIES = ["Ranks", "Coins", "Crates", "Keys", "Cosmetics", "Bundles", "Misc"];
 
 export default function EmployeeProducts() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -11,18 +14,24 @@ export default function EmployeeProducts() {
   const [editing, setEditing] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<Product>>({});
   const [showAdd, setShowAdd] = useState(false);
-  const [addForm, setAddForm] = useState({ slug: "", name: "", description: "", imageUrl: "", price: "", badge: "" });
+  const [addForm, setAddForm] = useState({ slug: "", name: "", description: "", imageUrl: "", category: "Ranks", price: "", badge: "" });
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (p: number) => {
+    setLoading(true);
     try {
-      const res = await fetch("/api/admin/products", { credentials: "include" });
+      const res = await fetch(`/api/employee/products?page=${p}&limit=20`, { credentials: "include" });
       const data = await res.json();
       setProducts(data.products ?? []);
+      setTotalPages(data.pagination?.totalPages ?? 1);
+      setTotal(data.pagination?.total ?? 0);
     } catch { toast.error("Failed to load products"); }
     finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchProducts(); }, []);
+  useEffect(() => { fetchProducts(page); }, [page]);
 
   const startEdit = (p: Product) => { setEditing(p.id); setEditForm(p); };
   const cancelEdit = () => { setEditing(null); setEditForm({}); };
@@ -30,7 +39,7 @@ export default function EmployeeProducts() {
   const saveEdit = async () => {
     if (!editForm.name || !editForm.price) return toast.error("Name and price required");
     try {
-      const res = await fetch("/api/admin/products/update", {
+      const res = await fetch("/api/employee/products/update", {
         method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editForm),
@@ -39,14 +48,14 @@ export default function EmployeeProducts() {
       if (!res.ok) return toast.error(data?.error ?? "Failed to update");
       toast.success("Product updated");
       cancelEdit();
-      await fetchProducts();
+      await fetchProducts(page);
     } catch { toast.error("Failed to update"); }
   };
 
   const deleteProduct = async (id: string) => {
     if (!confirm("Delete this product?")) return;
     try {
-      const res = await fetch("/api/admin/products/delete", {
+      const res = await fetch("/api/employee/products/delete", {
         method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
@@ -54,14 +63,14 @@ export default function EmployeeProducts() {
       const data = await res.json();
       if (!res.ok) return toast.error(data?.error ?? "Failed to delete");
       toast.success("Product deleted");
-      await fetchProducts();
+      await fetchProducts(page);
     } catch { toast.error("Failed to delete"); }
   };
 
   const addProduct = async () => {
     if (!addForm.slug || !addForm.name || !addForm.price) return toast.error("Slug, name, price required");
     try {
-      const res = await fetch("/api/admin/products/create", {
+      const res = await fetch("/api/employee/products/create", {
         method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...addForm, price: parseFloat(addForm.price) }),
@@ -70,8 +79,9 @@ export default function EmployeeProducts() {
       if (!res.ok) return toast.error(data?.error ?? "Failed to create");
       toast.success("Product created");
       setShowAdd(false);
-      setAddForm({ slug: "", name: "", description: "", imageUrl: "", price: "", badge: "" });
-      await fetchProducts();
+      setAddForm({ slug: "", name: "", description: "", imageUrl: "", category: "Ranks", price: "", badge: "" });
+      setPage(1);
+      await fetchProducts(1);
     } catch { toast.error("Failed to create"); }
   };
 
@@ -99,8 +109,11 @@ export default function EmployeeProducts() {
               className="h-11 rounded-xl border border-white/10 bg-black/60 px-4 text-sm text-white outline-none focus:border-[rgba(62,162,255,0.45)]" />
             <input placeholder="Price" type="number" value={addForm.price} onChange={(e) => setAddForm({ ...addForm, price: e.target.value })}
               className="h-11 rounded-xl border border-white/10 bg-black/60 px-4 text-sm text-white outline-none focus:border-[rgba(62,162,255,0.45)]" />
-            <input placeholder="Image URL" value={addForm.imageUrl} onChange={(e) => setAddForm({ ...addForm, imageUrl: e.target.value })}
-              className="h-11 rounded-xl border border-white/10 bg-black/60 px-4 text-sm text-white outline-none focus:border-[rgba(62,162,255,0.45)]" />
+            <select value={addForm.category} onChange={(e) => setAddForm({ ...addForm, category: e.target.value })}
+              className="h-11 rounded-xl border border-white/10 bg-black/60 px-4 text-sm text-white outline-none focus:border-[rgba(62,162,255,0.45)]">
+              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <ImageUpload value={addForm.imageUrl} onChange={(url) => setAddForm({ ...addForm, imageUrl: url ?? "" })} label="Product Image" />
             <input placeholder="Badge (optional)" value={addForm.badge} onChange={(e) => setAddForm({ ...addForm, badge: e.target.value })}
               className="h-11 rounded-xl border border-white/10 bg-black/60 px-4 text-sm text-white outline-none focus:border-[rgba(62,162,255,0.45)]" />
             <textarea placeholder="Description" value={addForm.description} onChange={(e) => setAddForm({ ...addForm, description: e.target.value })}
@@ -133,7 +146,12 @@ export default function EmployeeProducts() {
                     className="h-11 rounded-xl border border-white/10 bg-black/60 px-4 text-sm text-white outline-none focus:border-[rgba(62,162,255,0.45)]" type="number" />
                   <input value={editForm.slug ?? ""} onChange={(e) => setEditForm({ ...editForm, slug: e.target.value })}
                     className="h-11 rounded-xl border border-white/10 bg-black/60 px-4 text-sm text-white outline-none focus:border-[rgba(62,162,255,0.45)]" />
-                  <input value={editForm.imageUrl ?? ""} onChange={(e) => setEditForm({ ...editForm, imageUrl: e.target.value })}
+                  <select value={editForm.category ?? "Ranks"} onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                    className="h-11 rounded-xl border border-white/10 bg-black/60 px-4 text-sm text-white outline-none focus:border-[rgba(62,162,255,0.45)]">
+                    {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                  <ImageUpload value={editForm.imageUrl ?? ""} onChange={(url) => setEditForm({ ...editForm, imageUrl: url ?? "" })} label="Product Image" />
+                  <input placeholder="Badge (optional)" value={editForm.badge ?? ""} onChange={(e) => setEditForm({ ...editForm, badge: e.target.value })}
                     className="h-11 rounded-xl border border-white/10 bg-black/60 px-4 text-sm text-white outline-none focus:border-[rgba(62,162,255,0.45)]" />
                   <textarea value={editForm.description ?? ""} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                     className="h-11 rounded-xl border border-white/10 bg-black/60 px-4 text-sm text-white outline-none focus:border-[rgba(62,162,255,0.45)] md:col-span-2" />
@@ -148,6 +166,7 @@ export default function EmployeeProducts() {
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-white">{p.name}</span>
                       {p.badge && <span className="rounded-full bg-[rgba(255,138,42,0.15)] px-2 py-0.5 text-xs text-[var(--hub-orange)]">{p.badge}</span>}
+                      <span className="rounded-full bg-[rgba(62,162,255,0.15)] px-2 py-0.5 text-xs text-[var(--hub-blue)]">{p.category}</span>
                       {!p.active && <span className="rounded-full bg-[rgba(239,68,68,0.15)] px-2 py-0.5 text-xs text-red-400">Inactive</span>}
                     </div>
                     <div className="mt-1 text-sm text-white/50">₹{p.price.toFixed(2)} · {p.slug}</div>
@@ -160,6 +179,13 @@ export default function EmployeeProducts() {
               )}
             </motion.div>
           ))}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-3 pt-4">
+              <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/60 disabled:opacity-30 hover:bg-white/[0.05]">Previous</button>
+              <span className="text-sm text-white/40">Page {page} of {totalPages} ({total} total)</span>
+              <button disabled={page >= totalPages} onClick={() => setPage(page + 1)} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/60 disabled:opacity-30 hover:bg-white/[0.05]">Next</button>
+            </div>
+          )}
         </div>
       )}
     </motion.div>

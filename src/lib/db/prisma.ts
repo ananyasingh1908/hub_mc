@@ -12,8 +12,8 @@ export async function getPrismaClient(): Promise<PrismaClient> {
   }
 
   if (!prismaPromise) {
-    prismaPromise = import("@prisma/client").then((module) => {
-      const PrismaClientCtor = (module as { PrismaClient: new (...args: any[]) => PrismaClient }).PrismaClient;
+    prismaPromise = import("@prisma/client").then(async (module) => {
+      const PrismaClientCtor = (module as { PrismaClient: new (...args: any[]) => any }).PrismaClient;
 
       if (!PrismaClientCtor) {
         throw new Error(
@@ -21,9 +21,11 @@ export async function getPrismaClient(): Promise<PrismaClient> {
         );
       }
 
+      const { withAccelerate } = await import("@prisma/extension-accelerate");
+
       const client = new PrismaClientCtor({
         log: ["warn", "error"],
-      });
+      }).$extends(withAccelerate()) as unknown as PrismaClient;
 
       if (process.env.NODE_ENV !== "production") {
         globalThis.__hubmcPrisma__ = client;

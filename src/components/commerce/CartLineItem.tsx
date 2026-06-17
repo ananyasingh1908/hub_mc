@@ -11,11 +11,11 @@ export function CartLineItem({ line }: { line: CartLine }) {
   return (
     <article className="rounded-[28px] border border-white/10 bg-[rgba(11,11,11,0.92)] p-5">
       <div className="flex flex-col gap-5 md:flex-row md:items-center">
-        <div className="h-28 w-full shrink-0 overflow-hidden rounded-2xl md:w-40">
+        <div className="h-28 w-full shrink-0 overflow-hidden rounded-2xl bg-[rgba(11,11,11,0.96)] md:w-40">
           <img
             src={line.product.image}
             alt={line.product.name}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-contain"
             style={{ objectPosition: line.product.imagePosition ?? "center center" }}
           />
         </div>

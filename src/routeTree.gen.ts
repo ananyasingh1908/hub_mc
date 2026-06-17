@@ -12,18 +12,18 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TournamentsRouteImport } from './routes/tournaments'
 import { Route as PurchasesRouteImport } from './routes/purchases'
 import { Route as ProfileRouteImport } from './routes/profile'
-import { Route as PaymentSuccessRouteImport } from './routes/payment-success'
-import { Route as PaymentFailedRouteImport } from './routes/payment-failed'
 import { Route as PackagesRouteImport } from './routes/packages'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LivestreamRouteImport } from './routes/livestream'
 import { Route as EmployeeLoginRouteImport } from './routes/employee-login'
 import { Route as EmployeeRouteImport } from './routes/employee'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TournamentsIndexRouteImport } from './routes/tournaments.index'
 import { Route as EmployeeIndexRouteImport } from './routes/employee.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as TournamentsIdRouteImport } from './routes/tournaments.$id'
@@ -58,16 +58,6 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PaymentSuccessRoute = PaymentSuccessRouteImport.update({
-  id: '/payment-success',
-  path: '/payment-success',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PaymentFailedRoute = PaymentFailedRouteImport.update({
-  id: '/payment-failed',
-  path: '/payment-failed',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const PackagesRoute = PackagesRouteImport.update({
   id: '/packages',
   path: '/packages',
@@ -91,6 +81,11 @@ const EmployeeLoginRoute = EmployeeLoginRouteImport.update({
 const EmployeeRoute = EmployeeRouteImport.update({
   id: '/employee',
   path: '/employee',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -117,6 +112,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const TournamentsIndexRoute = TournamentsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => TournamentsRoute,
 } as any)
 const EmployeeIndexRoute = EmployeeIndexRouteImport.update({
   id: '/',
@@ -215,13 +215,12 @@ export interface FileRoutesByFullPath {
   '/admin-login': typeof AdminLoginRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/contact': typeof ContactRoute
   '/employee': typeof EmployeeRouteWithChildren
   '/employee-login': typeof EmployeeLoginRoute
   '/livestream': typeof LivestreamRoute
   '/login': typeof LoginRoute
   '/packages': typeof PackagesRoute
-  '/payment-failed': typeof PaymentFailedRoute
-  '/payment-success': typeof PaymentSuccessRoute
   '/profile': typeof ProfileRoute
   '/purchases': typeof PurchasesRoute
   '/tournaments': typeof TournamentsRouteWithChildren
@@ -243,21 +242,20 @@ export interface FileRoutesByFullPath {
   '/tournaments/$id': typeof TournamentsIdRoute
   '/admin/': typeof AdminIndexRoute
   '/employee/': typeof EmployeeIndexRoute
+  '/tournaments/': typeof TournamentsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin-login': typeof AdminLoginRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/contact': typeof ContactRoute
   '/employee-login': typeof EmployeeLoginRoute
   '/livestream': typeof LivestreamRoute
   '/login': typeof LoginRoute
   '/packages': typeof PackagesRoute
-  '/payment-failed': typeof PaymentFailedRoute
-  '/payment-success': typeof PaymentSuccessRoute
   '/profile': typeof ProfileRoute
   '/purchases': typeof PurchasesRoute
-  '/tournaments': typeof TournamentsRouteWithChildren
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/delivery': typeof AdminDeliveryRoute
   '/admin/employees': typeof AdminEmployeesRoute
@@ -276,6 +274,7 @@ export interface FileRoutesByTo {
   '/tournaments/$id': typeof TournamentsIdRoute
   '/admin': typeof AdminIndexRoute
   '/employee': typeof EmployeeIndexRoute
+  '/tournaments': typeof TournamentsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -284,13 +283,12 @@ export interface FileRoutesById {
   '/admin-login': typeof AdminLoginRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/contact': typeof ContactRoute
   '/employee': typeof EmployeeRouteWithChildren
   '/employee-login': typeof EmployeeLoginRoute
   '/livestream': typeof LivestreamRoute
   '/login': typeof LoginRoute
   '/packages': typeof PackagesRoute
-  '/payment-failed': typeof PaymentFailedRoute
-  '/payment-success': typeof PaymentSuccessRoute
   '/profile': typeof ProfileRoute
   '/purchases': typeof PurchasesRoute
   '/tournaments': typeof TournamentsRouteWithChildren
@@ -312,6 +310,7 @@ export interface FileRoutesById {
   '/tournaments/$id': typeof TournamentsIdRoute
   '/admin/': typeof AdminIndexRoute
   '/employee/': typeof EmployeeIndexRoute
+  '/tournaments/': typeof TournamentsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -321,13 +320,12 @@ export interface FileRouteTypes {
     | '/admin-login'
     | '/cart'
     | '/checkout'
+    | '/contact'
     | '/employee'
     | '/employee-login'
     | '/livestream'
     | '/login'
     | '/packages'
-    | '/payment-failed'
-    | '/payment-success'
     | '/profile'
     | '/purchases'
     | '/tournaments'
@@ -349,21 +347,20 @@ export interface FileRouteTypes {
     | '/tournaments/$id'
     | '/admin/'
     | '/employee/'
+    | '/tournaments/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin-login'
     | '/cart'
     | '/checkout'
+    | '/contact'
     | '/employee-login'
     | '/livestream'
     | '/login'
     | '/packages'
-    | '/payment-failed'
-    | '/payment-success'
     | '/profile'
     | '/purchases'
-    | '/tournaments'
     | '/admin/customers'
     | '/admin/delivery'
     | '/admin/employees'
@@ -382,6 +379,7 @@ export interface FileRouteTypes {
     | '/tournaments/$id'
     | '/admin'
     | '/employee'
+    | '/tournaments'
   id:
     | '__root__'
     | '/'
@@ -389,13 +387,12 @@ export interface FileRouteTypes {
     | '/admin-login'
     | '/cart'
     | '/checkout'
+    | '/contact'
     | '/employee'
     | '/employee-login'
     | '/livestream'
     | '/login'
     | '/packages'
-    | '/payment-failed'
-    | '/payment-success'
     | '/profile'
     | '/purchases'
     | '/tournaments'
@@ -417,6 +414,7 @@ export interface FileRouteTypes {
     | '/tournaments/$id'
     | '/admin/'
     | '/employee/'
+    | '/tournaments/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -425,13 +423,12 @@ export interface RootRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
+  ContactRoute: typeof ContactRoute
   EmployeeRoute: typeof EmployeeRouteWithChildren
   EmployeeLoginRoute: typeof EmployeeLoginRoute
   LivestreamRoute: typeof LivestreamRoute
   LoginRoute: typeof LoginRoute
   PackagesRoute: typeof PackagesRoute
-  PaymentFailedRoute: typeof PaymentFailedRoute
-  PaymentSuccessRoute: typeof PaymentSuccessRoute
   ProfileRoute: typeof ProfileRoute
   PurchasesRoute: typeof PurchasesRoute
   TournamentsRoute: typeof TournamentsRouteWithChildren
@@ -458,20 +455,6 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payment-success': {
-      id: '/payment-success'
-      path: '/payment-success'
-      fullPath: '/payment-success'
-      preLoaderRoute: typeof PaymentSuccessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payment-failed': {
-      id: '/payment-failed'
-      path: '/payment-failed'
-      fullPath: '/payment-failed'
-      preLoaderRoute: typeof PaymentFailedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/packages': {
@@ -509,6 +492,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmployeeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/checkout': {
       id: '/checkout'
       path: '/checkout'
@@ -543,6 +533,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/tournaments/': {
+      id: '/tournaments/'
+      path: '/'
+      fullPath: '/tournaments/'
+      preLoaderRoute: typeof TournamentsIndexRouteImport
+      parentRoute: typeof TournamentsRoute
     }
     '/employee/': {
       id: '/employee/'
@@ -727,10 +724,12 @@ const EmployeeRouteWithChildren = EmployeeRoute._addFileChildren(
 
 interface TournamentsRouteChildren {
   TournamentsIdRoute: typeof TournamentsIdRoute
+  TournamentsIndexRoute: typeof TournamentsIndexRoute
 }
 
 const TournamentsRouteChildren: TournamentsRouteChildren = {
   TournamentsIdRoute: TournamentsIdRoute,
+  TournamentsIndexRoute: TournamentsIndexRoute,
 }
 
 const TournamentsRouteWithChildren = TournamentsRoute._addFileChildren(
@@ -743,13 +742,12 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
+  ContactRoute: ContactRoute,
   EmployeeRoute: EmployeeRouteWithChildren,
   EmployeeLoginRoute: EmployeeLoginRoute,
   LivestreamRoute: LivestreamRoute,
   LoginRoute: LoginRoute,
   PackagesRoute: PackagesRoute,
-  PaymentFailedRoute: PaymentFailedRoute,
-  PaymentSuccessRoute: PaymentSuccessRoute,
   ProfileRoute: ProfileRoute,
   PurchasesRoute: PurchasesRoute,
   TournamentsRoute: TournamentsRouteWithChildren,

@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { UserCog, Shield, Activity, Clock, Search, LoaderCircle, CheckCircle, XCircle } from "lucide-react";
+import { Shield, Activity, LoaderCircle, CheckCircle, XCircle } from "lucide-react";
 
 type Employee = {
   id: string;
-  name: string;
+  displayName: string;
   email: string;
-  active: boolean;
-  lastLogin?: string;
-  permissions: Record<string, boolean>;
-  actions: number;
+  isActive: boolean;
+  department?: string | null;
+  ticketCount: number;
+  permissions: Record<string, boolean> | null;
+  recentActivity: Array<{ id: string; action: string; entity: string; details: string | null; severity: string; createdAt: string }>;
   createdAt: string;
 };
 
@@ -51,12 +52,12 @@ export default function AdminEmployeeMonitor() {
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[var(--hub-blue)] to-[var(--hub-orange)] text-lg font-black text-black">
-                  {emp.name[0]?.toUpperCase() || "?"}
+                  {emp.displayName[0]?.toUpperCase() || "?"}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-lg font-bold text-white">{emp.name}</h2>
-                    {emp.active ? (
+                    <h2 className="text-lg font-bold text-white">{emp.displayName}</h2>
+                    {emp.isActive ? (
                       <span className="flex items-center gap-1 rounded-md bg-green-500/15 px-2 py-0.5 text-[10px] font-bold text-green-400"><CheckCircle className="h-3 w-3" />Active</span>
                     ) : (
                       <span className="flex items-center gap-1 rounded-md bg-red-500/15 px-2 py-0.5 text-[10px] font-bold text-red-400"><XCircle className="h-3 w-3" />Inactive</span>
@@ -64,8 +65,8 @@ export default function AdminEmployeeMonitor() {
                   </div>
                   <p className="text-sm text-white/50">{emp.email}</p>
                   <div className="mt-2 flex items-center gap-4 text-xs text-white/30">
-                    <span className="flex items-center gap-1"><Activity className="h-3 w-3" />{emp.actions} actions</span>
-                    {emp.lastLogin && <span className="flex items-center gap-1"><Clock className="h-3 w-3" />Last: {new Date(emp.lastLogin).toLocaleDateString("en-IN")}</span>}
+                    <span className="flex items-center gap-1"><Activity className="h-3 w-3" />{emp.ticketCount} tickets</span>
+                    {emp.department && <span className="flex items-center gap-1">{emp.department}</span>}
                   </div>
                 </div>
               </div>
@@ -73,10 +74,10 @@ export default function AdminEmployeeMonitor() {
             <div className="mt-4">
               <h3 className="text-xs font-bold text-white/40 flex items-center gap-1"><Shield className="h-3 w-3" />Permissions</h3>
               <div className="mt-2 flex flex-wrap gap-2">
-                {Object.entries(emp.permissions).filter(([,v]) => v).map(([key]) => (
+                {Object.entries(emp.permissions ?? {}).filter(([,v]) => v).map(([key]) => (
                   <span key={key} className="rounded-md bg-white/[0.06] px-2.5 py-1 text-[10px] font-medium text-white/60">{key.replace(/([A-Z])/g, " $1").trim()}</span>
                 ))}
-                {Object.values(emp.permissions).filter(Boolean).length === 0 && (
+                {Object.values(emp.permissions ?? {}).filter(Boolean).length === 0 && (
                   <span className="text-[10px] text-white/30">No permissions assigned</span>
                 )}
               </div>

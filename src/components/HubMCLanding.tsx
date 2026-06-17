@@ -55,7 +55,7 @@ function Hero({ navHeight }: { navHeight: number }) {
     mass: 1,
   });
 
-  const scale = useTransform(smooth, [0, 1], [1.0, 0.97]);
+  const scale = useTransform(smooth, [0, 1], [1.07, 1.0]);
   const y = useTransform(smooth, [0, 1], ["0%", "-6%"]);
   const heroOpacity = useTransform(smooth, [0, 0.82, 1], [1, 1, 0.78]);
   const textY = useTransform(smooth, [0, 1], ["0%", "-24%"]);
@@ -113,7 +113,7 @@ function Hero({ navHeight }: { navHeight: number }) {
                 src={heroImg}
                 alt="HubMC Minecraft world"
                 className="h-full w-full select-none object-cover"
-                style={{ objectPosition: imgPos, transform: "scale(0.91)", imageRendering: "auto" }}
+                style={{ objectPosition: imgPos, imageRendering: "auto" }}
                 draggable={false}
                 fetchPriority="high"
                 loading="eager"
@@ -151,7 +151,7 @@ function Hero({ navHeight }: { navHeight: number }) {
                 ].map((item) => (
                   <a
                     key={item.label}
-                    href={`/#${item.label.toLowerCase().replace(/\s+/g, "-")}`}
+                    href="#"
                     className="group relative flex flex-col items-center justify-center rounded-xl px-1.5 py-3 md:py-4 text-center transition-all duration-300 hover:-translate-y-2 hover:scale-105"
                     style={{
                       background: "linear-gradient(to bottom, rgba(35,35,35,.82), rgba(0,0,0,.9))",
@@ -194,7 +194,9 @@ function Hero({ navHeight }: { navHeight: number }) {
             style={{ bottom: "clamp(95px, 17vh, 155px)" }}
           >
             <a
-              href="/#community"
+              href="https://discord.gg/CwNVBCuSbj"
+              target="_blank"
+              rel="noopener noreferrer"
               className="group relative mx-auto block max-w-3xl overflow-hidden rounded-xl px-6 py-3 md:py-4 text-center transition-all duration-300 hover:-translate-y-1"
               style={{
                 background: "linear-gradient(to bottom, rgba(30,30,30,.88), rgba(0,0,0,.95))",
@@ -220,26 +222,6 @@ function Hero({ navHeight }: { navHeight: number }) {
                 <span className="text-[var(--hub-orange)] drop-shadow-[0_0_12px_rgba(255,138,42,0.55)]">LEGACY</span>
               </p>
             </a>
-          </div>
-
-          {/* ─── SCROLL INDICATOR ─── */}
-          <div className="absolute left-1/2 -translate-x-1/2 bottom-0 pb-8 md:pb-10 px-6 text-center">
-            <p className="text-[10px] md:text-xs font-medium uppercase tracking-[0.6em] text-white/85">
-              Scroll to enter
-            </p>
-            <motion.div
-              initial={{ scaleY: 0 }}
-              animate={{ scaleY: 1 }}
-              transition={{
-                duration: 1.6,
-                ease: [0.22, 1, 0.36, 1],
-                repeat: Infinity,
-                repeatType: "reverse",
-                repeatDelay: 0.2,
-              }}
-              style={{ originY: 0 }}
-              className="mt-4 h-12 w-px bg-gradient-to-b from-white/90 to-transparent"
-            />
           </div>
         </motion.div>
       </div>

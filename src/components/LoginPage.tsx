@@ -166,9 +166,9 @@ function LoginForm() {
             <Link to="/packages" className="text-sm font-medium text-white/56 transition-colors hover:text-[var(--hub-orange)]">
               Back to packages
             </Link>
-            <a href="/#contact" className="text-sm font-medium text-white/56 transition-colors hover:text-[var(--hub-blue)]">
+            <Link to="/contact" className="text-sm font-medium text-white/56 transition-colors hover:text-[var(--hub-blue)]">
               Need help?
-            </a>
+            </Link>
           </div>
         </motion.div>
       </section>
@@ -192,7 +192,7 @@ export default function LoginPage() {
     return (
       <AlreadySignedIn
         username={session.user.minecraftUsername}
-        onGoToProfile={() => window.location.href = "/"}
+        onGoToProfile={() => window.location.href = "/profile"}
       />
     );
   }

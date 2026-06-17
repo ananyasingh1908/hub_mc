@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import type { CartItem, CheckoutFormValues, Coupon, Product, UserAgreements } from "@/lib/commerce/types";
+import type { CartItem, Coupon, Product, UserAgreements } from "@/lib/commerce/types";
 
 type CouponResult =
   | { ok: true; coupon: Coupon; message: string }
@@ -19,7 +19,6 @@ type CartState = {
   clearCoupon: () => void;
   setAgreement: (key: keyof UserAgreements, value: boolean) => void;
   resetAgreements: () => void;
-  completeCheckout: (values: CheckoutFormValues) => void;
 };
 
 const defaultAgreements: UserAgreements = {
@@ -142,12 +141,6 @@ export const useCartStore = create<CartState>()(
           },
         })),
       resetAgreements: () => set({ agreements: defaultAgreements }),
-      completeCheckout: () =>
-        set({
-          items: [],
-          appliedCoupon: null,
-          agreements: defaultAgreements,
-        }),
     }),
     {
       name: "hubmc-cart-store",

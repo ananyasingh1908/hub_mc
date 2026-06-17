@@ -1,0 +1,940 @@
+
+> dev
+> vite dev
+
+
+  [32m[1mVITE[22m v7.3.2[39m  [2mready in [0m[1m1478[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m8080[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [36mhttp://10.218.69.178:[1m8080[22m/[39m
+[vite] connected.
+[ENV] GOOGLE_CLIENT_ID is configured
+[ENV] Super admin credentials are configured
+prisma:error 
+Invalid `prisma.tournament.updateMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+prisma:error 
+Invalid `prisma.tournament.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+prisma:error 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+prisma:error 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+prisma:error 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+prisma:error 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+prisma:error 
+Invalid `prisma.serverReview.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+prisma:error 
+Invalid `prisma.product.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"n-RSzr-18Nt54EQE5K6wmDg5IsI","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"wEhwaWAnRL3CqTFWx_GktsoAY7c","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching videos: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&maxResults=10&order=date&type=video&key=REDACTED
+[YouTube] videos response: {"kind":"youtube#searchListResponse","etag":"dbWAyiTl6wEFGq39-Rbu_095NhI","nextPageToken":"CAoQAA","regionCode":"IN","pageInfo":{"totalResults":119,"resultsPerPage":10},"items":[{"kind":"youtube#searchResult","etag":"Oqe1djOlTVtzrUSNmpkuj3gPYrY","id":{"kind":"youtube#video","videoId":"vtpLtosr2es"},"snippet":{"publishedAt":"2025-09-06T10:57:17Z","channelId":"UC0Krc1QNCKs6jovdXe5WICA","title":"Minecrafte HUBMC with be continued by POGOMC .. #minecraft #senpai #psd1 #mrlapis #public #tranding","de
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Fetching livestream: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&eventType=live&type=video&key=REDACTED
+[YouTube] livestream response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+[Discord] Using cache
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+prisma:error 
+Invalid `prisma.serverReview.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+prisma:error 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Videos & livestream refreshed
+[Discord] Waiting due to rate limit for 7920ms
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[Discord] Using cache
+prisma:error 
+Invalid `prisma.serverReview.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+prisma:error 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"n-RSzr-18Nt54EQE5K6wmDg5IsI","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"wEhwaWAnRL3CqTFWx_GktsoAY7c","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching community-search: https://www.googleapis.com/youtube/v3/search?part=snippet&q=HUBMC&type=video&eventType=live&maxResults=25&key=REDACTED
+[YouTube] community-search response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Community streams refreshed (0 found)
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] Fetching videos: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&maxResults=10&order=date&type=video&key=REDACTED
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+prisma:error 
+Invalid `prisma.serverReview.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Fetching community-search: https://www.googleapis.com/youtube/v3/search?part=snippet&q=HUBMC&type=video&eventType=live&maxResults=25&key=REDACTED
+[YouTube] community-search response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Community streams refreshed (0 found)
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching videos: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&maxResults=10&order=date&type=video&key=REDACTED
+[YouTube] videos response: {"kind":"youtube#searchListResponse","etag":"dbWAyiTl6wEFGq39-Rbu_095NhI","nextPageToken":"CAoQAA","regionCode":"IN","pageInfo":{"totalResults":119,"resultsPerPage":10},"items":[{"kind":"youtube#searchResult","etag":"Oqe1djOlTVtzrUSNmpkuj3gPYrY","id":{"kind":"youtube#video","videoId":"vtpLtosr2es"},"snippet":{"publishedAt":"2025-09-06T10:57:17Z","channelId":"UC0Krc1QNCKs6jovdXe5WICA","title":"Minecrafte HUBMC with be continued by POGOMC .. #minecraft #senpai #psd1 #mrlapis #public #tranding","de
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Fetching livestream: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&eventType=live&type=video&key=REDACTED
+[YouTube] livestream response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Videos & livestream refreshed
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching community-search: https://www.googleapis.com/youtube/v3/search?part=snippet&q=HUBMC&type=video&eventType=live&maxResults=25&key=REDACTED
+[YouTube] community-search response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Community streams refreshed (0 found)
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching videos: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&maxResults=10&order=date&type=video&key=REDACTED
+[YouTube] videos response: {"kind":"youtube#searchListResponse","etag":"dbWAyiTl6wEFGq39-Rbu_095NhI","nextPageToken":"CAoQAA","regionCode":"IN","pageInfo":{"totalResults":119,"resultsPerPage":10},"items":[{"kind":"youtube#searchResult","etag":"Oqe1djOlTVtzrUSNmpkuj3gPYrY","id":{"kind":"youtube#video","videoId":"vtpLtosr2es"},"snippet":{"publishedAt":"2025-09-06T10:57:17Z","channelId":"UC0Krc1QNCKs6jovdXe5WICA","title":"Minecrafte HUBMC with be continued by POGOMC .. #minecraft #senpai #psd1 #mrlapis #public #tranding","de
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Fetching livestream: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&eventType=live&type=video&key=REDACTED
+[YouTube] livestream response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Videos & livestream refreshed
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching community-search: https://www.googleapis.com/youtube/v3/search?part=snippet&q=HUBMC&type=video&eventType=live&maxResults=25&key=REDACTED
+[YouTube] community-search response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Community streams refreshed (0 found)
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching videos: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&maxResults=10&order=date&type=video&key=REDACTED
+[YouTube] videos response: {"kind":"youtube#searchListResponse","etag":"Yvc5zDO0vvlsCpF9z21lOcFQNg8","nextPageToken":"CAoQAA","regionCode":"IN","pageInfo":{"totalResults":117,"resultsPerPage":10},"items":[{"kind":"youtube#searchResult","etag":"Oqe1djOlTVtzrUSNmpkuj3gPYrY","id":{"kind":"youtube#video","videoId":"vtpLtosr2es"},"snippet":{"publishedAt":"2025-09-06T10:57:17Z","channelId":"UC0Krc1QNCKs6jovdXe5WICA","title":"Minecrafte HUBMC with be continued by POGOMC .. #minecraft #senpai #psd1 #mrlapis #public #tranding","de
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Fetching livestream: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&eventType=live&type=video&key=REDACTED
+[YouTube] livestream response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Videos & livestream refreshed
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching community-search: https://www.googleapis.com/youtube/v3/search?part=snippet&q=HUBMC&type=video&eventType=live&maxResults=25&key=REDACTED
+[YouTube] community-search response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Community streams refreshed (0 found)
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching videos: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&maxResults=10&order=date&type=video&key=REDACTED
+[YouTube] videos response: {"kind":"youtube#searchListResponse","etag":"dbWAyiTl6wEFGq39-Rbu_095NhI","nextPageToken":"CAoQAA","regionCode":"IN","pageInfo":{"totalResults":119,"resultsPerPage":10},"items":[{"kind":"youtube#searchResult","etag":"Oqe1djOlTVtzrUSNmpkuj3gPYrY","id":{"kind":"youtube#video","videoId":"vtpLtosr2es"},"snippet":{"publishedAt":"2025-09-06T10:57:17Z","channelId":"UC0Krc1QNCKs6jovdXe5WICA","title":"Minecrafte HUBMC with be continued by POGOMC .. #minecraft #senpai #psd1 #mrlapis #public #tranding","de
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Fetching livestream: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&eventType=live&type=video&key=REDACTED
+[YouTube] livestream response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Videos & livestream refreshed
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching community-search: https://www.googleapis.com/youtube/v3/search?part=snippet&q=HUBMC&type=video&eventType=live&maxResults=25&key=REDACTED
+[YouTube] community-search response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Community streams refreshed (0 found)
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching videos: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&maxResults=10&order=date&type=video&key=REDACTED
+[YouTube] videos response: {"kind":"youtube#searchListResponse","etag":"dbWAyiTl6wEFGq39-Rbu_095NhI","nextPageToken":"CAoQAA","regionCode":"IN","pageInfo":{"totalResults":119,"resultsPerPage":10},"items":[{"kind":"youtube#searchResult","etag":"Oqe1djOlTVtzrUSNmpkuj3gPYrY","id":{"kind":"youtube#video","videoId":"vtpLtosr2es"},"snippet":{"publishedAt":"2025-09-06T10:57:17Z","channelId":"UC0Krc1QNCKs6jovdXe5WICA","title":"Minecrafte HUBMC with be continued by POGOMC .. #minecraft #senpai #psd1 #mrlapis #public #tranding","de
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Fetching livestream: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&eventType=live&type=video&key=REDACTED
+[YouTube] livestream response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Videos & livestream refreshed
+prisma:error 
+Invalid `prisma.serverReview.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[2m8:16:06 pm[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css?direct, /src/routes/checkout.tsx[22m
+[2m8:16:06 pm[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2msrc/routes/checkout.tsx[22m
+[vite] program reload
+[ENV] GOOGLE_CLIENT_ID is configured
+[ENV] Super admin credentials are configured
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+prisma:error 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+prisma:error 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+prisma:error 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+prisma:error 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+prisma:error 
+Invalid `prisma.serverReview.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching videos: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&maxResults=10&order=date&type=video&key=REDACTED
+[Discord] Waiting due to rate limit for 2945ms
+[YouTube] videos response: {"kind":"youtube#searchListResponse","etag":"dbWAyiTl6wEFGq39-Rbu_095NhI","nextPageToken":"CAoQAA","regionCode":"IN","pageInfo":{"totalResults":119,"resultsPerPage":10},"items":[{"kind":"youtube#searchResult","etag":"Oqe1djOlTVtzrUSNmpkuj3gPYrY","id":{"kind":"youtube#video","videoId":"vtpLtosr2es"},"snippet":{"publishedAt":"2025-09-06T10:57:17Z","channelId":"UC0Krc1QNCKs6jovdXe5WICA","title":"Minecrafte HUBMC with be continued by POGOMC .. #minecraft #senpai #psd1 #mrlapis #public #tranding","de
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Fetching livestream: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&eventType=live&type=video&key=REDACTED
+[YouTube] livestream response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Videos & livestream refreshed
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+prisma:error 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching community-search: https://www.googleapis.com/youtube/v3/search?part=snippet&q=HUBMC&type=video&eventType=live&maxResults=25&key=REDACTED
+[YouTube] community-search response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Community streams refreshed (0 found)
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] Fetching videos: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&maxResults=10&order=date&type=video&key=REDACTED
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] Fetching community-search: https://www.googleapis.com/youtube/v3/search?part=snippet&q=HUBMC&type=video&eventType=live&maxResults=25&key=REDACTED
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] Fetching videos: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&maxResults=10&order=date&type=video&key=REDACTED
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching community-search: https://www.googleapis.com/youtube/v3/search?part=snippet&q=HUBMC&type=video&eventType=live&maxResults=25&key=REDACTED
+[YouTube] community-search response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Community streams refreshed (0 found)
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching videos: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&maxResults=10&order=date&type=video&key=REDACTED
+[YouTube] videos response: {"kind":"youtube#searchListResponse","etag":"dbWAyiTl6wEFGq39-Rbu_095NhI","nextPageToken":"CAoQAA","regionCode":"IN","pageInfo":{"totalResults":119,"resultsPerPage":10},"items":[{"kind":"youtube#searchResult","etag":"Oqe1djOlTVtzrUSNmpkuj3gPYrY","id":{"kind":"youtube#video","videoId":"vtpLtosr2es"},"snippet":{"publishedAt":"2025-09-06T10:57:17Z","channelId":"UC0Krc1QNCKs6jovdXe5WICA","title":"Minecrafte HUBMC with be continued by POGOMC .. #minecraft #senpai #psd1 #mrlapis #public #tranding","de
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Fetching livestream: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&eventType=live&type=video&key=REDACTED
+[YouTube] livestream response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Videos & livestream refreshed
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] Fetching community-search: https://www.googleapis.com/youtube/v3/search?part=snippet&q=HUBMC&type=video&eventType=live&maxResults=25&key=REDACTED
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] Fetching videos: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&maxResults=10&order=date&type=video&key=REDACTED
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] Fetching community-search: https://www.googleapis.com/youtube/v3/search?part=snippet&q=HUBMC&type=video&eventType=live&maxResults=25&key=REDACTED
+[YouTube] community-search response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Community streams refreshed (0 found)
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching videos: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&maxResults=10&order=date&type=video&key=REDACTED
+[YouTube] videos response: {"kind":"youtube#searchListResponse","etag":"dbWAyiTl6wEFGq39-Rbu_095NhI","nextPageToken":"CAoQAA","regionCode":"IN","pageInfo":{"totalResults":119,"resultsPerPage":10},"items":[{"kind":"youtube#searchResult","etag":"Oqe1djOlTVtzrUSNmpkuj3gPYrY","id":{"kind":"youtube#video","videoId":"vtpLtosr2es"},"snippet":{"publishedAt":"2025-09-06T10:57:17Z","channelId":"UC0Krc1QNCKs6jovdXe5WICA","title":"Minecrafte HUBMC with be continued by POGOMC .. #minecraft #senpai #psd1 #mrlapis #public #tranding","de
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Fetching livestream: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&eventType=live&type=video&key=REDACTED
+[YouTube] livestream response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Videos & livestream refreshed
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching community-search: https://www.googleapis.com/youtube/v3/search?part=snippet&q=HUBMC&type=video&eventType=live&maxResults=25&key=REDACTED
+[YouTube] community-search response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Community streams refreshed (0 found)
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching videos: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&maxResults=10&order=date&type=video&key=REDACTED
+[YouTube] videos response: {"kind":"youtube#searchListResponse","etag":"dbWAyiTl6wEFGq39-Rbu_095NhI","nextPageToken":"CAoQAA","regionCode":"IN","pageInfo":{"totalResults":119,"resultsPerPage":10},"items":[{"kind":"youtube#searchResult","etag":"Oqe1djOlTVtzrUSNmpkuj3gPYrY","id":{"kind":"youtube#video","videoId":"vtpLtosr2es"},"snippet":{"publishedAt":"2025-09-06T10:57:17Z","channelId":"UC0Krc1QNCKs6jovdXe5WICA","title":"Minecrafte HUBMC with be continued by POGOMC .. #minecraft #senpai #psd1 #mrlapis #public #tranding","de
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Fetching livestream: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&eventType=live&type=video&key=REDACTED
+[YouTube] livestream response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Videos & livestream refreshed
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching community-search: https://www.googleapis.com/youtube/v3/search?part=snippet&q=HUBMC&type=video&eventType=live&maxResults=25&key=REDACTED
+[YouTube] community-search response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Community streams refreshed (0 found)
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+prisma:error 
+Invalid `prisma.serverReview.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching videos: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&maxResults=10&order=date&type=video&key=REDACTED
+[YouTube] videos response: {"kind":"youtube#searchListResponse","etag":"dbWAyiTl6wEFGq39-Rbu_095NhI","nextPageToken":"CAoQAA","regionCode":"IN","pageInfo":{"totalResults":119,"resultsPerPage":10},"items":[{"kind":"youtube#searchResult","etag":"Oqe1djOlTVtzrUSNmpkuj3gPYrY","id":{"kind":"youtube#video","videoId":"vtpLtosr2es"},"snippet":{"publishedAt":"2025-09-06T10:57:17Z","channelId":"UC0Krc1QNCKs6jovdXe5WICA","title":"Minecrafte HUBMC with be continued by POGOMC .. #minecraft #senpai #psd1 #mrlapis #public #tranding","de
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Fetching livestream: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&eventType=live&type=video&key=REDACTED
+[YouTube] livestream response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Videos & livestream refreshed
+prisma:error 
+Invalid `prisma.serverReview.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching community-search: https://www.googleapis.com/youtube/v3/search?part=snippet&q=HUBMC&type=video&eventType=live&maxResults=25&key=REDACTED
+[YouTube] community-search response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Community streams refreshed (0 found)
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+prisma:error 
+Invalid `prisma.serverReview.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching videos: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&maxResults=10&order=date&type=video&key=REDACTED
+[YouTube] videos response: {"kind":"youtube#searchListResponse","etag":"dbWAyiTl6wEFGq39-Rbu_095NhI","nextPageToken":"CAoQAA","regionCode":"IN","pageInfo":{"totalResults":119,"resultsPerPage":10},"items":[{"kind":"youtube#searchResult","etag":"Oqe1djOlTVtzrUSNmpkuj3gPYrY","id":{"kind":"youtube#video","videoId":"vtpLtosr2es"},"snippet":{"publishedAt":"2025-09-06T10:57:17Z","channelId":"UC0Krc1QNCKs6jovdXe5WICA","title":"Minecrafte HUBMC with be continued by POGOMC .. #minecraft #senpai #psd1 #mrlapis #public #tranding","de
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Fetching livestream: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&eventType=live&type=video&key=REDACTED
+[YouTube] livestream response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Videos & livestream refreshed
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] Fetching community-search: https://www.googleapis.com/youtube/v3/search?part=snippet&q=HUBMC&type=video&eventType=live&maxResults=25&key=REDACTED
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching videos: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&maxResults=10&order=date&type=video&key=REDACTED
+[YouTube] videos response: {"kind":"youtube#searchListResponse","etag":"dbWAyiTl6wEFGq39-Rbu_095NhI","nextPageToken":"CAoQAA","regionCode":"IN","pageInfo":{"totalResults":119,"resultsPerPage":10},"items":[{"kind":"youtube#searchResult","etag":"Oqe1djOlTVtzrUSNmpkuj3gPYrY","id":{"kind":"youtube#video","videoId":"vtpLtosr2es"},"snippet":{"publishedAt":"2025-09-06T10:57:17Z","channelId":"UC0Krc1QNCKs6jovdXe5WICA","title":"Minecrafte HUBMC with be continued by POGOMC .. #minecraft #senpai #psd1 #mrlapis #public #tranding","de
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Fetching livestream: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&eventType=live&type=video&key=REDACTED
+[YouTube] livestream response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Videos & livestream refreshed
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching community-search: https://www.googleapis.com/youtube/v3/search?part=snippet&q=HUBMC&type=video&eventType=live&maxResults=25&key=REDACTED
+[YouTube] community-search response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Community streams refreshed (0 found)
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching videos: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&maxResults=10&order=date&type=video&key=REDACTED
+[YouTube] videos response: {"kind":"youtube#searchListResponse","etag":"dbWAyiTl6wEFGq39-Rbu_095NhI","nextPageToken":"CAoQAA","regionCode":"IN","pageInfo":{"totalResults":119,"resultsPerPage":10},"items":[{"kind":"youtube#searchResult","etag":"Oqe1djOlTVtzrUSNmpkuj3gPYrY","id":{"kind":"youtube#video","videoId":"vtpLtosr2es"},"snippet":{"publishedAt":"2025-09-06T10:57:17Z","channelId":"UC0Krc1QNCKs6jovdXe5WICA","title":"Minecrafte HUBMC with be continued by POGOMC .. #minecraft #senpai #psd1 #mrlapis #public #tranding","de
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Fetching livestream: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&eventType=live&type=video&key=REDACTED
+[YouTube] livestream response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Videos & livestream refreshed
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching community-search: https://www.googleapis.com/youtube/v3/search?part=snippet&q=HUBMC&type=video&eventType=live&maxResults=25&key=REDACTED
+[YouTube] community-search response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Community streams refreshed (0 found)
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching videos: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&maxResults=10&order=date&type=video&key=REDACTED
+[YouTube] videos response: {"kind":"youtube#searchListResponse","etag":"dbWAyiTl6wEFGq39-Rbu_095NhI","nextPageToken":"CAoQAA","regionCode":"IN","pageInfo":{"totalResults":119,"resultsPerPage":10},"items":[{"kind":"youtube#searchResult","etag":"Oqe1djOlTVtzrUSNmpkuj3gPYrY","id":{"kind":"youtube#video","videoId":"vtpLtosr2es"},"snippet":{"publishedAt":"2025-09-06T10:57:17Z","channelId":"UC0Krc1QNCKs6jovdXe5WICA","title":"Minecrafte HUBMC with be continued by POGOMC .. #minecraft #senpai #psd1 #mrlapis #public #tranding","de
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Fetching livestream: https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0Krc1QNCKs6jovdXe5WICA&eventType=live&type=video&key=REDACTED
+[YouTube] livestream response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Videos & livestream refreshed
+[YouTube] Fetching status: https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=UC0Krc1QNCKs6jovdXe5WICA&key=REDACTED
+[YouTube] status response: {"kind":"youtube#channelListResponse","etag":"DaFK5n6zDy8HnDPaMv0L5zaxf0w","pageInfo":{"totalResults":1,"resultsPerPage":5},"items":[{"kind":"youtube#channel","etag":"aPUf1GFZwuvbLPfg_LrCTVwkRAM","id":"UC0Krc1QNCKs6jovdXe5WICA","snippet":{"title":"PRABHAT","description":"Welcome to HUBMC Official!\n\nFounded by Prabhat, HUBMC is a Minecraft community focused on fun, competition, and exciting gameplay experiences for all players.\n\n🎮 Explore multiple game modes including Survival, Lifesteal, Pv
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refreshed
+[YouTube] Fetching community-search: https://www.googleapis.com/youtube/v3/search?part=snippet&q=HUBMC&type=video&eventType=live&maxResults=25&key=REDACTED
+[YouTube] community-search response: {"kind":"youtube#searchListResponse","etag":"O3-nwicpOKLtnp0e6OBdRVSWFTA","regionCode":"IN","pageInfo":{"totalResults":0,"resultsPerPage":0},"items":[]}
+prisma:error 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Community streams refreshed (0 found)
+prisma:error 
+Invalid `prisma.serverReview.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[2m10:36:47 pm[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css?direct, /src/routes/payment-success.tsx[22m
+[2m10:36:47 pm[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2msrc/routes/payment-success.tsx[22m
+[vite] program reload
+[ENV] GOOGLE_CLIENT_ID is configured
+[ENV] Super admin credentials are configured
+[2m10:36:55 pm[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css?direct, /src/routes/payment-failed.tsx[22m
+[2m10:36:55 pm[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2msrc/routes/payment-failed.tsx[22m
+[2m10:42:34 pm[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/routeTree.gen.ts[22m
+[2m10:42:34 pm[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2msrc/routeTree.gen.ts[22m
+[ENV] GOOGLE_CLIENT_ID is configured
+[ENV] Super admin credentials are configured
+[2m10:42:41 pm[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css?direct, /src/components/commerce/HubMCNavbar.tsx[22m
+[2m10:42:41 pm[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2msrc/components/commerce/HubMCNavbar.tsx[22m
+[vite] program reload
+[ENV] GOOGLE_CLIENT_ID is configured
+[ENV] Super admin credentials are configured
+[2m10:42:49 pm[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css?direct, /src/components/commerce/HubMCNavbar.tsx[22m
+[2m10:42:49 pm[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2msrc/components/commerce/HubMCNavbar.tsx[22m
+[2m10:42:56 pm[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css?direct, /src/components/commerce/HubMCNavbar.tsx[22m
+[2m10:42:56 pm[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2msrc/components/commerce/HubMCNavbar.tsx[22m

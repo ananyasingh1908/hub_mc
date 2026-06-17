@@ -103,7 +103,16 @@ export function OrderSummaryCard({
       ) : null}
 
       <div className="mt-6 flex gap-3">
-        {ctaHref && canProceed ? (
+        {ctaHref && ctaHref.startsWith("http") ? (
+          <a
+            href={ctaHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex flex-1 items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-300 bg-[var(--hub-orange)] text-black hover:-translate-y-0.5 hover:bg-[#ff9a46]"
+          >
+            {ctaLabel}
+          </a>
+        ) : ctaHref && canProceed ? (
           <Link
             to={ctaHref}
             className={`inline-flex flex-1 items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-300 ${

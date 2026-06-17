@@ -37,7 +37,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const handleLogout = async () => {
     await beginAdminSignOut();
     await invalidate();
-    await navigate({ to: "/login" });
+    await navigate({ to: "/admin-login" });
   };
 
   if (isPending || !session?.authenticated) {

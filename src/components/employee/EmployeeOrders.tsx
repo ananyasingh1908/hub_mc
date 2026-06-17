@@ -23,7 +23,7 @@ export default function EmployeeOrders() {
       if (search) params.set("search", search);
       if (statusFilter) params.set("status", statusFilter);
       if (deliveryFilter) params.set("delivery", deliveryFilter);
-      const res = await fetch(`/api/admin/orders?${params}`, { credentials: "include" });
+      const res = await fetch(`/api/employee/orders?${params}`, { credentials: "include" });
       const data = await res.json();
       setOrders(data.orders ?? []);
       setTotalPages(data.totalPages ?? 1);
@@ -35,7 +35,7 @@ export default function EmployeeOrders() {
 
   const updateStatus = async (id: string, deliveryStatus: string) => {
     try {
-      const res = await fetch("/api/admin/orders/update", {
+      const res = await fetch("/api/employee/orders/update", {
         method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, deliveryStatus }),
@@ -50,7 +50,7 @@ export default function EmployeeOrders() {
   const handleRefund = async (id: string) => {
     const reason = prompt("Refund reason (optional):");
     try {
-      const res = await fetch("/api/admin/orders/refund", {
+      const res = await fetch("/api/employee/orders/refund", {
         method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderId: id, reason: reason || undefined }),

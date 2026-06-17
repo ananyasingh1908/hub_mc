@@ -54,10 +54,29 @@ async function logActivity(employeeId: string | null, action: string, entity: st
 
 // ─── PRODUCTS ────────────────────────────────────────────────
 
-export async function handleAdminGetProducts() {
+export async function handleAdminGetProducts(request: Request) {
+  const url = new URL(request.url);
+  const page = parseInt(url.searchParams.get("page") ?? "1");
+  const limit = 20;
+  const skip = (page - 1) * limit;
+
   const prisma = await getPrismaClient();
-  const products = await prisma.product.findMany({ orderBy: { createdAt: "desc" } });
-  return json({ products: products.map((p) => ({ ...p, price: Number(p.price) })) });
+  const [products, total] = await Promise.all([
+    prisma.product.findMany({
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+    }),
+    prisma.product.count(),
+  ]);
+
+  return json({
+    products: products.map((p) => {
+      const meta = p.metadata as Record<string, any> | null;
+      return { ...p, price: Number(p.price), badge: meta?.badge ?? "" };
+    }),
+    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+  });
 }
 
 export async function handleAdminCreateProduct(request: Request) {
@@ -79,6 +98,7 @@ export async function handleAdminCreateProduct(request: Request) {
   const name = typeof body.name === "string" ? body.name.trim() : "";
   const description = typeof body.description === "string" ? body.description.trim() : "";
   const imageUrl = typeof body.imageUrl === "string" ? body.imageUrl.trim() : "";
+  const category = typeof body.category === "string" ? body.category.trim() : "Ranks";
   const priceRaw = body.price;
 
   if (!slug) { devlog("[AdminProducts] Missing slug"); return error("Slug is required", 400); }
@@ -102,7 +122,7 @@ export async function handleAdminCreateProduct(request: Request) {
     devlog("[AdminProducts] Prisma client acquired, creating product...");
     const product = await prisma.product.create({
       data: {
-        slug, name, description, imageUrl,
+        slug, name, description, imageUrl, category,
         price,
         metadata: body.rewards ? { rewards: body.rewards, badge: body.badge ?? "" } : {},
       },
@@ -130,7 +150,7 @@ export async function handleAdminUpdateProduct(request: Request) {
   try { body = await request.json(); }
   catch { return error("Invalid request body", 400); }
 
-  const { id, slug, name, description, imageUrl, price, active, badge } = body;
+  const { id, slug, name, description, imageUrl, category, price, active, badge } = body;
   if (!id) return error("id required", 400);
   devlog("[AdminProducts] Updating product:", id);
 
@@ -139,13 +159,19 @@ export async function handleAdminUpdateProduct(request: Request) {
   if (name !== undefined) data.name = name;
   if (description !== undefined) data.description = description;
   if (imageUrl !== undefined) data.imageUrl = imageUrl;
+  if (category !== undefined) data.category = category;
   if (price !== undefined) {
     const p = Number(price);
     if (isNaN(p) || p <= 0) return error("Invalid price", 400);
     data.price = p;
   }
   if (active !== undefined) data.active = active;
-  if (badge !== undefined) data.metadata = { badge };
+  if (badge !== undefined) {
+    const prisma = await getPrismaClient();
+    const existing = await prisma.product.findUnique({ where: { id }, select: { metadata: true } });
+    const existingMeta = (existing?.metadata as Record<string, unknown> | null) ?? {};
+    data.metadata = { ...existingMeta, badge };
+  }
 
   try {
     const prisma = await getPrismaClient();
@@ -347,14 +373,24 @@ export async function handleAdminGetCustomers(request: Request) {
   const authErr = await requireRole(request, ["SUPER_ADMIN"]);
   if (authErr) return authErr;
 
+  const url = new URL(request.url);
+  const page = parseInt(url.searchParams.get("page") ?? "1");
+  const limit = 20;
+  const skip = (page - 1) * limit;
+
   const prisma = await getPrismaClient();
-  const customers = await prisma.customer.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      orders: { select: { id: true, total: true, status: true, createdAt: true } },
-      user: { select: { email: true } },
-    },
-  });
+  const [customers, total] = await Promise.all([
+    prisma.customer.findMany({
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+      include: {
+        orders: { select: { id: true, total: true, status: true, createdAt: true } },
+        user: { select: { email: true } },
+      },
+    }),
+    prisma.customer.count(),
+  ]);
 
   return json({
     customers: customers.map((c) => ({
@@ -367,6 +403,7 @@ export async function handleAdminGetCustomers(request: Request) {
         o.status === "PAID" || o.status === "FULFILLED").length,
       orders: c.orders ?? [],
     })),
+    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   });
 }
 

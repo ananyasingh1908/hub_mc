@@ -5,7 +5,7 @@ import {
   Calendar, Clock, Users, Award, Trophy, Sword, Gamepad2,
   ChevronRight, LoaderCircle, Server, ExternalLink,
 } from "lucide-react";
-import { StorePageLayout } from "@/components/commerce/StorePageLayout";
+import { devlog, devwarn } from "@/lib/dev-log";
 
 type TournamentSummary = {
   id: string;
@@ -29,16 +29,28 @@ export default function TournamentsPage() {
   const [live, setLive] = useState<TournamentSummary[]>([]);
   const [past, setPast] = useState<TournamentSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    devlog("[TournamentsPage] Fetching tournaments...");
     fetch("/api/tournaments/public")
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error(`API error: ${r.status}`);
+        return r.json();
+      })
       .then((d) => {
+        const liveCount = (d.live || []).length;
+        const upcomingCount = (d.upcoming || []).length;
+        const pastCount = (d.past || []).length;
+        devlog("[TournamentsPage] Loaded:", { live: liveCount, upcoming: upcomingCount, past: pastCount });
         setUpcoming(d.upcoming ?? []);
         setLive(d.live ?? []);
         setPast(d.past ?? []);
       })
-      .catch(() => {})
+      .catch((err) => {
+        devwarn("[TournamentsPage] Failed to load tournaments:", err);
+        setError("Failed to load tournaments. Please try again later.");
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -65,6 +77,7 @@ export default function TournamentsPage() {
               <Link
                 to="/tournaments/$id"
                 params={{ id: t.id }}
+                onClick={() => devlog("[TournamentsPage] Navigating to:", `/tournaments/${t.id}`, t.title)}
                 className="group block overflow-hidden rounded-2xl border border-white/10 bg-[rgba(11,11,11,0.92)] transition-all duration-300 hover:border-[var(--hub-blue)] hover:shadow-[0_0_24px_rgba(62,162,255,0.12)]"
               >
                 {t.bannerUrl && (
@@ -139,51 +152,55 @@ export default function TournamentsPage() {
   );
 
   return (
-    <StorePageLayout>
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="flex items-center gap-4 mb-2">
-            <Trophy className="h-8 w-8 text-[var(--hub-orange)]" />
-            <h1 className="text-4xl font-black text-white">Tournaments</h1>
-          </div>
-          <p className="mt-2 text-white/56 max-w-2xl">
-            Compete against the best players in HUBMC. Register for upcoming tournaments, check live events, and view past results.
-          </p>
-        </motion.div>
+    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="flex items-center gap-4 mb-2">
+          <Trophy className="h-8 w-8 text-[var(--hub-orange)]" />
+          <h1 className="text-4xl font-black text-white">Tournaments</h1>
+        </div>
+        <p className="mt-2 text-white/56 max-w-2xl">
+          Compete against the best players in HUBMC. Register for upcoming tournaments, check live events, and view past results.
+        </p>
+      </motion.div>
 
-        {loading ? (
-          <div className="mt-12 flex items-center justify-center py-20">
-            <LoaderCircle className="h-8 w-8 animate-spin text-[var(--hub-blue)]" />
-          </div>
-        ) : (
-          <div className="mt-10">
-            {live.length > 0 && renderSection(
-              "Live Now",
-              <span className="relative flex h-3 w-3">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-                <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500" />
-              </span>,
-              live,
-              "No live tournaments right now.",
-              "border-green-500"
-            )}
-            {renderSection(
-              "Upcoming",
-              <Calendar className="h-5 w-5 text-[var(--hub-blue)]" />,
-              upcoming,
-              "No upcoming tournaments. Check back soon!",
-              "border-[var(--hub-blue)]"
-            )}
-            {renderSection(
-              "Past Tournaments",
-              <Clock className="h-5 w-5 text-white/40" />,
-              past,
-              "No past tournaments yet.",
-              "border-white/20"
-            )}
-          </div>
-        )}
-      </div>
-    </StorePageLayout>
+      {error && (
+        <div className="mt-8 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-center text-sm text-red-400">
+          {error}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="mt-12 flex items-center justify-center py-20">
+          <LoaderCircle className="h-8 w-8 animate-spin text-[var(--hub-blue)]" />
+        </div>
+      ) : !error ? (
+        <div className="mt-10">
+          {live.length > 0 && renderSection(
+            "Live Now",
+            <span className="relative flex h-3 w-3">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+              <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500" />
+            </span>,
+            live,
+            "No live tournaments right now.",
+            "border-green-500"
+          )}
+          {renderSection(
+            "Upcoming",
+            <Calendar className="h-5 w-5 text-[var(--hub-blue)]" />,
+            upcoming,
+            "No upcoming tournaments. Check back soon!",
+            "border-[var(--hub-blue)]"
+          )}
+          {renderSection(
+            "Past Tournaments",
+            <Clock className="h-5 w-5 text-white/40" />,
+            past,
+            "No past tournaments yet.",
+            "border-white/20"
+          )}
+        </div>
+      ) : null}
+    </div>
   );
 }

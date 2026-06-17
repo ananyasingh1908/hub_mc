@@ -1,0 +1,1687 @@
+[Tournaments] autoUpdateStatuses failed: PrismaClientInitializationError: 
+Invalid `prisma.tournament.updateMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async autoUpdateStatuses (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:58:5)
+    at async handleGetPublicTournaments (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:71:3)
+    at async Object.fetch (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:245:77)
+    at async file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/@tanstack/start-plugin-core/dist/esm/vite/dev-server-plugin/plugin.js:71:36 {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+PrismaClientInitializationError: 
+Invalid `prisma.tournament.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async handleGetPublicTournaments (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:73:23)
+    at async Object.fetch (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:245:77)
+    at async file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/@tanstack/start-plugin-core/dist/esm/vite/dev-server-plugin/plugin.js:71:36 {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB load error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async loadFromDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:51:19)
+    at async getCachedData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:82:14)
+    at async getStatusData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:285:18)
+    at async handleYouTubeStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:24:20)
+    at async Object.fetch (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:224:88)
+    at async file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/@tanstack/start-plugin-core/dist/esm/vite/dev-server-plugin/plugin.js:71:36 {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB load error (videos): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async loadFromDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:51:19)
+    at async getCachedData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:82:14)
+    at async getVideosData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:289:18)
+    at async handleYouTubeVideos (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:34:20)
+    at async Object.fetch (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:225:88)
+    at async file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/@tanstack/start-plugin-core/dist/esm/vite/dev-server-plugin/plugin.js:71:36 {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB load error (livestream): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async loadFromDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:51:19)
+    at async getCachedData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:82:14)
+    at async getLivestreamData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:293:18)
+    at async handleYouTubeLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:44:20)
+    at async Object.fetch (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:226:92)
+    at async file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/@tanstack/start-plugin-core/dist/esm/vite/dev-server-plugin/plugin.js:71:36 {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB load error (community-streams): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async loadFromDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:51:19)
+    at async getCachedData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:82:14)
+    at async getCommunityStreamsData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:297:18)
+    at async handleYouTubeCommunityStreams (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:54:20)
+    at async Object.fetch (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:227:99)
+    at async file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/@tanstack/start-plugin-core/dist/esm/vite/dev-server-plugin/plugin.js:71:36 {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[ServerReviews] Failed to fetch reviews: 
+Invalid `prisma.serverReview.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+PrismaClientInitializationError: 
+Invalid `prisma.product.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async GET (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:23:24)
+    at async Object.fetch (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:292:16)
+    at async file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/@tanstack/start-plugin-core/dist/esm/vite/dev-server-plugin/plugin.js:71:36 {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (videos): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:131:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (livestream): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:163:7)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[ServerReviews] Failed to fetch reviews: 
+Invalid `prisma.serverReview.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTubeCache] DB load error (community-streams): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async loadFromDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:51:19)
+    at async getCachedData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:82:14)
+    at async getCommunityStreamsData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:297:18)
+    at async handleYouTubeCommunityStreams (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:54:20)
+    at async Object.fetch (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:227:99)
+    at async file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/@tanstack/start-plugin-core/dist/esm/vite/dev-server-plugin/plugin.js:71:36 {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[ServerReviews] Failed to fetch reviews: 
+Invalid `prisma.serverReview.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTubeCache] DB load error (community-streams): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async loadFromDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:51:19)
+    at async getCachedData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:82:14)
+    at async getCommunityStreamsData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:297:18)
+    at async handleYouTubeCommunityStreams (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:54:20)
+    at async Object.fetch (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:227:99)
+    at async file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/@tanstack/start-plugin-core/dist/esm/vite/dev-server-plugin/plugin.js:71:36 {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (community-streams): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshCommunityStreams (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:219:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:270:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTube] Status refresh failed: fetch failed
+[YouTube] Videos/livestream refresh failed: fetch failed
+[ServerReviews] Failed to fetch reviews: 
+Invalid `prisma.serverReview.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTube] Status refresh failed: The operation was aborted due to timeout
+[Discord] Fetch failed — serving stale cache (age 53292907ms): The operation was aborted due to timeout
+[YouTubeCache] DB save error (community-streams): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshCommunityStreams (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:219:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:270:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (videos): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:131:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (livestream): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:163:7)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (community-streams): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshCommunityStreams (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:219:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:270:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (videos): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:131:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (livestream): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:163:7)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (community-streams): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshCommunityStreams (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:219:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:270:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (videos): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:131:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (livestream): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:163:7)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (community-streams): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshCommunityStreams (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:219:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:270:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (videos): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:131:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (livestream): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:163:7)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (community-streams): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshCommunityStreams (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:219:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:270:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (videos): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:131:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (livestream): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:163:7)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[ServerReviews] Failed to fetch reviews: 
+Invalid `prisma.serverReview.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTubeCache] DB load error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async loadFromDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:51:19)
+    at async getCachedData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:82:14)
+    at async getStatusData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:285:18)
+    at async handleYouTubeStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:24:20)
+    at async Object.fetch (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:224:88)
+    at async file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/@tanstack/start-plugin-core/dist/esm/vite/dev-server-plugin/plugin.js:71:36 {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB load error (videos): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async loadFromDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:51:19)
+    at async getCachedData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:82:14)
+    at async getVideosData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:289:18)
+    at async handleYouTubeVideos (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:34:20)
+    at async Object.fetch (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:225:88)
+    at async file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/@tanstack/start-plugin-core/dist/esm/vite/dev-server-plugin/plugin.js:71:36 {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB load error (livestream): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async loadFromDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:51:19)
+    at async getCachedData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:82:14)
+    at async getLivestreamData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:293:18)
+    at async handleYouTubeLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:44:20)
+    at async Object.fetch (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:226:92)
+    at async file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/@tanstack/start-plugin-core/dist/esm/vite/dev-server-plugin/plugin.js:71:36 {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB load error (community-streams): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async loadFromDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:51:19)
+    at async getCachedData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:82:14)
+    at async getCommunityStreamsData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:297:18)
+    at async handleYouTubeCommunityStreams (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:54:20)
+    at async Object.fetch (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:227:99)
+    at async file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/@tanstack/start-plugin-core/dist/esm/vite/dev-server-plugin/plugin.js:71:36 {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[ServerReviews] Failed to fetch reviews: 
+Invalid `prisma.serverReview.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (videos): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:131:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (livestream): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:163:7)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB load error (community-streams): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.findUnique()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async loadFromDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:51:19)
+    at async getCachedData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:82:14)
+    at async getCommunityStreamsData (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:297:18)
+    at async handleYouTubeCommunityStreams (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:54:20)
+    at async Object.fetch (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:227:99)
+    at async file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/@tanstack/start-plugin-core/dist/esm/vite/dev-server-plugin/plugin.js:71:36 {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (community-streams): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshCommunityStreams (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:219:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:270:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTube] Status refresh failed: The operation was aborted due to timeout
+[YouTube] Videos/livestream refresh failed: The operation was aborted due to timeout
+[YouTube] Status refresh failed: fetch failed
+[YouTube] Community streams refresh failed: fetch failed
+[YouTube] Status refresh failed: The operation was aborted due to timeout
+[YouTube] Videos/livestream refresh failed: The operation was aborted due to timeout
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (community-streams): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshCommunityStreams (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:219:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:270:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (videos): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:131:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (livestream): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:163:7)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTube] Status refresh failed: The operation was aborted due to timeout
+[YouTube] Community streams refresh failed: The operation was aborted due to timeout
+[YouTube] Status refresh failed: The operation was aborted due to timeout
+[YouTube] Videos/livestream refresh failed: The operation was aborted due to timeout
+[YouTube] Status refresh failed: The operation was aborted due to timeout
+[YouTubeCache] DB save error (community-streams): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshCommunityStreams (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:219:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:270:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (videos): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:131:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (livestream): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:163:7)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (community-streams): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshCommunityStreams (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:219:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:270:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (videos): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:131:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (livestream): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:163:7)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (community-streams): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshCommunityStreams (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:219:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:270:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[ServerReviews] Failed to fetch reviews: 
+Invalid `prisma.serverReview.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (videos): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:131:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (livestream): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:163:7)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[ServerReviews] Failed to fetch reviews: 
+Invalid `prisma.serverReview.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (community-streams): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshCommunityStreams (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:219:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:270:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[ServerReviews] Failed to fetch reviews: 
+Invalid `prisma.serverReview.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (videos): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:131:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (livestream): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:163:7)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTube] Status refresh failed: The operation was aborted due to timeout
+[YouTube] Community streams refresh failed: The operation was aborted due to timeout
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (videos): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:131:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (livestream): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:163:7)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (community-streams): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshCommunityStreams (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:219:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:270:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (videos): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:131:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (livestream): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:163:7)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (community-streams): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshCommunityStreams (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:219:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:270:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (videos): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:131:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (livestream): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshVideosAndLivestream (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:163:7)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:264:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (status): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshStatus (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:112:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:258:7) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[YouTubeCache] DB save error (community-streams): PrismaClientInitializationError: 
+Invalid `prisma.youTubeCache.upsert()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.
+    at ei.handleRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:242:13)
+    at ei.handleAndLogRequestError (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:174:12)
+    at ei.request (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\RequestHandler.ts:143:12)
+    at async a (C:\Users\ANANYA SINGH\HUB_MC\hub_mc\node_modules\@prisma\client\src\runtime\getPrismaClient.ts:833:24)
+    at async saveToDB (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:62:5)
+    at async refreshCommunityStreams (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:219:3)
+    at async doFullRefresh (eval at runInlinedModule (file:///C:/Users/ANANYA%20SINGH/HUB_MC/hub_mc/node_modules/vite/dist/node/module-runner.js:913:9), <anonymous>:270:9) {
+  clientVersion: '6.16.0',
+  errorCode: undefined,
+  retryable: undefined
+}
+[ServerReviews] Failed to fetch reviews: 
+Invalid `prisma.serverReview.findMany()` invocation:
+
+
+Can't reach database server at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`
+
+Please make sure your database server is running at `mysql-1b65daf9-ananyasingh561329-8639.a.aivencloud.com:21030`.

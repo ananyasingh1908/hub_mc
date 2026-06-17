@@ -7,6 +7,7 @@ export type Product = {
   description: string;
   price: number;
   image: string;
+  category: string;
   accent: ProductAccent;
   badge: string;
   imagePosition?: string;
@@ -39,14 +40,6 @@ export type UserAgreements = {
 export type PaymentMethod = "card" | "upi" | "netbanking" | "wallet";
 
 export type DeliveryStatusType = "PENDING" | "PROCESSING" | "DELIVERED" | "FAILED" | "AWAITING_SERVER";
-
-export type CheckoutFormValues = {
-  minecraftUsername: string;
-  minecraftUuid: string;
-  email: string;
-  country: string;
-  paymentMethod: PaymentMethod;
-};
 
 export type OrderSummary = {
   itemCount: number;

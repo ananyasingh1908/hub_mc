@@ -9,14 +9,23 @@ export default function AdminCustomers() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
-  useEffect(() => {
-    fetch("/api/admin/customers", { credentials: "include" })
-      .then((r) => r.json())
-      .then((d) => setCustomers(d.customers ?? []))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
+  const fetchCustomers = async (p: number) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/admin/customers?page=${p}&limit=20`, { credentials: "include" });
+      const d = await res.json();
+      setCustomers(d.customers ?? []);
+      setTotalPages(d.pagination?.totalPages ?? 1);
+      setTotal(d.pagination?.total ?? 0);
+    } catch {}
+    finally { setLoading(false); }
+  };
+
+  useEffect(() => { fetchCustomers(page); }, [page]);
 
   const filtered = customers.filter((c) =>
     !search || c.minecraftUsername?.toLowerCase().includes(search.toLowerCase()) ||
@@ -91,6 +100,13 @@ export default function AdminCustomers() {
               )}
             </motion.div>
           ))}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-3 pt-4">
+              <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/60 disabled:opacity-30 hover:bg-white/[0.05]">Previous</button>
+              <span className="text-sm text-white/40">Page {page} of {totalPages} ({total} total)</span>
+              <button disabled={page >= totalPages} onClick={() => setPage(page + 1)} className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/60 disabled:opacity-30 hover:bg-white/[0.05]">Next</button>
+            </div>
+          )}
         </div>
       )}
     </motion.div>

@@ -120,13 +120,26 @@ export async function handleDeleteAnnouncement(request: Request) {
 
 // ─── SITE NOTIFICATIONS ───────────────────────────────────────
 
-export async function handleGetSiteNotifications() {
+export async function handleGetSiteNotifications(request: Request) {
+  const url = new URL(request.url);
+  const page = parseInt(url.searchParams.get("page") ?? "1");
+  const limit = 20;
+  const skip = (page - 1) * limit;
+
   const prisma = await getPrismaClient();
-  const notifications = await prisma.siteNotification.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 50,
+  const [notifications, total] = await Promise.all([
+    prisma.siteNotification.findMany({
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+    }),
+    prisma.siteNotification.count(),
+  ]);
+
+  return json({
+    notifications,
+    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   });
-  return json({ notifications });
 }
 
 export async function handleGetActiveSiteNotifications() {
