@@ -350,8 +350,6 @@ async function tryRecoverQuota(): Promise<boolean> {
 
 // ─── Refresh Orchestrator ───────────────────────────────────
 
-let refreshCycle = 0;
-
 async function doFullRefresh(): Promise<void> {
   if (_refreshInFlight) return;
   _refreshInFlight = true;
@@ -370,26 +368,22 @@ async function doFullRefresh(): Promise<void> {
       }
     }
 
-    refreshCycle++;
-
     try {
       await refreshStatus();
     } catch (err) {
       console.error("[YouTube] Status refresh failed:", err instanceof Error ? err.message : err);
     }
 
-    if (refreshCycle % 2 === 1) {
-      try {
-        await refreshVideosAndLivestream();
-      } catch (err) {
-        console.error("[YouTube] Videos/livestream refresh failed:", err instanceof Error ? err.message : err);
-      }
-    } else {
-      try {
-        await refreshCommunityStreams();
-      } catch (err) {
-        console.error("[YouTube] Community streams refresh failed:", err instanceof Error ? err.message : err);
-      }
+    try {
+      await refreshVideosAndLivestream();
+    } catch (err) {
+      console.error("[YouTube] Videos/livestream refresh failed:", err instanceof Error ? err.message : err);
+    }
+
+    try {
+      await refreshCommunityStreams();
+    } catch (err) {
+      console.error("[YouTube] Community streams refresh failed:", err instanceof Error ? err.message : err);
     }
   } finally {
     _refreshInFlight = false;

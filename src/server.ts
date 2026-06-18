@@ -13,6 +13,9 @@ if (!process.env.SUPER_ADMIN_PASSWORD) console.warn("[ENV] SUPER_ADMIN_PASSWORD 
 if (process.env.GOOGLE_CLIENT_ID) devlog("[ENV] GOOGLE_CLIENT_ID is configured");
 if (process.env.SUPER_ADMIN_ID && process.env.SUPER_ADMIN_PASSWORD) devlog("[ENV] Super admin credentials are configured");
 
+// Pre-warm YouTube cache from DB on startup so first request serves data immediately
+initializeCache();
+
 import {
   getClientVisibleAuthState,
   handleLoginRequest,
@@ -110,7 +113,7 @@ import {
   handleEmployeeDashboardStats,
 } from "@/lib/employee/employee-handlers";
 import { handleYouTubeStatus, handleYouTubeVideos, handleYouTubeLivestream, handleYouTubeCommunityStreams, handleAdminApproveStream, handleAdminRemoveStream, handleAdminBlacklistChannel, handleAdminGetFeaturedStreams } from "@/lib/youtube/youtube-handler";
-import { scheduleRefresh } from "@/lib/youtube/youtube-cache";
+import { scheduleRefresh, initializeCache } from "@/lib/youtube/youtube-cache";
 import { handleDiscordStatus, handleDiscordEvents } from "@/lib/discord/discord-handler";
 import { handleGetNotifications, handleUnreadCount, handleMarkRead, handleMarkAllRead } from "@/lib/notifications/notification-handler";
 import { handleGetProfile } from "@/lib/profile/profile-handlers";

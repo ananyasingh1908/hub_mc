@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Star, Send, LoaderCircle, AlertCircle, CheckCircle,
@@ -93,6 +93,7 @@ export default function LivestreamPage() {
   const [ytVideos, setYtVideos] = useState<YouTubeVideo[]>([]);
   const [ytLive, setYtLive] = useState<YouTubeLive | null>(null);
   const [ytLoading, setYtLoading] = useState(true);
+  const ytRetryCountRef = useRef(0);
 
   const [communityStreams, setCommunityStreams] = useState<CommunityStream[]>([]);
   const [communityLoading, setCommunityLoading] = useState(true);
@@ -158,6 +159,18 @@ export default function LivestreamPage() {
   };
 
   useEffect(() => { fetchYouTube(); fetchCommunityStreams(); fetchDiscord(); fetchReviews(); }, []);
+
+  // Retry YouTube fetch if first attempt returned empty (cache was cold on server)
+  useEffect(() => {
+    if (ytLoading) return;
+    if (ytConnected) return;
+    const retryCount = ytRetryCountRef.current;
+    if (retryCount >= 3) return;
+    ytRetryCountRef.current++;
+    const delay = 1500 * (retryCount + 1);
+    const timer = setTimeout(() => { fetchYouTube(); fetchCommunityStreams(); }, delay);
+    return () => clearTimeout(timer);
+  }, [ytLoading, ytConnected]);
 
   useEffect(() => {
     // Server cache refreshes every 10-15 min, so no need for aggressive polling
