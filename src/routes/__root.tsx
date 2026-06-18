@@ -1,13 +1,19 @@
+import { useEffect, useRef } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
+import { SiteFooter } from "@/components/SiteFooter";
+import { organizationSchema, websiteSchema } from "@/lib/json-ld";
+import { initAnalytics, trackPageView } from "@/lib/analytics";
+import { initSentry } from "@/lib/sentry";
 
 import appCss from "../styles.css?url";
 import logoPng from "@/assets/hubmc-logo.png";
@@ -70,7 +76,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-const siteUrl = process.env.BASE_URL || "https://hubmc.net";
+const siteUrl = process.env.BASE_URL || "https://hubmc.in";
 const siteName = "HUBMC";
 const ogImage = heroPng;
 
@@ -82,9 +88,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "HUBMC — The World You Love" },
       { name: "description", content: "Premium Minecraft server with tournaments, livestreams, store, community and events." },
       { name: "author", content: "HUBMC" },
-      { name: "keywords", content: "Minecraft, HUBMC, Minecraft server, tournaments, PvP, community" },
+      { name: "keywords", content: "Minecraft, HUBMC, Minecraft server, tournaments, PvP, community, gaming" },
       { name: "theme-color", content: "#050505" },
       { name: "application-name", content: siteName },
+      { name: "referrer", content: "origin-when-cross-origin" },
       { property: "og:title", content: "HUBMC — The World You Love" },
       { property: "og:description", content: "Premium Minecraft server with tournaments, livestreams, store, community and events." },
       { property: "og:image", content: ogImage },
@@ -116,10 +123,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    initSentry();
+    initAnalytics();
+  }, []);
+
   return (
     <html lang="en" className="dark">
       <head>
         <HeadContent />
+        <script type="application/ld+json" suppressHydrationWarning dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema()) }} />
+        <script type="application/ld+json" suppressHydrationWarning dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema()) }} />
       </head>
       <body>
         {children}
@@ -131,11 +145,26 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const location = useRouterState({ select: (s) => s.location });
+  const prevPath = useRef(location.pathname);
+
+  useEffect(() => {
+    const path = location.pathname;
+    const search = location.searchStr ? `?${location.searchStr}` : "";
+    const fullPath = `${path}${search}`;
+
+    if (prevPath.current !== path) {
+      prevPath.current = path;
+      trackPageView(fullPath, document.title);
+    }
+  }, [location.pathname, location.searchStr]);
 
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
+      <SiteFooter />
       <Toaster position="top-right" />
     </QueryClientProvider>
   );
 }
+

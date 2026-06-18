@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Star, Send, LoaderCircle, AlertCircle, CheckCircle,
@@ -8,6 +8,8 @@ import {
 import { toast } from "sonner";
 import { StorePageLayout } from "@/components/commerce/StorePageLayout";
 import { useAuthSession } from "@/lib/auth/client";
+import { JsonLd } from "@/components/JsonLd";
+import { reviewAggregateSchema, breadcrumbSchema } from "@/lib/json-ld";
 
 type Review = {
   id: string; minecraftUsername: string; avatarUrl: string | null;
@@ -190,8 +192,23 @@ export default function LivestreamPage() {
   const dsConnected = discordStatus?.connected;
   const discordInvite = discordStatus?.invite;
 
+  const aggregateReviewSchema = useMemo(() => totalReviews > 0 ? reviewAggregateSchema({
+    ratingValue: overallRating,
+    reviewCount: totalReviews,
+    itemName: "HUBMC Minecraft Server",
+    itemDescription: "HUBMC is an Indian Minecraft server community featuring SMP survival, kit PvP, parkour, minigames, tournaments, and a player-driven economy.",
+    itemUrl: "/livestream",
+  }) : null, [overallRating, totalReviews]);
+
+  const livestreamBreadcrumbItems = [
+    { name: "Home", url: "/" },
+    { name: "Livestream & Reviews", url: "/livestream" },
+  ];
+
   return (
     <StorePageLayout>
+      {aggregateReviewSchema && <JsonLd data={aggregateReviewSchema} />}
+      <JsonLd data={breadcrumbSchema(livestreamBreadcrumbItems)} />
       <section className="relative min-h-screen overflow-hidden px-6 pt-32 pb-20">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-1/4 top-0 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(62,162,255,0.15),transparent_68%)] blur-3xl" />

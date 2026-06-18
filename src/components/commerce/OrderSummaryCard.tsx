@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { Link } from "@tanstack/react-router";
 import { AlertTriangle, TicketPercent, Trash2 } from "lucide-react";
 import { calculateOrderSummary, formatCurrency } from "@/lib/commerce/pricing";
 import { useCartStore } from "@/store/cart-store";
 import type { UserAgreements } from "@/lib/commerce/types";
+import { trackEvent, AnalyticsEvents } from "@/lib/analytics";
 
 type OrderSummaryCardProps = {
   heading?: string;
@@ -39,6 +40,15 @@ export function OrderSummaryCard({
   );
 
   const canProceed = !ctaDisabled && summary.itemCount > 0;
+
+  const handleExternalCta = useCallback(() => {
+    if (ctaHref && ctaHref.includes("discord")) {
+      trackEvent(AnalyticsEvents.DISCORD_CHECKOUT_CLICK, {
+        item_count: items.length,
+        subtotal: summary.subtotal,
+      });
+    }
+  }, [ctaHref, items.length, summary.subtotal]);
   const agreementWarning =
     !agreementsComplete(agreements) && ctaHref === "/checkout"
       ? "Complete the user agreement before continuing to checkout."
@@ -108,6 +118,7 @@ export function OrderSummaryCard({
             href={ctaHref}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={handleExternalCta}
             className="inline-flex flex-1 items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-300 bg-[var(--hub-orange)] text-black hover:-translate-y-0.5 hover:bg-[#ff9a46]"
           >
             {ctaLabel}

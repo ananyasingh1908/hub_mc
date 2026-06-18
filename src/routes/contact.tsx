@@ -1,20 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router";
-import ContactPage from "@/components/contact/ContactPage";
+import { createFileRoute, lazyRouteComponent as lazy } from "@tanstack/react-router";
+import { seoHead } from "@/lib/seo";
+
+const ContactPage = lazy(() => import("@/components/contact/ContactPage"));
 
 export const Route = createFileRoute("/contact")({
   component: ContactRoute,
-  head: () => ({
-    meta: [
-      { title: "Contact HUBMC – Support & Help Center" },
-      {
-        name: "description",
-        content:
-          "Get in touch with the HUBMC team. Contact support, ask questions, or browse our FAQ for Minecraft server help.",
-      },
-    ],
+  head: () => seoHead({
+    title: "Contact Us — HUBMC",
+    description: "Get in touch with the HUBMC team. We're here to help with any questions about our server, store, or tournaments.",
+    path: "/contact",
   }),
 });
 
 function ContactRoute() {
   return <ContactPage />;
 }
+

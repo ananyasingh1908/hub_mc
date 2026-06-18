@@ -1,4 +1,5 @@
 import { getPrismaClient } from "@/lib/db/prisma";
+import { devlog } from "@/lib/dev-log";
 
 function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
@@ -33,7 +34,7 @@ export async function handleGetNotifications(request: Request): Promise<Response
       })),
     });
   } catch (err) {
-    console.log("[Notifications] Failed to fetch:", err);
+    devlog("[Notifications] Failed to fetch:", err);
     return json({ notifications: [] }, 200);
   }
 }

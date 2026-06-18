@@ -64,7 +64,7 @@ function EmployeeLoginForm() {
   const [googleClientId, setGoogleClientId] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const callbackRef = useRef<(response: { credential: string }) => void>();
+  const callbackRef = useRef<(response: { credential: string }) => void>(null);
 
   callbackRef.current = async (response) => {
     setIsSubmitting(true);

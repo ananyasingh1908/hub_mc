@@ -3,6 +3,9 @@ import { motion } from "framer-motion";
 import { PackageCard } from "@/components/commerce/PackageCard";
 import { StorePageLayout } from "@/components/commerce/StorePageLayout";
 import { ChevronDown } from "lucide-react";
+import { JsonLd } from "@/components/JsonLd";
+import { productSchema, itemListSchema, breadcrumbSchema } from "@/lib/json-ld";
+import { trackEvent, AnalyticsEvents } from "@/lib/analytics";
 
 const CATEGORIES = ["All Packages", "Ranks", "Coins", "Crates", "Keys", "Cosmetics", "Bundles", "Misc"];
 
@@ -27,7 +30,18 @@ export default function PackagesPage() {
   useEffect(() => {
     fetch("/api/products")
       .then((r) => r.json())
-      .then((d) => setProducts(d.products ?? []))
+      .then((d) => {
+        const allProducts = d.products ?? [];
+        setProducts(allProducts);
+        allProducts.forEach((p: any) => {
+          trackEvent(AnalyticsEvents.VIEW_PACKAGE, {
+            product_id: p.id,
+            product_name: p.name,
+            product_category: p.category,
+            price: p.price,
+          });
+        });
+      })
       .catch(() => setError("Failed to load packages. Please try again later."))
       .finally(() => setLoading(false));
   }, []);
@@ -58,8 +72,24 @@ export default function PackagesPage() {
     return list;
   }, [products, category, sort]);
 
+  const productSchemas = useMemo(() => products.map((p) => productSchema(p)), [products]);
+
+  const breadcrumbItems = [
+    { name: "Home", url: "/" },
+    { name: "Packages", url: "/packages" },
+  ];
+
   return (
     <StorePageLayout>
+      {!loading && !error && products.length > 0 && (
+        <>
+          <JsonLd data={itemListSchema(productSchemas)} />
+          {products.slice(0, 8).map((p) => (
+            <JsonLd key={p.id} data={productSchema(p)} />
+          ))}
+        </>
+      )}
+      <JsonLd data={breadcrumbSchema(breadcrumbItems)} />
       <section className="mx-auto max-w-[1200px] px-4 pb-20 pt-16 md:px-6 md:pb-28 md:pt-24">
         <div className="max-w-3xl">
           <p className="text-xs font-semibold uppercase tracking-[0.45em] text-[var(--hub-blue)]">

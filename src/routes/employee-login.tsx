@@ -1,16 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import EmployeeLoginPage from "@/components/EmployeeLoginPage";
+import { noindexHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/employee-login")({
   component: EmployeeLoginRoute,
-  head: () => ({
-    meta: [
-      { title: "Staff Login - HUBMC" },
-      { name: "description", content: "Sign in to HUBMC staff panel with Google." },
-    ],
-  }),
+  head: () => noindexHead("Staff Login — HUBMC"),
 });
 
 function EmployeeLoginRoute() {
   return <EmployeeLoginPage />;
 }
+

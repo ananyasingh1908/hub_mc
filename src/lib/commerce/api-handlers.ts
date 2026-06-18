@@ -48,37 +48,6 @@ export const commerceApiHandlers: Record<string, Partial<Record<string, RouteHan
     },
   },
 
-  "/api/cart/add": {
-    POST: async (request) => {
-      const body = await readJson<{ productId?: string; quantity?: number }>(request);
-      if (!body.productId) return error("productId is required.", 400);
-
-      const prisma = await getPrismaClient();
-      const product = await prisma.product.findUnique({ where: { id: body.productId } });
-      if (!product) return error("Product not found.", 404);
-
-      const meta = product.metadata as Record<string, any> | null;
-      const line = {
-        product: {
-          id: product.id, slug: product.slug, name: product.name,
-          description: product.description, price: Number(product.price),
-          image: product.imageUrl, imageUrl: product.imageUrl,
-          category: product.category, accent: meta?.accent ?? "blue", badge: meta?.badge ?? "", rewards: meta?.rewards ?? [],
-        },
-        quantity: Math.max(1, body.quantity ?? 1),
-        subtotal: Number(product.price) * Math.max(1, body.quantity ?? 1),
-      };
-
-      return json({ items: [line] });
-    },
-  },
-
-  "/api/cart/remove": {
-    POST: async (request) => {
-      return json({ items: [] });
-    },
-  },
-
   "/api/coupon": {
     POST: async (request) => {
       const body = await readJson<{ code?: string }>(request);
@@ -96,39 +65,6 @@ export const commerceApiHandlers: Record<string, Partial<Record<string, RouteHan
           description: coupon.description,
         },
       });
-    },
-  },
-
-  "/api/support": {
-    POST: async (request) => {
-      const body = await readJson<{
-        minecraftUsername?: string;
-        email?: string;
-        subject?: string;
-        message?: string;
-      }>(request);
-
-      if (!body.minecraftUsername || !body.email || !body.subject || !body.message) {
-        return error("Invalid support payload.", 400);
-      }
-
-      const prisma = await getPrismaClient();
-      const customer = await prisma.customer.findUnique({
-        where: { minecraftUsername: body.minecraftUsername },
-        include: { user: true },
-      });
-
-      const ticket = await prisma.supportTicket.create({
-        data: {
-          subject: body.subject,
-          message: body.message,
-          status: "OPEN",
-          customerId: customer?.id ?? null,
-          userId: customer?.userId ?? null,
-        },
-      });
-
-      return json({ ticket: { id: ticket.id, status: ticket.status, createdAt: ticket.createdAt.toISOString() } }, { status: 201 });
     },
   },
 };

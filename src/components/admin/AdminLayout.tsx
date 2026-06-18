@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, Users, UserCog, ScrollText, Shield, LogOut,
   Menu, X, ChevronRight, Store, LoaderCircle, Trophy, Megaphone,
-  Activity, BarChart3, Globe, Truck, Radio,
+  BarChart3, Truck, Radio,
 } from "lucide-react";
 import { useAdminSession, beginAdminSignOut, useInvalidateAdminSession } from "@/lib/auth/client";
 

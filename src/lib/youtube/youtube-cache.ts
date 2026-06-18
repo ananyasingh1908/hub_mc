@@ -197,7 +197,7 @@ async function refreshStatus(): Promise<void> {
   const now = Date.now();
   inMemoryCache.set("status", { data: result, cachedAt: now });
   await saveToDB("status", result);
-  console.log(`[YouTube] Status refreshed`);
+  devlog(`[YouTube] Status refreshed`);
 }
 
 async function refreshVideosAndLivestream(): Promise<void> {
@@ -264,7 +264,7 @@ async function refreshVideosAndLivestream(): Promise<void> {
     }
   }
 
-  console.log(`[YouTube] Videos & livestream refreshed`);
+  devlog(`[YouTube] Videos & livestream refreshed`);
 }
 
 async function refreshCommunityStreams(): Promise<void> {
@@ -327,7 +327,7 @@ async function refreshCommunityStreams(): Promise<void> {
   const now = Date.now();
   inMemoryCache.set("community-streams", { data: result, cachedAt: now });
   await saveToDB("community-streams", result);
-  console.log(`[YouTube] Community streams refreshed (${streams.length} found)`);
+  devlog(`[YouTube] Community streams refreshed (${streams.length} found)`);
 }
 
 async function tryRecoverQuota(): Promise<boolean> {
@@ -341,7 +341,7 @@ async function tryRecoverQuota(): Promise<boolean> {
     if (meta) {
       await saveMetaToDB({ quotaExceeded: false, quotaExceededAt: null });
     }
-    console.log(`[YouTube] Quota recovered at ${new Date().toISOString()}`);
+    devlog(`[YouTube] Quota recovered at ${new Date().toISOString()}`);
     return true;
   } catch {
     return false;
@@ -360,12 +360,12 @@ async function doFullRefresh(): Promise<void> {
     if (_quotaExceeded) {
       const cooldownMs = 30 * 60 * 1000;
       if (Date.now() - _quotaExceededAt < cooldownMs) {
-        console.log(`[YouTube] In quota cooldown, skipping refresh`);
+        devlog(`[YouTube] In quota cooldown, skipping refresh`);
         return;
       }
       const recovered = await tryRecoverQuota();
       if (!recovered) {
-        console.log(`[YouTube] Quota still exceeded, skipping refresh`);
+        devlog(`[YouTube] Quota still exceeded, skipping refresh`);
         return;
       }
     }
@@ -440,7 +440,7 @@ export async function initializeCache(ctx?: { waitUntil?: (p: Promise<unknown>) 
   if (meta?.quotaExceeded && meta.quotaExceededAt) {
     _quotaExceeded = true;
     _quotaExceededAt = meta.quotaExceededAt;
-    console.log(`[YouTube] Loaded quota-exceeded state from DB (at ${new Date(meta.quotaExceededAt).toISOString()})`);
+    devlog(`[YouTube] Loaded quota-exceeded state from DB (at ${new Date(meta.quotaExceededAt).toISOString()})`);
   }
 
   // Attempt immediate refresh (non-blocking for response)

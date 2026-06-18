@@ -1,18 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
-import AdminLogs from "@/components/admin/AdminLogs";
-import { requireAdminAuth } from "@/lib/auth/route-guard";
+import { createFileRoute, lazyRouteComponent as lazy } from "@tanstack/react-router";
+import { noindexHead } from "@/lib/seo";
+
+const AdminLogs = lazy(() => import("@/components/admin/AdminLogs"));
 
 export const Route = createFileRoute("/admin/logs")({
-  beforeLoad: () => requireAdminAuth("/admin-login"),
-  component: AdminLogsPage,
-  head: () => ({
-    meta: [
-      { title: "Activity Logs - HUBMC Admin" },
-      { name: "description", content: "View HUBMC staff activity logs." },
-    ],
-  }),
+  component: AdminLogsRoute,
+  head: () => noindexHead("Logs — HUBMC Admin"),
 });
 
-function AdminLogsPage() {
+function AdminLogsRoute() {
   return <AdminLogs />;
 }
+

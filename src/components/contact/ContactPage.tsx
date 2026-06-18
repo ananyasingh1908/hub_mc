@@ -2,6 +2,8 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, MessageCircle, Mail, Clock, CheckCircle, HelpCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { StorePageLayout } from "@/components/commerce/StorePageLayout";
+import { JsonLd } from "@/components/JsonLd";
+import { faqSchema, breadcrumbSchema } from "@/lib/json-ld";
 
 type FaqItem = {
   q: string;
@@ -63,8 +65,15 @@ export default function ContactPage() {
     }
   };
 
+  const contactBreadcrumbItems = [
+    { name: "Home", url: "/" },
+    { name: "Contact", url: "/contact" },
+  ];
+
   return (
     <StorePageLayout>
+      <JsonLd data={faqSchema(FAQS.map((f) => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={breadcrumbSchema(contactBreadcrumbItems)} />
       <section className="relative min-h-screen overflow-hidden px-6 pt-32 pb-20">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-1/4 top-0 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(62,162,255,0.15),transparent_68%)] blur-3xl" />
@@ -218,7 +227,7 @@ export default function ContactPage() {
                         </div>
                         <div>
                           <p className="font-semibold text-white">Email Support</p>
-                          <p className="mt-1 text-sm leading-6 text-white/50">Send us an email at support@hubmc.net and we'll respond within 24 hours.</p>
+                          <p className="mt-1 text-sm leading-6 text-white/50">Send us an email at support@hubmc.in and we'll respond within 24 hours.</p>
                         </div>
                       </div>
                       <div className="flex items-start gap-4">

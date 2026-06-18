@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 import {
-  BadgeCheck, CreditCard, Headset, LoaderCircle, Pickaxe, ShieldCheck,
-  Package, ShoppingCart, Trophy, Download, RefreshCw,
+  BadgeCheck, CreditCard, LoaderCircle, Pickaxe, ShieldCheck,
+  Package, ShoppingCart, Trophy, Download,
 } from "lucide-react";
 import { StorePageLayout } from "@/components/commerce/StorePageLayout";
 import { useAuthSession } from "@/lib/auth/client";

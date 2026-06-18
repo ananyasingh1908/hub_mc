@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { HeadphonesIcon, MessageSquare, CheckCircle2, Search } from "lucide-react";
+import { HeadphonesIcon, MessageSquare, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
 type Reply = { id: string; authorName: string; message: string; createdAt: string };

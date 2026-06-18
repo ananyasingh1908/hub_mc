@@ -1,11 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 import {
   Calendar, Clock, Users, Award, Trophy, Sword, Gamepad2,
-  ChevronRight, LoaderCircle, Server, ExternalLink,
+  ChevronRight, LoaderCircle,
 } from "lucide-react";
 import { devlog, devwarn } from "@/lib/dev-log";
+import { JsonLd } from "@/components/JsonLd";
+import { eventSchema, itemListSchema, breadcrumbSchema } from "@/lib/json-ld";
+import { trackEvent, AnalyticsEvents } from "@/lib/analytics";
 
 type TournamentSummary = {
   id: string;
@@ -39,13 +42,22 @@ export default function TournamentsPage() {
         return r.json();
       })
       .then((d) => {
-        const liveCount = (d.live || []).length;
-        const upcomingCount = (d.upcoming || []).length;
-        const pastCount = (d.past || []).length;
-        devlog("[TournamentsPage] Loaded:", { live: liveCount, upcoming: upcomingCount, past: pastCount });
-        setUpcoming(d.upcoming ?? []);
-        setLive(d.live ?? []);
-        setPast(d.past ?? []);
+        const liveData = d.live ?? [];
+        const upcomingData = d.upcoming ?? [];
+        const pastData = d.past ?? [];
+        devlog("[TournamentsPage] Loaded:", { live: liveData.length, upcoming: upcomingData.length, past: pastData.length });
+        setUpcoming(upcomingData);
+        setLive(liveData);
+        setPast(pastData);
+
+        [...liveData, ...upcomingData, ...pastData].forEach((t: any) => {
+          trackEvent(AnalyticsEvents.VIEW_TOURNAMENT, {
+            tournament_id: t.id,
+            tournament_title: t.title,
+            tournament_type: t.type,
+            status: t.status,
+          });
+        });
       })
       .catch((err) => {
         devwarn("[TournamentsPage] Failed to load tournaments:", err);
@@ -77,7 +89,6 @@ export default function TournamentsPage() {
               <Link
                 to="/tournaments/$id"
                 params={{ id: t.id }}
-                onClick={() => devlog("[TournamentsPage] Navigating to:", `/tournaments/${t.id}`, t.title)}
                 className="group block overflow-hidden rounded-2xl border border-white/10 bg-[rgba(11,11,11,0.92)] transition-all duration-300 hover:border-[var(--hub-blue)] hover:shadow-[0_0_24px_rgba(62,162,255,0.12)]"
               >
                 {t.bannerUrl && (
@@ -151,8 +162,41 @@ export default function TournamentsPage() {
     </section>
   );
 
+  const allTournaments = useMemo(() => [...live, ...upcoming, ...past], [live, upcoming, past]);
+
+  const eventSchemas = useMemo(() => {
+    return allTournaments.map((t) => eventSchema({
+      id: t.id,
+      name: t.title,
+      description: `${t.type} ${t.gameMode} tournament on HUBMC. ${t.prizePool ? `Prize pool: ${t.prizePool}.` : ""} Entry: ${t.entryFee && t.entryFee > 0 ? `₹${t.entryFee}` : "Free"}.`,
+      startDate: t.dateTime,
+      status: t.status,
+      type: t.type,
+      maxParticipants: t.maxParticipants,
+      registrationsCount: t.registrationsCount,
+      entryFee: t.entryFee,
+      prizePool: t.prizePool,
+      image: t.bannerUrl ?? undefined,
+      location: "play.hubmc.in",
+    }));
+  }, [allTournaments]);
+
+  const breadcrumbItems = [
+    { name: "Home", url: "/" },
+    { name: "Tournaments", url: "/tournaments" },
+  ];
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      {!loading && !error && eventSchemas.length > 0 && (
+        <>
+          <JsonLd data={itemListSchema(eventSchemas)} />
+          {eventSchemas.map((s, i) => (
+            <JsonLd key={allTournaments[i]?.id ?? i} data={s} />
+          ))}
+        </>
+      )}
+      <JsonLd data={breadcrumbSchema(breadcrumbItems)} />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-center gap-4 mb-2">
           <Trophy className="h-8 w-8 text-[var(--hub-orange)]" />

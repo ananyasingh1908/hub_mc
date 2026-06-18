@@ -8,6 +8,10 @@ export async function handleContactRequest(request: Request): Promise<Response> 
       return Response.json({ ok: false, error: "Name, email, subject, and message are required." }, { status: 400 });
     }
 
+    if (body.name.length > 100 || body.email.length > 254 || body.subject.length > 200 || body.message.length > 5000 || (body.minecraftUsername && body.minecraftUsername.length > 16)) {
+      return Response.json({ ok: false, error: "One or more fields exceed maximum length." }, { status: 400 });
+    }
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
       return Response.json({ ok: false, error: "Enter a valid email address." }, { status: 400 });
     }

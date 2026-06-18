@@ -1,22 +1,20 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
-import ProfilePage from "@/components/ProfilePage";
+import { createFileRoute, lazyRouteComponent as lazy } from "@tanstack/react-router";
+import { seoHead } from "@/lib/seo";
+import { requireAuth } from "@/lib/auth/route-guard";
+
+const ProfilePage = lazy(() => import("@/components/ProfilePage"));
 
 export const Route = createFileRoute("/profile")({
   component: ProfileRoute,
-  beforeLoad: async ({ context }) => {
-    const auth = (context as any).auth;
-    if (!auth?.authenticated) {
-      throw redirect({ to: "/login" });
-    }
-  },
-  head: () => ({
-    meta: [
-      { title: "My Profile - HUBMC" },
-      { name: "description", content: "View your HUBMC profile, owned packages, purchase history, and player details." },
-    ],
+  beforeLoad: () => requireAuth("/login"),
+  head: () => seoHead({
+    title: "My Profile — HUBMC",
+    description: "View your HUBMC profile, owned packages, purchase history, and player details.",
+    path: "/profile",
   }),
 });
 
 function ProfileRoute() {
   return <ProfilePage />;
 }
+

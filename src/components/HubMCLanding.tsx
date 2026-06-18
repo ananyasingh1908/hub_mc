@@ -149,9 +149,8 @@ function Hero({ navHeight }: { navHeight: number }) {
                   { icon: Shield, label: "FAIR PLAY", subtitle: "ZERO TOLERANCE" },
                   { icon: Settings, label: "CUSTOM FEATURES", subtitle: "UNIQUE EXPERIENCE" },
                 ].map((item) => (
-                  <a
+                  <div
                     key={item.label}
-                    href="#"
                     className="group relative flex flex-col items-center justify-center rounded-xl px-1.5 py-3 md:py-4 text-center transition-all duration-300 hover:-translate-y-2 hover:scale-105"
                     style={{
                       background: "linear-gradient(to bottom, rgba(35,35,35,.82), rgba(0,0,0,.9))",
@@ -182,7 +181,7 @@ function Hero({ navHeight }: { navHeight: number }) {
                     <span className="relative z-10 mt-0.5 text-[8px] md:text-[10px] font-semibold uppercase tracking-[0.15em]" style={{ color: "rgba(255,255,255,.75)" }}>
                       {item.subtitle}
                     </span>
-                  </a>
+                  </div>
                 ))}
               </div>
             </div>
@@ -559,7 +558,7 @@ function ContactSection() {
                       </div>
                       <div>
                         <p className="font-semibold text-white">Email Support</p>
-                        <p className="mt-1 text-sm leading-6 text-white/50">support@hubmc.net — we respond within 24h.</p>
+                        <p className="mt-1 text-sm leading-6 text-white/50">support@hubmc.in — we respond within 24h.</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-4">

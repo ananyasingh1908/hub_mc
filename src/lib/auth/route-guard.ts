@@ -41,7 +41,7 @@ export async function requireEmployeeAuth(loginPath?: string) {
     const res = await fetch("/api/auth/employee/session", { credentials: "include", headers: { accept: "application/json" } });
     if (!res.ok) throw redirect({ to: path, replace: true });
     const data = await res.json();
-    if (!data?.authenticated || data.role !== "EMPLOYEE") throw redirect({ to: path, replace: true });
+    if (!data?.authenticated || !["EMPLOYEE", "SUPER_ADMIN"].includes(data.role)) throw redirect({ to: path, replace: true });
   } catch (err) {
     if (err && typeof err === "object" && "code" in err && (err as any).code === "REDIRECT") throw err;
     throw redirect({ to: path, replace: true });

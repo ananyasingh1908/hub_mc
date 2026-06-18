@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Search, X, User, Shield, AlertTriangle, FileText, ShoppingCart,
-  HeadphonesIcon, Star, Calendar, Clock, Trophy, Ban, CheckCircle,
-  LoaderCircle, ChevronDown, ChevronUp, ExternalLink, Award,
+  Search, X, User, Shield, FileText, ShoppingCart,
+  HeadphonesIcon, Star, Trophy, Ban,
+  LoaderCircle, Award,
 } from "lucide-react";
 import { toast } from "sonner";
 

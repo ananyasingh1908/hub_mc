@@ -1,10 +1,10 @@
-import { useMemo, useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { ExternalLink, MessageSquare, Server, ShoppingCart } from "lucide-react";
+import { useMemo, useState, useEffect, useCallback } from "react";
+import { ExternalLink, MessageSquare, Server } from "lucide-react";
 import { StorePageLayout } from "@/components/commerce/StorePageLayout";
 import { OrderSummaryCard } from "@/components/commerce/OrderSummaryCard";
 import { buildCartLines, calculateOrderSummary } from "@/lib/commerce/pricing";
 import { useCartStore } from "@/store/cart-store";
+import { trackEvent, AnalyticsEvents } from "@/lib/analytics";
 
 const DISCORD_INVITE = "https://discord.gg/CwNVBCuSbj";
 const MINECRAFT_IP = "play.hubmc.in";
@@ -27,6 +27,13 @@ export default function CheckoutPage() {
     () => calculateOrderSummary(items, appliedCoupon, allProducts),
     [items, appliedCoupon, allProducts],
   );
+
+  const handleDiscordClick = useCallback(() => {
+    trackEvent(AnalyticsEvents.DISCORD_CHECKOUT_CLICK, {
+      item_count: items.length,
+      subtotal: summary.subtotal,
+    });
+  }, [items.length, summary.subtotal]);
 
   return (
     <StorePageLayout>
@@ -124,6 +131,7 @@ export default function CheckoutPage() {
                       href={DISCORD_INVITE}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={handleDiscordClick}
                       className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[#5865F2] px-6 py-4 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#4752C4]"
                     >
                       <ExternalLink className="h-4 w-4" />

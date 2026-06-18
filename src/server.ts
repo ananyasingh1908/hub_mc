@@ -4,19 +4,14 @@ import { handleUpload } from "@/lib/upload/upload-handler";
 import { checkRateLimit } from "@/lib/rate-limiter";
 import { cachedJson } from "@/lib/response-cache";
 
-const _GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
-const _GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || "";
-const _SUPER_ADMIN_ID = process.env.SUPER_ADMIN_ID || "";
-const _SUPER_ADMIN_PASSWORD = process.env.SUPER_ADMIN_PASSWORD || "";
-const _JWT_SECRET = process.env.JWT_SECRET || "";
-
-if (!_JWT_SECRET) console.warn("[ENV] JWT_SECRET is not set");
-if (!_GOOGLE_CLIENT_ID) console.warn("[ENV] GOOGLE_CLIENT_ID is not set");
-if (!_GOOGLE_CLIENT_SECRET) console.warn("[ENV] GOOGLE_CLIENT_SECRET is not set");
-if (!_SUPER_ADMIN_ID) console.warn("[ENV] SUPER_ADMIN_ID is not set");
-if (!_SUPER_ADMIN_PASSWORD) console.warn("[ENV] SUPER_ADMIN_PASSWORD is not set");
-if (_GOOGLE_CLIENT_ID) devlog("[ENV] GOOGLE_CLIENT_ID is configured");
-if (_SUPER_ADMIN_ID && _SUPER_ADMIN_PASSWORD) devlog("[ENV] Super admin credentials are configured");
+// Warn about missing env vars at startup
+if (!process.env.JWT_SECRET) console.warn("[ENV] JWT_SECRET is not set");
+if (!process.env.GOOGLE_CLIENT_ID) console.warn("[ENV] GOOGLE_CLIENT_ID is not set");
+if (!process.env.GOOGLE_CLIENT_SECRET) console.warn("[ENV] GOOGLE_CLIENT_SECRET is not set");
+if (!process.env.SUPER_ADMIN_ID) console.warn("[ENV] SUPER_ADMIN_ID is not set");
+if (!process.env.SUPER_ADMIN_PASSWORD) console.warn("[ENV] SUPER_ADMIN_PASSWORD is not set");
+if (process.env.GOOGLE_CLIENT_ID) devlog("[ENV] GOOGLE_CLIENT_ID is configured");
+if (process.env.SUPER_ADMIN_ID && process.env.SUPER_ADMIN_PASSWORD) devlog("[ENV] Super admin credentials are configured");
 
 import {
   getClientVisibleAuthState,
@@ -30,10 +25,6 @@ import { handleEmployeeSessionRequest, handleEmployeeLogoutRequest } from "@/lib
 import { handleAdminSessionRequest, handleAdminLogoutRequest } from "@/lib/auth/admin-session";
 import { handleAllSessionsRequest } from "@/lib/auth/all-sessions";
 import { commerceApiHandlers } from "@/lib/commerce/api-handlers";
-import {
-  handleCreateOrder,
-  handleVerifyPayment,
-} from "@/lib/commerce/payment-handlers";
 import {
   handleGetOrders,
   handleRetryDelivery,
@@ -102,7 +93,6 @@ import {
 import {
   handleGetAnnouncements,
   handleCreateAnnouncement,
-  handleUpdateAnnouncement,
   handleDeleteAnnouncement,
   handleGetSiteNotifications,
   handleGetActiveSiteNotifications,
@@ -124,6 +114,66 @@ import { scheduleRefresh } from "@/lib/youtube/youtube-cache";
 import { handleDiscordStatus, handleDiscordEvents } from "@/lib/discord/discord-handler";
 import { handleGetNotifications, handleUnreadCount, handleMarkRead, handleMarkAllRead } from "@/lib/notifications/notification-handler";
 import { handleGetProfile } from "@/lib/profile/profile-handlers";
+
+// ─── SECURITY HEADERS ────────────────────────────────────────
+function applySecurityHeaders(response: Response, url: URL): Response {
+  const headers = new Headers(response.headers);
+  headers.set("X-Content-Type-Options", "nosniff");
+  headers.set("X-Frame-Options", "DENY");
+  headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()");
+  if (url.protocol === "https:") {
+    headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains");
+  }
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
+// ─── CSRF PROTECTION ─────────────────────────────────────────
+const CSRF_MUTABLE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+const CSRF_EXEMPT_PATHS = new Set([
+  "/api/auth/login",
+  "/api/auth/admin-login",
+  "/api/auth/employee-login",
+  "/api/contact",
+  "/api/auth/logout",
+  "/api/auth/employee/logout",
+  "/api/auth/admin/logout",
+  "/api/server-reviews/submit",
+]);
+
+function checkCsrf(request: Request, url: URL): Response | null {
+  if (!CSRF_MUTABLE_METHODS.has(request.method)) return null;
+  if (CSRF_EXEMPT_PATHS.has(url.pathname)) return null;
+
+  const origin = request.headers.get("origin");
+  const referer = request.headers.get("referer");
+  const allowedHost = url.host;
+  const allowedOrigin = process.env.BASE_URL;
+
+  if (origin) {
+    try {
+      const originHost = new URL(origin).host;
+      if (originHost === allowedHost || (allowedOrigin && origin === allowedOrigin)) {
+        return null;
+      }
+    } catch { /* invalid origin header — reject */ }
+  } else if (referer) {
+    try {
+      const refererHost = new URL(referer).host;
+      if (refererHost === allowedHost) {
+        return null;
+      }
+    } catch { /* invalid referer header — reject */ }
+  }
+
+  // Allow requests with no origin AND no referer (curl / same-origin cookie requests
+  // from a first-party page that strips Referer via Referrer-Policy are fine — they
+  // have the cookie and the browser won't send the header, which is the expected
+  // behavior for SameSite=Strict cookies).
+  if (!origin && !referer) return null;
+
+  return Response.json({ error: "CSRF validation failed" }, { status: 403 });
+}
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -190,8 +240,16 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const url = new URL(request.url);
+    const response = await this.handleRequest(request, env, ctx, url);
+    return applySecurityHeaders(response, url);
+  },
+
+  async handleRequest(request: Request, env: unknown, ctx: unknown, url: URL): Promise<Response> {
     try {
-      const url = new URL(request.url);
+      // CSRF check for all state-changing API routes
+      const csrfError = checkCsrf(request, url);
+      if (csrfError) return csrfError;
 
       // Health check
       if (url.pathname === "/api/health" && request.method === "GET") {
@@ -199,6 +257,59 @@ export default {
           status: "ok",
           timestamp: new Date().toISOString(),
           environment: process.env.NODE_ENV || "production",
+        });
+      }
+
+      // SEO: robots.txt
+      if (url.pathname === "/robots.txt") {
+        const baseUrl = process.env.BASE_URL || "https://hubmc.in";
+        const robots = [
+          "User-agent: *",
+          "Allow: /$",
+          "Allow: /packages",
+          "Allow: /tournaments",
+          "Allow: /tournaments/",
+          "Allow: /contact",
+          "Allow: /livestream",
+          "Allow: /login",
+          "Disallow: /admin",
+          "Disallow: /admin-login",
+          "Disallow: /employee",
+          "Disallow: /employee-login",
+          "Disallow: /profile",
+          "Disallow: /purchases",
+          "Disallow: /cart",
+          "Disallow: /checkout",
+          "Disallow: /api/",
+          `Sitemap: ${baseUrl}/sitemap.xml`,
+        ].join("\n");
+        return new Response(robots, {
+          headers: { "content-type": "text/plain; charset=utf-8" },
+        });
+      }
+
+      // SEO: sitemap.xml
+      if (url.pathname === "/sitemap.xml") {
+        const baseUrl = process.env.BASE_URL || "https://hubmc.in";
+        const urls = [
+          { loc: "/", priority: "1.0", changefreq: "weekly" },
+          { loc: "/packages", priority: "0.9", changefreq: "weekly" },
+          { loc: "/tournaments", priority: "0.8", changefreq: "daily" },
+          { loc: "/contact", priority: "0.6", changefreq: "monthly" },
+          { loc: "/livestream", priority: "0.7", changefreq: "daily" },
+          { loc: "/login", priority: "0.3", changefreq: "monthly" },
+        ];
+        const sitemap = [
+          `<?xml version="1.0" encoding="UTF-8"?>`,
+          `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
+          ...urls.map(
+            (u) =>
+              `  <url><loc>${baseUrl}${u.loc}</loc><priority>${u.priority}</priority><changefreq>${u.changefreq}</changefreq></url>`,
+          ),
+          `</urlset>`,
+        ].join("\n");
+        return new Response(sitemap, {
+          headers: { "content-type": "application/xml; charset=utf-8" },
         });
       }
 
@@ -247,18 +358,6 @@ export default {
         return new Response("Not found", { status: 404 });
       }
 
-      // Payment API routes (disabled — purchases are now manual via Discord)
-      if (url.pathname === "/api/payment/create-order" && request.method === "POST") {
-        return new Response(JSON.stringify({ error: "Online payments are currently disabled. Please use Discord." }), {
-          status: 503, headers: { "content-type": "application/json" },
-        });
-      }
-      if (url.pathname === "/api/payment/verify" && request.method === "POST") {
-        return new Response(JSON.stringify({ error: "Online payments are currently disabled. Please use Discord." }), {
-          status: 503, headers: { "content-type": "application/json" },
-        });
-      }
-
       // Order & Delivery API routes
       if (url.pathname === "/api/orders" && request.method === "GET") {
         return await handleGetOrders(request);
@@ -291,23 +390,66 @@ export default {
         const method = request.method;
         if (route === "/api/admin/stats" && method === "GET") return await handleAdminDashboardStats(request);
         if (route === "/api/admin/products" && method === "GET") return await handleAdminGetProducts(request);
-        if (route === "/api/admin/products/create" && method === "POST") return await handleAdminCreateProduct(request);
-        if (route === "/api/admin/products/update" && method === "POST") return await handleAdminUpdateProduct(request);
-        if (route === "/api/admin/products/delete" && method === "POST") return await handleAdminDeleteProduct(request);
+        if (route === "/api/admin/products/create" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 10, label: "admin-product-create" });
+          if (rl) return rl;
+          return await handleAdminCreateProduct(request);
+        }
+        if (route === "/api/admin/products/update" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 15, label: "admin-product-update" });
+          if (rl) return rl;
+          return await handleAdminUpdateProduct(request);
+        }
+        if (route === "/api/admin/products/delete" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 10, label: "admin-product-delete" });
+          if (rl) return rl;
+          return await handleAdminDeleteProduct(request);
+        }
         if (route === "/api/admin/orders" && method === "GET") return await handleAdminGetOrders(request);
-        if (route === "/api/admin/orders/update" && method === "POST") return await handleAdminUpdateOrderStatus(request);
-        if (route === "/api/admin/orders/refund" && method === "POST") return await handleRefundOrder(request);
-        if (route === "/api/admin/tickets" && method === "GET") return await handleAdminGetTickets(request);
-        if (route === "/api/admin/tickets/reply" && method === "POST") return await handleAdminReplyTicket(request);
-        if (route === "/api/admin/tickets/resolve" && method === "POST") return await handleAdminResolveTicket(request);
+        if (route === "/api/admin/orders/update" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 20, label: "admin-order-update" });
+          if (rl) return rl;
+          return await handleAdminUpdateOrderStatus(request);
+        }
+        if (route === "/api/admin/orders/refund" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 5, label: "admin-order-refund" });
+          if (rl) return rl;
+          return await handleRefundOrder(request);
+        }
+        if (route === "/api/admin/tickets/reply" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 30, label: "admin-ticket-reply" });
+          if (rl) return rl;
+          return await handleAdminReplyTicket(request);
+        }
+        if (route === "/api/admin/tickets/resolve" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 15, label: "admin-ticket-resolve" });
+          if (rl) return rl;
+          return await handleAdminResolveTicket(request);
+        }
         if (route === "/api/admin/customers" && method === "GET") return await handleAdminGetCustomers(request);
         if (route === "/api/admin/employees" && method === "GET") return await handleAdminGetEmployees(request);
-        if (route === "/api/admin/employees/create" && method === "POST") return await handleAdminCreateEmployee(request);
-        if (route === "/api/admin/employees/update" && method === "POST") return await handleAdminUpdateEmployee(request);
-        if (route === "/api/admin/employees/delete" && method === "POST") return await handleAdminDeleteEmployee(request);
+        if (route === "/api/admin/employees/create" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 5, label: "admin-employee-create" });
+          if (rl) return rl;
+          return await handleAdminCreateEmployee(request);
+        }
+        if (route === "/api/admin/employees/update" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 15, label: "admin-employee-update" });
+          if (rl) return rl;
+          return await handleAdminUpdateEmployee(request);
+        }
+        if (route === "/api/admin/employees/delete" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 5, label: "admin-employee-delete" });
+          if (rl) return rl;
+          return await handleAdminDeleteEmployee(request);
+        }
         if (route === "/api/admin/logs" && method === "GET") return await handleAdminGetLogs(request);
         if (route === "/api/admin/permissions" && method === "GET") return await handleAdminGetPermissions(request);
-        if (route === "/api/admin/permissions/update" && method === "POST") return await handleAdminUpdatePermissions(request);
+        if (route === "/api/admin/permissions/update" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 10, label: "admin-permissions-update" });
+          if (rl) return rl;
+          return await handleAdminUpdatePermissions(request);
+        }
 
         if (route === "/api/admin/platform/stats" && method === "GET") return await handleAdminPlatformStats(request);
         if (route === "/api/admin/platform/tournaments" && method === "GET") return await handleAdminMonitorTournaments(request);
@@ -315,14 +457,34 @@ export default {
         if (route === "/api/admin/platform/logs" && method === "GET") return await handleAdminPlatformLogs(request);
         if (route === "/api/admin/platform/tournament-actions" && method === "GET") return await handleAdminTournamentActions(request);
         if (route === "/api/admin/platform/players" && method === "GET") return await handleAdminAllPlayers(request);
-        if (route === "/api/admin/platform/send-notification" && method === "POST") return await handleAdminSendGlobalNotification(request);
+        if (route === "/api/admin/platform/send-notification" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 5, label: "admin-send-notif" });
+          if (rl) return rl;
+          return await handleAdminSendGlobalNotification(request);
+        }
 
         if (route === "/api/admin/deliveries" && method === "GET") return await handleAdminGetDeliveries(request);
-        if (route === "/api/admin/deliveries/resend" && method === "POST") return await handleAdminResendDelivery(request);
+        if (route === "/api/admin/deliveries/resend" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 5, label: "admin-delivery-resend" });
+          if (rl) return rl;
+          return await handleAdminResendDelivery(request);
+        }
 
-        if (route === "/api/admin/streams/approve" && method === "POST") return await handleAdminApproveStream(request);
-        if (route === "/api/admin/streams/remove" && method === "POST") return await handleAdminRemoveStream(request);
-        if (route === "/api/admin/streams/blacklist" && method === "POST") return await handleAdminBlacklistChannel(request);
+        if (route === "/api/admin/streams/approve" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 10, label: "admin-stream-approve" });
+          if (rl) return rl;
+          return await handleAdminApproveStream(request);
+        }
+        if (route === "/api/admin/streams/remove" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 10, label: "admin-stream-remove" });
+          if (rl) return rl;
+          return await handleAdminRemoveStream(request);
+        }
+        if (route === "/api/admin/streams/blacklist" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 5, label: "admin-stream-blacklist" });
+          if (rl) return rl;
+          return await handleAdminBlacklistChannel(request);
+        }
         if (route === "/api/admin/streams/featured" && method === "GET") return await handleAdminGetFeaturedStreams(request);
 
         return new Response("Not found", { status: 404 });
@@ -340,6 +502,8 @@ export default {
         return cachedJson(request, 120, () => handleGetServerReviews());
       }
       if (url.pathname === "/api/server-reviews/submit" && request.method === "POST") {
+        const rl = checkRateLimit(request, { limit: 5, label: "review-submit" });
+        if (rl) return rl;
         return await handleSubmitServerReview(request);
       }
 
@@ -390,22 +554,62 @@ export default {
         if (route === "/api/tournaments/brackets" && method === "GET") return await handleGetTournamentBrackets(request);
 
         if (route === "/api/tournaments/staff" && method === "GET") return await handleStaffGetTournaments(request);
-        if (route === "/api/tournaments/staff/create" && method === "POST") return await handleStaffCreateTournament(request);
-        if (route === "/api/tournaments/staff/update" && method === "POST") return await handleStaffUpdateTournament(request);
-        if (route === "/api/tournaments/staff/delete" && method === "POST") return await handleStaffDeleteTournament(request);
-        if (route === "/api/tournaments/staff/delete-registration" && method === "POST") return await handleDeleteTournamentRegistration(request);
+        if (route === "/api/tournaments/staff/create" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 10, label: "tournament-create" });
+          if (rl) return rl;
+          return await handleStaffCreateTournament(request);
+        }
+        if (route === "/api/tournaments/staff/update" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 15, label: "tournament-update" });
+          if (rl) return rl;
+          return await handleStaffUpdateTournament(request);
+        }
+        if (route === "/api/tournaments/staff/delete" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 5, label: "tournament-delete" });
+          if (rl) return rl;
+          return await handleStaffDeleteTournament(request);
+        }
+        if (route === "/api/tournaments/staff/delete-registration" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 10, label: "tournament-delete-reg" });
+          if (rl) return rl;
+          return await handleDeleteTournamentRegistration(request);
+        }
         if (route === "/api/tournaments/staff/search-registrations" && method === "GET") return await handleStaffSearchRegistrations(request);
         if (route === "/api/tournaments/staff/export-registrations" && method === "GET") return await handleStaffExportRegistrations(request);
-        if (route === "/api/tournaments/staff/start" && method === "POST") return await handleStaffStartTournament(request);
-        if (route === "/api/tournaments/staff/end" && method === "POST") return await handleStaffEndTournament(request);
+        if (route === "/api/tournaments/staff/start" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 5, label: "tournament-start" });
+          if (rl) return rl;
+          return await handleStaffStartTournament(request);
+        }
+        if (route === "/api/tournaments/staff/end" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 5, label: "tournament-end" });
+          if (rl) return rl;
+          return await handleStaffEndTournament(request);
+        }
 
         if (route === "/api/tournaments/leaderboard" && method === "GET") return await handleGetTournamentLeaderboard(request);
         if (route === "/api/tournaments/matches" && method === "GET") return await handleGetTournamentMatches(request);
 
-        if (route === "/api/tournaments/staff/generate-bracket" && method === "POST") return await handleStaffGenerateBracket(request);
-        if (route === "/api/tournaments/staff/update-match" && method === "POST") return await handleStaffUpdateMatch(request);
-        if (route === "/api/tournaments/staff/create-next-round" && method === "POST") return await handleStaffCreateNextRound(request);
-        if (route === "/api/tournaments/staff/delete-matches" && method === "POST") return await handleStaffDeleteMatches(request);
+        if (route === "/api/tournaments/staff/generate-bracket" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 5, label: "tournament-gen-bracket" });
+          if (rl) return rl;
+          return await handleStaffGenerateBracket(request);
+        }
+        if (route === "/api/tournaments/staff/update-match" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 30, label: "tournament-update-match" });
+          if (rl) return rl;
+          return await handleStaffUpdateMatch(request);
+        }
+        if (route === "/api/tournaments/staff/create-next-round" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 5, label: "tournament-next-round" });
+          if (rl) return rl;
+          return await handleStaffCreateNextRound(request);
+        }
+        if (route === "/api/tournaments/staff/delete-matches" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 5, label: "tournament-delete-matches" });
+          if (rl) return rl;
+          return await handleStaffDeleteMatches(request);
+        }
 
         return new Response("Not found", { status: 404 });
       }
@@ -418,45 +622,110 @@ export default {
         if (route === "/api/employee/stats" && method === "GET") return await handleEmployeeDashboardStats(request);
 
         if (route === "/api/employee/announcements" && method === "GET") return await handleGetAnnouncements(request);
-        if (route === "/api/employee/announcements/create" && method === "POST") return await handleCreateAnnouncement(request);
-        if (route === "/api/employee/announcements/update" && method === "POST") return await handleUpdateAnnouncement(request);
-        if (route === "/api/employee/announcements/delete" && method === "POST") return await handleDeleteAnnouncement(request);
+        if (route === "/api/employee/announcements/create" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 10, label: "emp-announce-create" });
+          if (rl) return rl;
+          return await handleCreateAnnouncement(request);
+        }
+        if (route === "/api/employee/announcements/delete" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 10, label: "emp-announce-delete" });
+          if (rl) return rl;
+          return await handleDeleteAnnouncement(request);
+        }
 
         if (route === "/api/employee/notifications" && method === "GET") return await handleGetSiteNotifications(request);
         if (route === "/api/employee/notifications/active" && method === "GET") return await handleGetActiveSiteNotifications();
-        if (route === "/api/employee/notifications/create" && method === "POST") return await handleCreateSiteNotification(request);
-        if (route === "/api/employee/notifications/update" && method === "POST") return await handleUpdateSiteNotification(request);
-        if (route === "/api/employee/notifications/delete" && method === "POST") return await handleDeleteSiteNotification(request);
+        if (route === "/api/employee/notifications/create" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 10, label: "emp-notif-create" });
+          if (rl) return rl;
+          return await handleCreateSiteNotification(request);
+        }
+        if (route === "/api/employee/notifications/update" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 15, label: "emp-notif-update" });
+          if (rl) return rl;
+          return await handleUpdateSiteNotification(request);
+        }
+        if (route === "/api/employee/notifications/delete" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 10, label: "emp-notif-delete" });
+          if (rl) return rl;
+          return await handleDeleteSiteNotification(request);
+        }
 
         if (route === "/api/employee/players/search" && method === "GET") return await handleSearchPlayers(request);
         if (route === "/api/employee/players/profile" && method === "GET") return await handleGetPlayerProfile(request);
-        if (route === "/api/employee/players/note" && method === "POST") return await handleAddPlayerNote(request);
-        if (route === "/api/employee/players/ban" && method === "POST") return await handleBanPlayer(request);
-        if (route === "/api/employee/players/unban" && method === "POST") return await handleUnbanPlayer(request);
-        if (route === "/api/employee/players/bans" && method === "GET") return await handleGetPlayerBans(request);
-        if (route === "/api/employee/players/assign-rank" && method === "POST") return await handleAssignRank(request);
-        if (route === "/api/employee/players/remove-rank" && method === "POST") return await handleRemoveRank(request);
+        if (route === "/api/employee/players/note" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 20, label: "emp-player-note" });
+          if (rl) return rl;
+          return await handleAddPlayerNote(request);
+        }
+        if (route === "/api/employee/players/ban" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 10, label: "emp-player-ban" });
+          if (rl) return rl;
+          return await handleBanPlayer(request);
+        }
+        if (route === "/api/employee/players/unban" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 10, label: "emp-player-unban" });
+          if (rl) return rl;
+          return await handleUnbanPlayer(request);
+        }
+        if (route === "/api/employee/players/assign-rank" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 10, label: "emp-assign-rank" });
+          if (rl) return rl;
+          return await handleAssignRank(request);
+        }
+        if (route === "/api/employee/players/remove-rank" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 10, label: "emp-remove-rank" });
+          if (rl) return rl;
+          return await handleRemoveRank(request);
+        }
 
         if (route === "/api/employee/products" && method === "GET") return await handleAdminGetProducts(request);
-        if (route === "/api/employee/products/create" && method === "POST") return await handleAdminCreateProduct(request);
-        if (route === "/api/employee/products/update" && method === "POST") return await handleAdminUpdateProduct(request);
-        if (route === "/api/employee/products/delete" && method === "POST") return await handleAdminDeleteProduct(request);
+        if (route === "/api/employee/products/create" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 10, label: "emp-product-create" });
+          if (rl) return rl;
+          return await handleAdminCreateProduct(request);
+        }
+        if (route === "/api/employee/products/update" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 15, label: "emp-product-update" });
+          if (rl) return rl;
+          return await handleAdminUpdateProduct(request);
+        }
+        if (route === "/api/employee/products/delete" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 10, label: "emp-product-delete" });
+          if (rl) return rl;
+          return await handleAdminDeleteProduct(request);
+        }
 
         if (route === "/api/employee/orders" && method === "GET") return await handleAdminGetOrders(request);
-        if (route === "/api/employee/orders/update" && method === "POST") return await handleAdminUpdateOrderStatus(request);
-        if (route === "/api/employee/orders/refund" && method === "POST") return await handleRefundOrder(request);
+        if (route === "/api/employee/orders/update" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 20, label: "emp-order-update" });
+          if (rl) return rl;
+          return await handleAdminUpdateOrderStatus(request);
+        }
+        if (route === "/api/employee/orders/refund" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 5, label: "emp-order-refund" });
+          if (rl) return rl;
+          return await handleRefundOrder(request);
+        }
 
-        if (route === "/api/employee/tickets" && method === "GET") return await handleAdminGetTickets(request);
-        if (route === "/api/employee/tickets/reply" && method === "POST") return await handleAdminReplyTicket(request);
-        if (route === "/api/employee/tickets/resolve" && method === "POST") return await handleAdminResolveTicket(request);
+        if (route === "/api/employee/tickets/reply" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 30, label: "emp-ticket-reply" });
+          if (rl) return rl;
+          return await handleAdminReplyTicket(request);
+        }
+        if (route === "/api/employee/tickets/resolve" && method === "POST") {
+          const rl = checkRateLimit(request, { limit: 15, label: "emp-ticket-resolve" });
+          if (rl) return rl;
+          return await handleAdminResolveTicket(request);
+        }
 
         return new Response("Not found", { status: 404 });
       }
 
       // Public products — cached 5 min
       if (url.pathname === "/api/products" && request.method === "GET") {
-        return cachedJson(request, 300, () =>
-          commerceApiHandlers["/api/products"]!.GET!(request),
+        return await cachedJson(request, 300, () =>
+          commerceApiHandlers["/api/products"]!.GET!(request) as Promise<Response>,
         );
       }
 

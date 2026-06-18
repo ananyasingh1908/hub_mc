@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, Package, ShoppingCart, HeadphonesIcon, LogOut,
   Menu, X, ChevronRight, Store, LoaderCircle, Trophy, Megaphone,
-  Users, Shield,
+  Users,
 } from "lucide-react";
 import { useEmployeeSession, beginEmployeeSignOut, useInvalidateEmployeeSession } from "@/lib/auth/client";
 

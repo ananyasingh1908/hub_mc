@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "@tanstack/react-router";
 import {
   Trophy, Users, Megaphone, Calendar, Activity, Clock,
-  UserPlus, ArrowRight, LoaderCircle,
+  ArrowRight,
 } from "lucide-react";
 
 type DashboardStats = {

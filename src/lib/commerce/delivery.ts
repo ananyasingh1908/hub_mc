@@ -1,3 +1,4 @@
+import { devlog } from "@/lib/dev-log";
 import { getPrismaClient } from "@/lib/db/prisma";
 import { getRconConnection } from "@/lib/minecraft/rcon";
 
@@ -30,7 +31,7 @@ export async function triggerDelivery(
 
   if (!rcon) {
     const commandLog = commands.join("\n");
-    console.log(`[RCON] No connection — commands queued for order ${orderId}:\n${commandLog}`);
+    devlog(`[RCON] No connection — commands queued for order ${orderId}:\n${commandLog}`);
 
     await logOrderActivity(
       orderId,
@@ -109,7 +110,7 @@ export async function retryDelivery(orderId: string): Promise<boolean> {
 
   if (!rcon) {
     const commandLog = commands.join("\n");
-    console.log(`[RCON] No connection — retry commands queued for order ${orderId}:\n${commandLog}`);
+    devlog(`[RCON] No connection — retry commands queued for order ${orderId}:\n${commandLog}`);
 
     await logOrderActivity(
       orderId,

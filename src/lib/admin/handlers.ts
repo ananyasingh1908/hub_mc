@@ -41,7 +41,7 @@ function getStaffSession(request: Request): StaffSession | null {
   return (request as any).__staffSession ?? null;
 }
 
-async function logActivity(employeeId: string | null, action: string, entity: string, entityId: string | null, details: string | null, severity = "INFO") {
+async function logActivity(employeeId: string | null | undefined, action: string, entity: string, entityId: string | null, details: string | null, severity = "INFO") {
   try {
     const prisma = await getPrismaClient();
     await prisma.activityLog.create({

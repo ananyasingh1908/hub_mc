@@ -62,7 +62,7 @@ export default function AdminCustomers() {
               <button onClick={() => setExpanded(expanded === c.id ? null : c.id)}
                 className="flex w-full items-center gap-4 p-4 text-left transition-colors hover:bg-white/[0.02]">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[rgba(62,162,255,0.12)]">
-                  {c.avatarUrl ? <img src={c.avatarUrl} className="h-full w-full object-cover" /> :
+                  {c.avatarUrl ? <img src={c.avatarUrl} alt={c.minecraftUsername || "Customer avatar"} className="h-full w-full object-cover" /> :
                     <span className="text-sm font-bold text-[var(--hub-blue)]">{c.minecraftUsername?.[0]}</span>}
                 </div>
                 <div className="min-w-0 flex-1">

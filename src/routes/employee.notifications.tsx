@@ -1,14 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
-import EmployeeNotifications from "@/components/employee/EmployeeNotifications";
+import { createFileRoute, lazyRouteComponent as lazy } from "@tanstack/react-router";
+import { noindexHead } from "@/lib/seo";
+
+const EmployeeNotifications = lazy(() => import("@/components/employee/EmployeeNotifications"));
 
 export const Route = createFileRoute("/employee/notifications")({
   component: EmployeeNotificationsRoute,
+  head: () => noindexHead("Notifications — HUBMC Staff"),
 });
 
 function EmployeeNotificationsRoute() {
-  return (
-    <div className="p-6">
-      <EmployeeNotifications />
-    </div>
-  );
+  return <EmployeeNotifications />;
 }
+

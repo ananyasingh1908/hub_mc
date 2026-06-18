@@ -1,18 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
-import EmployeeProducts from "@/components/employee/EmployeeProducts";
-import { requireEmployeeAuth } from "@/lib/auth/route-guard";
+import { createFileRoute, lazyRouteComponent as lazy } from "@tanstack/react-router";
+import { noindexHead } from "@/lib/seo";
+
+const EmployeeProducts = lazy(() => import("@/components/employee/EmployeeProducts"));
 
 export const Route = createFileRoute("/employee/products")({
-  beforeLoad: () => requireEmployeeAuth("/employee-login"),
-  component: EmployeeProductsPage,
-  head: () => ({
-    meta: [
-      { title: "Products - HUBMC Staff" },
-      { name: "description", content: "Manage HUBMC store products." },
-    ],
-  }),
+  component: EmployeeProductsRoute,
+  head: () => noindexHead("Products — HUBMC Staff"),
 });
 
-function EmployeeProductsPage() {
+function EmployeeProductsRoute() {
   return <EmployeeProducts />;
 }
+

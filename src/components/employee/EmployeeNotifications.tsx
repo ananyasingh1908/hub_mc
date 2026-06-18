@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Megaphone, Plus, Pencil, Trash2, X, LoaderCircle, Globe,
-  Calendar, Clock, CheckCircle, AlertCircle, Bell, ExternalLink,
+  Calendar, Clock, Bell, ExternalLink,
   Eye, EyeOff,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -361,7 +361,7 @@ export default function EmployeeNotifications() {
                 </div>
                 <div>
                   <label className="text-xs font-medium text-white/50">Link (optional)</label>
-                  <input type="url" value={notifForm.link} onChange={(e) => setNotifForm((prev) => ({ ...prev, link: e.target.value }))} placeholder="https://hubmc.net/tournaments" className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-[var(--hub-blue)]" />
+                  <input type="url" value={notifForm.link} onChange={(e) => setNotifForm((prev) => ({ ...prev, link: e.target.value }))} placeholder="https://hubmc.in/tournaments" className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-[var(--hub-blue)]" />
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>

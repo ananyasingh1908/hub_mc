@@ -58,10 +58,10 @@ import { getAdminSession } from "@/lib/auth/admin-session";
 import { getPrismaClient } from "@/lib/db/prisma";
 
 async function getStaffSession(request: Request): Promise<{ employeeId: string | null; email: string | null } | null> {
-  let s = await getAdminSession(request);
-  if (s) return { employeeId: s.sub, email: s.email };
-  s = await getEmployeeSession(request);
-  if (s) return { employeeId: s.employeeId, email: s.email };
+  const admin = await getAdminSession(request);
+  if (admin) return { employeeId: admin.sub, email: admin.email };
+  const employee = await getEmployeeSession(request);
+  if (employee) return { employeeId: employee.employeeId, email: employee.email };
   return null;
 }
 

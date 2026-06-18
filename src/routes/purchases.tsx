@@ -1,22 +1,20 @@
-import { createFileRoute } from "@tanstack/react-router";
-import PurchasesPage from "@/components/PurchasesPage";
+import { createFileRoute, lazyRouteComponent as lazy } from "@tanstack/react-router";
+import { seoHead } from "@/lib/seo";
 import { requireAuth } from "@/lib/auth/route-guard";
 
+const PurchasesPage = lazy(() => import("@/components/PurchasesPage"));
+
 export const Route = createFileRoute("/purchases")({
-  beforeLoad: requireAuth,
   component: PurchasesRoute,
-  head: () => ({
-    meta: [
-      { title: "HUBMC Purchases" },
-      {
-        name: "description",
-        content:
-          "View your HUBMC Minecraft server purchase history, active ranks, and premium rewards.",
-      },
-    ],
+  beforeLoad: () => requireAuth("/login"),
+  head: () => seoHead({
+    title: "My Purchases — HUBMC",
+    description: "View your HUBMC purchase history and order details.",
+    path: "/purchases",
   }),
 });
 
 function PurchasesRoute() {
   return <PurchasesPage />;
 }
+

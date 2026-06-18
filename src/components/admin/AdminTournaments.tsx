@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Trophy, Plus, Pencil, Trash2, Users, Calendar, Clock, Gamepad2,
-  Sword, LoaderCircle, X, CheckCircle, AlertCircle, Award, Search,
+  Trophy, Plus, Pencil, Trash2, Users, Calendar, Gamepad2,
+  Sword, LoaderCircle, X, Award,
 } from "lucide-react";
 import { toast } from "sonner";
 import ImageUpload from "@/components/ui/ImageUpload";
@@ -448,11 +448,11 @@ export default function AdminTournaments() {
                   </div>
                   <div className="sm:col-span-2">
                     <label className="text-xs font-medium text-white/50">Discord Link</label>
-                    <input type="url" name="discordLink" value={form.discordLink} onChange={handleInputChange} placeholder="https://discord.gg/hubmc" className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-[var(--hub-blue)]" />
+                    <input type="url" name="discordLink" value={form.discordLink} onChange={handleInputChange} placeholder="https://discord.gg/CwNVBCuSbj" className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-[var(--hub-blue)]" />
                   </div>
                   <div className="sm:col-span-2">
                     <label className="text-xs font-medium text-white/50">Server IP</label>
-                    <input type="text" name="serverIp" value={form.serverIp} onChange={handleInputChange} placeholder="play.hubmc.net" className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-[var(--hub-blue)]" />
+                    <input type="text" name="serverIp" value={form.serverIp} onChange={handleInputChange} placeholder="play.hubmc.in" className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-[var(--hub-blue)]" />
                   </div>
                   <div className="sm:col-span-2">
                     <label className="text-xs font-medium text-white/50">Rules *</label>

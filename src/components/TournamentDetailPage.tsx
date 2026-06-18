@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 import {
   Calendar, Clock, Users, Award, Trophy, Sword, Gamepad2,
   Server, ExternalLink, ArrowLeft, CheckCircle, AlertCircle,
-  LoaderCircle, MessageSquare, User, ShieldCheck, ChevronDown, ChevronUp,
-  Swords, Medal, ChartBar, BookOpen,
+  LoaderCircle, MessageSquare, User, ChevronDown, ChevronUp,
+  Swords, Medal, BookOpen,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthSession } from "@/lib/auth/client";
 import { devlog, devwarn } from "@/lib/dev-log";
+import { trackEvent, AnalyticsEvents } from "@/lib/analytics";
+import { JsonLd } from "@/components/JsonLd";
+import { eventSchema, breadcrumbSchema } from "@/lib/json-ld";
 
 type TournamentDetail = {
   id: string;
@@ -87,7 +90,7 @@ export default function TournamentDetailPage({ tournamentId }: { tournamentId: s
   const [submitting, setSubmitting] = useState(false);
   const [rulesOpen, setRulesOpen] = useState(false);
 
-  const session = useAuthSession();
+  const { data: session } = useAuthSession();
 
   useEffect(() => {
     devlog("[TournamentDetailPage] Loading tournament:", tournamentId);
@@ -100,6 +103,14 @@ export default function TournamentDetailPage({ tournamentId }: { tournamentId: s
         devlog("[TournamentDetailPage] Loaded:", d.tournament?.title, "registered:", !!d.userRegistration);
         setTournament(d.tournament);
         setUserRegistration(d.userRegistration);
+
+        if (d.tournament) {
+          trackEvent(AnalyticsEvents.VIEW_TOURNAMENT, {
+            tournament_id: d.tournament.id,
+            tournament_title: d.tournament.title,
+            tournament_type: d.tournament.type,
+          });
+        }
       })
       .catch((err) => {
         devwarn("[TournamentDetailPage] Failed to load tournament:", err);
@@ -188,6 +199,10 @@ export default function TournamentDetailPage({ tournamentId }: { tournamentId: s
       });
       const d = await res.json();
       if (d.ok) {
+        trackEvent(AnalyticsEvents.TOURNAMENT_REGISTRATION, {
+          tournament_id: tournamentId,
+          tournament_title: tournament?.title ?? "",
+        });
         toast.success("Successfully registered for the tournament!");
         const full = await fetch(`/api/tournaments/detail?id=${tournamentId}`).then((r) => r.json());
         if (full.userRegistration) setUserRegistration(full.userRegistration);
@@ -243,8 +258,31 @@ export default function TournamentDetailPage({ tournamentId }: { tournamentId: s
   const maxRound = matches.length > 0 ? Math.max(...matches.map((m) => m.round)) : 0;
   const rounds = Array.from({ length: maxRound }, (_, i) => i + 1);
 
+  const eventJsonLd = tournament ? eventSchema({
+    id: tournament.id,
+    name: tournament.title,
+    description: `${tournament.type} ${tournament.gameMode} tournament on HUBMC. ${tournament.rules?.slice(0, 160) || ""}`,
+    startDate: tournament.dateTime,
+    status: tournament.status,
+    type: tournament.type,
+    maxParticipants: tournament.maxParticipants,
+    registrationsCount: tournament.registrationsCount,
+    entryFee: tournament.entryFee,
+    prizePool: tournament.prizePool,
+    image: tournament.bannerUrl ?? undefined,
+    location: tournament.serverIp || "play.hubmc.in",
+  }) : null;
+
+  const detailBreadcrumbItems = [
+    { name: "Home", url: "/" },
+    { name: "Tournaments", url: "/tournaments" },
+    { name: tournament?.title ?? "Tournament", url: `/tournaments/${tournamentId}` },
+  ];
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+      {eventJsonLd && <JsonLd data={eventJsonLd} />}
+      <JsonLd data={breadcrumbSchema(detailBreadcrumbItems)} />
       <Link to="/tournaments" className="inline-flex items-center gap-2 text-sm text-white/50 transition-colors hover:text-white">
         <ArrowLeft className="h-4 w-4" /> All Tournaments
       </Link>

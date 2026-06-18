@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   Truck, Search, ChevronDown, ChevronUp, RotateCcw, Terminal,
-  Clock, CheckCircle2, XCircle, RefreshCw, AlertTriangle,
+  RefreshCw, AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 

@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Search, LoaderCircle, Shield, Ban, FileText, ChevronDown, X, Trophy, ShoppingCart, Ticket, Activity } from "lucide-react";
+import { Search, LoaderCircle, Shield, Ban, FileText, X, Trophy, ShoppingCart, Ticket } from "lucide-react";
 
 type Player = {
   id: string;

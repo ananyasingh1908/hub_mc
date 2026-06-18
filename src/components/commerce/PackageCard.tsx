@@ -5,6 +5,16 @@ import { toast } from "sonner";
 import type { Product } from "@/lib/commerce/types";
 import { formatCurrency } from "@/lib/commerce/pricing";
 import { useCartStore } from "@/store/cart-store";
+import { trackEvent, AnalyticsEvents } from "@/lib/analytics";
+
+function fireAddToCart(product: Product) {
+  trackEvent(AnalyticsEvents.ADD_TO_CART, {
+    product_id: product.id,
+    product_name: product.name,
+    product_category: product.category,
+    price: product.price,
+  });
+}
 import {
   Dialog,
   DialogContent,
@@ -41,6 +51,7 @@ export function PackageCard({ product }: { product: Product }) {
 
   const handleAddToCart = () => {
     addItem(product);
+    fireAddToCart(product);
     toast.success(`${product.name} added to cart`, {
       description: "Your HUBMC order summary updated instantly.",
     });

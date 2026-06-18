@@ -143,7 +143,7 @@ export async function handleEmployeeLoginRequest(request: Request): Promise<Resp
     const msg = sessionError instanceof Error ? sessionError.message : String(sessionError);
     console.error("[EmployeeAuth] Session creation FAILED:", msg);
     return Response.json(
-      { ok: false, error: "Session creation failed: " + msg },
+      { ok: false, error: "Session creation failed. Please try again." },
       { status: 500 },
     );
   }

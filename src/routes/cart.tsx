@@ -1,21 +1,22 @@
-import { createFileRoute } from "@tanstack/react-router";
-import CartPage from "@/components/CartPage";
+import { createFileRoute, lazyRouteComponent as lazy } from "@tanstack/react-router";
 import { RouteErrorBoundary } from "@/components/RouteErrorBoundary";
+import { seoHead } from "@/lib/seo";
+import { requireAuth } from "@/lib/auth/route-guard";
+
+const CartPage = lazy(() => import("@/components/CartPage"));
 
 export const Route = createFileRoute("/cart")({
   component: CartRoute,
+  beforeLoad: () => requireAuth("/login"),
   errorComponent: RouteErrorBoundary,
-  head: () => ({
-    meta: [
-      { title: "HUBMC Cart" },
-      {
-        name: "description",
-        content: "Review your HUBMC packages, coupons, and order summary.",
-      },
-    ],
+  head: () => seoHead({
+    title: "Cart — HUBMC Store",
+    description: "Review your HUBMC cart and proceed to checkout.",
+    path: "/cart",
   }),
 });
 
 function CartRoute() {
   return <CartPage />;
 }
+

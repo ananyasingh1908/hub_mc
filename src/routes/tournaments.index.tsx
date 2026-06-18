@@ -1,12 +1,20 @@
-import { createFileRoute } from "@tanstack/react-router";
-import TournamentsPage from "@/components/TournamentsPage";
+import { createFileRoute, lazyRouteComponent as lazy } from "@tanstack/react-router";
 import { RouteErrorBoundary } from "@/components/RouteErrorBoundary";
+import { seoHead } from "@/lib/seo";
+
+const TournamentsPage = lazy(() => import("@/components/TournamentsPage"));
 
 export const Route = createFileRoute("/tournaments/")({
-  component: TournamentsPageRoute,
+  component: TournamentsRoute,
   errorComponent: RouteErrorBoundary,
+  head: () => seoHead({
+    title: "HUBMC Tournaments — Minecraft PvP Events",
+    description: "Browse HUBMC Minecraft tournaments. Compete in PvP events, win prizes, and climb the leaderboard.",
+    path: "/tournaments",
+  }),
 });
 
-function TournamentsPageRoute() {
+function TournamentsRoute() {
   return <TournamentsPage />;
 }
+

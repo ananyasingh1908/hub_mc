@@ -326,14 +326,22 @@ export const HubMCNavbar = forwardRef<HTMLElement>(function HubMCNavbar(
                         <Headset className="h-4 w-4 text-[var(--hub-blue)]" />
                         Support
                       </Link>
-                      <button
-                        type="button"
+                      <Link
+                        to="/profile"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-sm text-white/72 transition-colors hover:bg-[rgba(62,162,255,0.1)] hover:text-white"
+                        className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm text-white/72 transition-colors hover:bg-[rgba(62,162,255,0.1)] hover:text-white"
                       >
-                        <Bell className="h-4 w-4 text-[var(--hub-blue)]" />
-                        Notifications
-                      </button>
+                        <UserRound className="h-4 w-4 text-[var(--hub-blue)]" />
+                        Profile
+                      </Link>
+                      <Link
+                        to="/purchases"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm text-white/72 transition-colors hover:bg-[rgba(62,162,255,0.1)] hover:text-white"
+                      >
+                        <WalletCards className="h-4 w-4 text-[var(--hub-blue)]" />
+                        Purchases
+                      </Link>
                     </div>
                   </>
                 )}

@@ -1,18 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
-import AdminStreams from "@/components/admin/AdminStreams";
-import { requireAdminAuth } from "@/lib/auth/route-guard";
+import { createFileRoute, lazyRouteComponent as lazy } from "@tanstack/react-router";
+import { noindexHead } from "@/lib/seo";
+
+const AdminStreams = lazy(() => import("@/components/admin/AdminStreams"));
 
 export const Route = createFileRoute("/admin/streams")({
-  beforeLoad: () => requireAdminAuth("/admin-login"),
   component: AdminStreamsRoute,
-  head: () => ({
-    meta: [
-      { title: "Stream Moderation - HUBMC Admin" },
-      { name: "description", content: "Manage community livestreams and blacklisted channels." },
-    ],
-  }),
+  head: () => noindexHead("Streams — HUBMC Admin"),
 });
 
 function AdminStreamsRoute() {
   return <AdminStreams />;
 }
+

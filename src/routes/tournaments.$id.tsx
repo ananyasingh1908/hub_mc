@@ -1,15 +1,16 @@
-import { createFileRoute } from "@tanstack/react-router";
-import TournamentDetailPage from "@/components/TournamentDetailPage";
+import { createFileRoute, lazyRouteComponent as lazy } from "@tanstack/react-router";
 import { RouteErrorBoundary } from "@/components/RouteErrorBoundary";
+import { seoHead } from "@/lib/seo";
+
+const TournamentDetailPage = lazy(() => import("@/components/TournamentDetailPage"));
 
 export const Route = createFileRoute("/tournaments/$id")({
   component: TournamentDetailRoute,
   errorComponent: RouteErrorBoundary,
-  head: () => ({
-    meta: [
-      { title: "Tournament Details - HUBMC" },
-      { name: "description", content: "View HUBMC tournament details, brackets, leaderboard, and register to compete." },
-    ],
+  head: () => seoHead({
+    title: "Tournament Details — HUBMC Minecraft Events",
+    description: "View HUBMC tournament details, brackets, leaderboard, and register to compete for prizes.",
+    path: "/tournaments",
   }),
 });
 
@@ -17,3 +18,4 @@ function TournamentDetailRoute() {
   const { id } = Route.useParams();
   return <TournamentDetailPage tournamentId={id} />;
 }
+

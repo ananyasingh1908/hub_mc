@@ -1,4 +1,6 @@
 import { getHubMCSession } from "@/lib/auth/session";
+import { getAdminSession } from "@/lib/auth/admin-session";
+import { getEmployeeSession } from "@/lib/auth/employee-session";
 import { getOrdersForUser, retryDelivery } from "@/lib/commerce/delivery";
 import { getPrismaClient } from "@/lib/db/prisma";
 
@@ -69,8 +71,23 @@ export async function handleRetryDelivery(request: Request): Promise<Response> {
   }
 }
 
+async function isStaffSession(request: Request): Promise<boolean> {
+  const admin = await getAdminSession(request);
+  if (admin) return true;
+  const employee = await getEmployeeSession(request);
+  if (employee) return true;
+  return false;
+}
+
 export async function handleRefundOrder(request: Request): Promise<Response> {
   try {
+    if (!await isStaffSession(request)) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized. Admin or employee session required." }),
+        { status: 401, headers: { "content-type": "application/json" } },
+      );
+    }
+
     const body = (await request.json()) as { orderId: string; reason?: string };
     if (!body.orderId) {
       return new Response(
@@ -148,6 +165,16 @@ export async function handleGetOrderInvoice(request: Request): Promise<Response>
       return new Response(
         JSON.stringify({ error: "Order not found." }),
         { status: 404, headers: { "content-type": "application/json" } },
+      );
+    }
+
+    const customerSession = await getHubMCSession(request);
+    const isStaff = await isStaffSession(request);
+    const isOwner = customerSession?.user?.minecraftUsername === order.minecraftUsername;
+    if (!isStaff && !isOwner) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized." }),
+        { status: 401, headers: { "content-type": "application/json" } },
       );
     }
 

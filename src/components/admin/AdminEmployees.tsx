@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { UserCog, Plus, UserX, Shield, ToggleLeft, ToggleRight, Save, X } from "lucide-react";
+import { UserCog, Plus, Shield, ToggleLeft, ToggleRight } from "lucide-react";
 import { toast } from "sonner";
 
 type Employee = { id: string; displayName: string; department: string | null; isActive: boolean; email: string; minecraftUsername: string; role: string; createdAt: string; permissions: { products: boolean; orders: boolean; support: boolean; customers: boolean; employees: boolean; logs: boolean } | null };

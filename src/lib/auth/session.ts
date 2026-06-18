@@ -20,7 +20,7 @@ function getEncodedSecret(): Uint8Array {
 }
 
 export function buildSetCookieHeader(cookieName: string, value: string, maxAge: number, secure: boolean): string {
-  return `${cookieName}=${value}; Max-Age=${maxAge}; Path=/; HttpOnly; SameSite=Lax${secure ? "; Secure" : ""}`;
+  return `${cookieName}=${value}; Max-Age=${maxAge}; Path=/; HttpOnly; SameSite=Strict${secure ? "; Secure" : ""}`;
 }
 
 function getExpirationDate(): Date {

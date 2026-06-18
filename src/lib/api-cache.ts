@@ -1,4 +1,4 @@
-import { devlog } from "@/lib/dev-log";
+import { devlog, devwarn } from "@/lib/dev-log";
 
 interface CacheEntry {
   data: unknown;
@@ -50,10 +50,10 @@ export async function dedupedFetch<T>(
     .then((data) => {
       if (isEmpty && isEmpty(data)) {
         if (cached) {
-          console.warn(`[${prefix}] Fresh fetch returned empty — keeping cached data`);
+          devwarn(`[${prefix}] Fresh fetch returned empty — keeping cached data`);
           return cached.data;
         }
-        console.warn(`[${prefix}] Fresh fetch returned empty, no cache to fall back to`);
+        devwarn(`[${prefix}] Fresh fetch returned empty, no cache to fall back to`);
       }
       setCache(cacheKey, data);
       return data;
@@ -61,7 +61,7 @@ export async function dedupedFetch<T>(
     .catch((err) => {
       if (cached) {
         const msg = err instanceof Error ? err.message : String(err);
-        console.warn(`[${prefix}] Fetch failed — serving stale cache (age ${cached.age}ms): ${msg}`);
+        devwarn(`[${prefix}] Fetch failed — serving stale cache (age ${cached.age}ms): ${msg}`);
         return cached.data;
       }
       throw err;
@@ -88,7 +88,7 @@ export function setRateLimited(endpoint: string, retryAfterSec: number): void {
   const nextBackoff = prevBackoff === 0 ? 1000 : Math.min(prevBackoff * 2, 10_000);
   const waitMs = Math.max(retryAfterSec * 1000, nextBackoff);
   rateLimitMap.set(endpoint, { until: Date.now() + waitMs, backoff: nextBackoff, endpoint });
-  console.log(`[Discord] Waiting due to rate limit for ${waitMs}ms`);
+  devlog(`[Discord] Waiting due to rate limit for ${waitMs}ms`);
 }
 
 export function clearStaleCache(): void {

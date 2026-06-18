@@ -8,9 +8,9 @@ type RconClient = {
 let rconInstance: RconClient | null = null;
 
 export function getRconConnection(): RconClient | null {
-  const host = process.env.MINECRAFT_RCON_HOST;
-  const port = process.env.MINECRAFT_RCON_PORT;
-  const password = process.env.MINECRAFT_RCON_PASSWORD;
+  const host = process.env.MC_RCON_HOST;
+  const port = process.env.MC_RCON_PORT;
+  const password = process.env.MC_RCON_PASSWORD;
 
   if (!host || !port || !password) {
     return null;
@@ -19,13 +19,39 @@ export function getRconConnection(): RconClient | null {
   if (rconInstance) return rconInstance;
 
   try {
-    const { Rcon } = require("rcon");
+    const Rcon = require("rcon");
     const conn = new Rcon(host, parseInt(port), password);
+
+    let authed = false;
+    let authResolve: (() => void) | null = null;
+    const authPromise = new Promise<void>((resolve) => { authResolve = resolve; });
+
+    conn.on("auth", () => {
+      authed = true;
+      if (authResolve) authResolve();
+    });
+
     conn.connect();
+
     rconInstance = {
       send: async (cmd: string) => {
+        if (!authed) {
+          await authPromise;
+        }
         return new Promise((resolve, reject) => {
-          conn.send(cmd, (result: string) => resolve(result), (err: Error) => reject(err));
+          const onResponse = (response: string) => {
+            conn.removeListener("response", onResponse);
+            conn.removeListener("error", onError);
+            resolve(response);
+          };
+          const onError = (err: Error) => {
+            conn.removeListener("response", onResponse);
+            conn.removeListener("error", onError);
+            reject(err);
+          };
+          conn.on("response", onResponse);
+          conn.on("error", onError);
+          conn.send(cmd);
         });
       },
       end: async () => {

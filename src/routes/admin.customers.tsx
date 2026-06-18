@@ -1,18 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
-import AdminCustomers from "@/components/admin/AdminCustomers";
-import { requireAdminAuth } from "@/lib/auth/route-guard";
+import { createFileRoute, lazyRouteComponent as lazy } from "@tanstack/react-router";
+import { noindexHead } from "@/lib/seo";
+
+const AdminCustomers = lazy(() => import("@/components/admin/AdminCustomers"));
 
 export const Route = createFileRoute("/admin/customers")({
-  beforeLoad: () => requireAdminAuth("/admin-login"),
-  component: AdminCustomersPage,
-  head: () => ({
-    meta: [
-      { title: "Customers - HUBMC Admin" },
-      { name: "description", content: "View HUBMC customer database." },
-    ],
-  }),
+  component: AdminCustomersRoute,
+  head: () => noindexHead("Customers — HUBMC Admin"),
 });
 
-function AdminCustomersPage() {
+function AdminCustomersRoute() {
   return <AdminCustomers />;
 }
+
