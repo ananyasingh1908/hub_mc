@@ -13,9 +13,6 @@ if (!process.env.SUPER_ADMIN_PASSWORD) console.warn("[ENV] SUPER_ADMIN_PASSWORD 
 if (process.env.GOOGLE_CLIENT_ID) devlog("[ENV] GOOGLE_CLIENT_ID is configured");
 if (process.env.SUPER_ADMIN_ID && process.env.SUPER_ADMIN_PASSWORD) devlog("[ENV] Super admin credentials are configured");
 
-// Pre-warm YouTube cache from DB on startup so first request serves data immediately
-initializeCache();
-
 import {
   getClientVisibleAuthState,
   handleLoginRequest,
@@ -241,9 +238,18 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
   return brandedErrorResponse();
 }
 
+let cacheInitialized = false;
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     const url = new URL(request.url);
+
+    // Lazy-init YouTube cache on first request (not at module scope)
+    if (!cacheInitialized) {
+      cacheInitialized = true;
+      initializeCache();
+    }
+
     const response = await this.handleRequest(request, env, ctx, url);
     return applySecurityHeaders(response, url);
   },

@@ -6,26 +6,16 @@ type CacheEntry = {
 
 const store = new Map<string, CacheEntry>();
 
-const CLEANUP_INTERVAL_MS = 60_000;
-let cleanupTimer: ReturnType<typeof setInterval> | null = null;
-
-function scheduleCleanup(): void {
-  if (cleanupTimer) return;
-  cleanupTimer = setInterval(() => {
-    const now = Date.now();
-    for (const [key, entry] of store) {
-      if (now >= entry.expiresAt) store.delete(key);
-    }
-    if (store.size === 0 && cleanupTimer) {
-      clearInterval(cleanupTimer);
-      cleanupTimer = null;
-    }
-  }, CLEANUP_INTERVAL_MS);
-}
-
 const JSON_HEADERS = {
   "content-type": "application/json; charset=utf-8",
 };
+
+function cleanupExpired(): void {
+  const now = Date.now();
+  for (const [key, entry] of store) {
+    if (now >= entry.expiresAt) store.delete(key);
+  }
+}
 
 export function cachedJson(
   request: Request,
@@ -34,6 +24,9 @@ export function cachedJson(
 ): Promise<Response> {
   const key = new URL(request.url).pathname;
   const now = Date.now();
+
+  // Lazy cleanup on each request (no setInterval in Workers)
+  cleanupExpired();
 
   const entry = store.get(key);
   if (entry && now < entry.expiresAt) {
@@ -55,7 +48,6 @@ export function cachedJson(
       return response.clone().json().then((data) => {
         const expiresAt = now + ttlSeconds * 1000;
         store.set(key, { data, status: response.status, expiresAt });
-        scheduleCleanup();
         return new Response(JSON.stringify(data), {
           status: response.status,
           headers: {

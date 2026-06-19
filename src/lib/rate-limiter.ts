@@ -66,8 +66,3 @@ export function clearExpiredBuckets(): void {
     if (now >= entry.resetAt) buckets.delete(key);
   }
 }
-
-// Periodic cleanup every 5 minutes
-if (typeof setInterval !== "undefined") {
-  setInterval(clearExpiredBuckets, 300_000);
-}

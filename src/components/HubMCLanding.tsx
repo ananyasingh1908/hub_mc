@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { AnimatePresence } from "framer-motion";
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
-import { Send, CheckCircle, HelpCircle, MessageCircle, Mail, Clock, Sword, Package, Trophy, Users, Shield, Settings } from "lucide-react";
+import { Send, CheckCircle, HelpCircle, MessageCircle, Mail, Clock, Sword, Package, Trophy, Users, Shield, Settings, Copy, Check } from "lucide-react";
+import { toast } from "sonner";
 import heroImg from "@/assets/last_home_hub.png";
 import logoImg from "@/assets/hubmc-logo.png";
 import { HubMCNavbar } from "@/components/commerce/HubMCNavbar";
@@ -41,6 +42,57 @@ function useElementHeight<T extends HTMLElement>(ref: RefObject<T | null>) {
   }, [ref]);
 
   return height;
+}
+
+function ServerIpPill() {
+  const [copied, setCopied] = useState(false);
+
+  async function copyIp() {
+    try {
+      await navigator.clipboard.writeText("play.hubmc.in");
+      setCopied(true);
+      toast.success("Server IP copied!");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Failed to copy IP");
+    }
+  }
+
+  return (
+    <div className="pointer-events-auto absolute left-4 top-6 z-20 sm:left-6 md:left-8 md:top-8">
+      <button
+        onClick={copyIp}
+        className="group flex items-center gap-2.5 cursor-pointer rounded-full px-4 py-2 transition-all duration-300 hover:scale-105"
+        style={{
+          background: "linear-gradient(135deg, rgba(20,20,20,.75), rgba(0,0,0,.85))",
+          border: "1px solid rgba(255,180,50,.4)",
+          boxShadow: "0 4px 24px rgba(0,0,0,.5), 0 0 16px rgba(255,160,0,.12)",
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
+        }}
+        aria-label="Copy server IP to clipboard"
+      >
+        {/* Hover glow */}
+        <div
+          className="pointer-events-none absolute inset-0 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          style={{ boxShadow: "0 0 30px -4px rgba(255,180,50,0.35)" }}
+        />
+        <span
+          className="relative z-10 text-xs sm:text-sm font-black tracking-widest text-white drop-shadow-[0_0_10px_rgba(255,138,42,0.5)]"
+          style={{ textShadow: "0 0 12px rgba(255,138,42,0.4)" }}
+        >
+          PLAY.HUBMC.IN
+        </span>
+        <span className="relative z-10 flex items-center gap-1.5 rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white/90">
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,.8)]" />
+          ONLINE
+        </span>
+        <span className="relative z-10 text-white/60 transition-colors duration-200 group-hover:text-white">
+          {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+        </span>
+      </button>
+    </div>
+  );
 }
 
 function Hero({ navHeight }: { navHeight: number }) {
@@ -134,6 +186,9 @@ function Hero({ navHeight }: { navHeight: number }) {
           }}
           className="relative z-10 h-full pointer-events-none"
         >
+          {/* ─── SERVER IP ─── */}
+          <ServerIpPill />
+
           {/* ─── FEATURE CARDS ─── */}
           <div
             className="pointer-events-auto absolute left-1/2 -translate-x-1/2 w-full px-4"
