@@ -21,8 +21,7 @@ async function lookupMojangProfile(username: string): Promise<{ id: string; name
       const response = await fetch(url, {
         signal: AbortSignal.timeout(20000),
         headers: {
-          "Accept": "application/json",
-          "User-Agent": "HUBMC",
+        "Accept": "application/json",
         },
       });
 
@@ -74,7 +73,12 @@ async function lookupMojangProfile(username: string): Promise<{ id: string; name
       return { id: profile.id, name: profile.name };
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      devlog("[Mojang] Network error for", username, ":", msg);
+
+      devlog("[Mojang] FULL ERROR:", {
+  username,
+  message: msg,
+  stack: err instanceof Error ? err.stack : null,
+});
       if (attempt < 2) {
         devlog("[Mojang] Retrying after network error...");
         continue;
@@ -94,7 +98,6 @@ async function fetchMinecraftProfile(uuid: string): Promise<MinecraftProfile | n
       signal: AbortSignal.timeout(20000),
       headers: {
         "Accept": "application/json",
-        "User-Agent": "HUBMC",
       },
     });
   } catch {
