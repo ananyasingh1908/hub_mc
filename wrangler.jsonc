@@ -5,7 +5,7 @@
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/server.ts",
   "vars": {
-    "SUPER_ADMIN_ID": "hub_mc_16",
+    "SUPER_ADMIN_ID": "HUB_MC_ADMIN",
     "YOUTUBE_CHANNEL_ID": "UC0Krc1QNCKs6jovdXe5WICA",
     "DISCORD_SERVER_ID": "1425411040329465878",
     "DISCORD_INVITE": "https://discord.gg/CwNVBCuSbj",
