@@ -157,7 +157,7 @@ export default function LivestreamPage() {
     } catch {}
     finally { setLoadingReviews(false); }
   };
-
+  const ytConnected = ytChannel?.connected;
   useEffect(() => { fetchYouTube(); fetchCommunityStreams(); fetchDiscord(); fetchReviews(); }, []);
 
   // Retry YouTube fetch if first attempt returned empty (cache was cold on server)
@@ -201,7 +201,6 @@ export default function LivestreamPage() {
   };
 
   const isCustomer = !sessionLoading && session?.user?.minecraftUsername;
-  const ytConnected = ytChannel?.connected;
   const dsConnected = discordStatus?.connected;
   const discordInvite = discordStatus?.invite;
 

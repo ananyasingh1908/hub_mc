@@ -17,7 +17,7 @@
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",
     "@hookform/resolvers": "^5.2.2",
-    "@prisma/client": "^6.16.0",
+    "@prisma/client": "^6.19.3",
     "@prisma/extension-accelerate": "^3.0.1",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -90,7 +90,7 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^15.15.0",
     "prettier": "^3.7.3",
-    "prisma": "^6.16.0",
+    "prisma": "^6.19.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^7.3.1"
