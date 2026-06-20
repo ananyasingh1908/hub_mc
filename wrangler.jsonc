@@ -2,7 +2,10 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "tanstack-start-app",
   "compatibility_date": "2025-09-24",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": [
+    "nodejs_compat",
+    "nodejs_als"
+  ],
   "main": "src/server.ts",
   "vars": {
     "SUPER_ADMIN_ID": "HUB_MC_ADMIN",
