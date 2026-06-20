@@ -4,7 +4,7 @@
   "installCommand": "npm install && npx prisma generate",
   "routes": [
     {
-      "src": "/assets/(.*)",
+      "src": "/(.*\\.(css|js|png|jpg|jpeg|gif|svg|webp|ico|map|woff|woff2|ttf|eot))",
       "dest": "/dist/client/assets/$1"
     },
     {
