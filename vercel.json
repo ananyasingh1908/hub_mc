@@ -4,14 +4,6 @@
   "installCommand": "npm install && npx prisma generate",
   "rewrites": [
     {
-      "source": "/assets/(.*)",
-      "destination": "/dist/client/assets/$1"
-    },
-    {
-      "source": "/(.*\\.(png|jpg|jpeg|gif|svg|webp|ico|css|js|map|txt|woff|woff2))",
-      "destination": "/dist/client/$1"
-    },
-    {
       "source": "/(.*)",
       "destination": "/api/index.js"
     }
