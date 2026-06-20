@@ -4,16 +4,7 @@
   "installCommand": "npm install && npx prisma generate",
   "routes": [
     {
-      "src": "/assets/(.*)",
-      "dest": "/dist/client/assets/$1"
-    },
-    {
-      "src": "/favicon.ico",
-      "dest": "/dist/client/favicon.ico"
-    },
-    {
-      "src": "/favicon.png",
-      "dest": "/dist/client/favicon.png"
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
