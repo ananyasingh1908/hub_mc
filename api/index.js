@@ -30,29 +30,84 @@ function contentType(filePath) {
   return MIME_TYPES[path.extname(filePath).toLowerCase()] || "application/octet-stream";
 }
 
-async function serveFile(filePath) {
+async function serveStaticFile(filePath, res) {
   try {
     const data = await fs.readFile(filePath);
-    return new Response(data, {
-      status: 200,
-      headers: {
-        "content-type": contentType(filePath),
-        "cache-control": "public, max-age=31536000, immutable"
-      }
-    });
+    res.statusCode = 200;
+    res.setHeader("content-type", contentType(filePath));
+
+    // long cache only for assets
+    if (filePath.includes(`${path.sep}assets${path.sep}`)) {
+      res.setHeader("cache-control", "public, max-age=31536000, immutable");
+    }
+
+    res.end(data);
+    return true;
   } catch {
-    return null;
+    return false;
   }
 }
 
 export default async function handler(req, res) {
-  const host = req.headers["x-forwarded-host"] || req.headers.host;
-  const proto = req.headers["x-forwarded-proto"] || "https";
-  const url = new URL(req.url, `${proto}://${host}`);
-  const pathname = url.pathname;
+  try {
+    const host = req.headers["x-forwarded-host"] || req.headers.host || "localhost";
+    const proto = req.headers["x-forwarded-proto"] || "https";
+    const url = new URL(req.url, `${proto}://${host}`);
+    const pathname = decodeURIComponent(url.pathname);
 
-  // 1) API routes -> TanStack server
-  if (pathname.startsWith("/api")) {
+    // 1) Serve built assets directly from dist/client/assets
+    if (pathname.startsWith("/assets/")) {
+      const assetFile = path.join(clientDir, pathname.slice(1)); // assets/...
+      const served = await serveStaticFile(assetFile, res);
+      if (served) return;
+    }
+
+    // 2) Serve common root static files from dist/client
+    const rootStaticCandidates = [
+      "favicon.ico",
+      "favicon.png",
+      "robots.txt",
+      "manifest.webmanifest",
+      "manifest.json"
+    ];
+
+    if (rootStaticCandidates.includes(pathname.slice(1))) {
+      const filePath = path.join(clientDir, pathname.slice(1));
+      const served = await serveStaticFile(filePath, res);
+      if (served) return;
+    }
+
+    // 3) API routes -> TanStack server handler
+    if (pathname.startsWith("/api")) {
+      const request = new Request(url.toString(), {
+        method: req.method,
+        headers: req.headers,
+        body:
+          req.method !== "GET" && req.method !== "HEAD"
+            ? req
+            : undefined,
+        duplex: "half"
+      });
+
+      const response = await serverHandler.fetch(request);
+
+      res.statusCode = response.status;
+      response.headers.forEach((value, key) => {
+        res.setHeader(key, value);
+      });
+
+      const buffer = Buffer.from(await response.arrayBuffer());
+      res.end(buffer);
+      return;
+    }
+
+    // 4) First try exact static file from dist/client
+    const cleanPath = pathname === "/" ? "index.html" : pathname.slice(1);
+    const directStaticFile = path.join(clientDir, cleanPath);
+    const servedDirect = await serveStaticFile(directStaticFile, res);
+    if (servedDirect) return;
+
+    // 5) Everything else -> TanStack server render
     const request = new Request(url.toString(), {
       method: req.method,
       headers: req.headers,
@@ -72,41 +127,10 @@ export default async function handler(req, res) {
 
     const buffer = Buffer.from(await response.arrayBuffer());
     res.end(buffer);
-    return;
+  } catch (error) {
+    console.error("Vercel handler error:", error);
+    res.statusCode = 500;
+    res.setHeader("content-type", "text/plain; charset=utf-8");
+    res.end("Internal Server Error");
   }
-
-  // 2) static assets under /assets/*
-  if (pathname.startsWith("/assets/")) {
-    const assetPath = path.join(clientDir, pathname);
-    const fileResponse = await serveFile(assetPath);
-    if (fileResponse) {
-      res.statusCode = fileResponse.status;
-      fileResponse.headers.forEach((value, key) => {
-        res.setHeader(key, value);
-      });
-      const buffer = Buffer.from(await fileResponse.arrayBuffer());
-      res.end(buffer);
-      return;
-    }
-  }
-
-  // 3) common static root files
-  const rootStatic = path.join(clientDir, pathname === "/" ? "index.html" : pathname.slice(1));
-  const maybeStatic = await serveFile(rootStatic);
-  if (maybeStatic) {
-    res.statusCode = maybeStatic.status;
-    maybeStatic.headers.forEach((value, key) => {
-      res.setHeader(key, value);
-    });
-    const buffer = Buffer.from(await maybeStatic.arrayBuffer());
-    res.end(buffer);
-    return;
-  }
-
-  // 4) SPA fallback -> index.html
-  const indexPath = path.join(clientDir, "index.html");
-  const indexHtml = await fs.readFile(indexPath);
-  res.statusCode = 200;
-  res.setHeader("content-type", "text/html; charset=utf-8");
-  res.end(indexHtml);
 }
