@@ -4,7 +4,7 @@
   "installCommand": "npm install && npx prisma generate",
   "functions": {
     "api/index.js": {
-      "runtime": "nodejs20.x"
+      "runtime": "@vercel/node"
     }
   },
   "routes": [
