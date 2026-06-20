@@ -1,3 +1,5 @@
-import handler from "../dist/server/server.js";
+import server from "../dist/server/server.js";
 
-export default handler;
+export default async function handler(request) {
+  return server.fetch(request);
+}
