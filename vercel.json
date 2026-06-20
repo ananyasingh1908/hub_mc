@@ -2,10 +2,22 @@
   "version": 2,
   "buildCommand": "npm run build",
   "installCommand": "npm install && npx prisma generate",
-  "rewrites": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/api/index.js"
+      "src": "/assets/(.*)",
+      "dest": "/dist/client/assets/$1"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/dist/client/favicon.ico"
+    },
+    {
+      "src": "/favicon.png",
+      "dest": "/dist/client/favicon.png"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.js"
     }
   ]
 }

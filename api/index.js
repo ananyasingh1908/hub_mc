@@ -36,7 +36,6 @@ export default async function handler(req, res) {
       duplex: body ? "half" : undefined,
     });
 
-    // minimal env/context object for TanStack server.fetch(request, env, ctx)
     const env = {};
     const ctx = {
       waitUntil: () => {},
@@ -48,7 +47,6 @@ export default async function handler(req, res) {
     res.statusCode = response.status;
 
     response.headers.forEach((value, key) => {
-      // avoid content-length mismatches when Node rewrites body
       if (key.toLowerCase() === "content-length") return;
       res.setHeader(key, value);
     });
