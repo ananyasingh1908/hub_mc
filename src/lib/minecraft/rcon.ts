@@ -7,7 +7,7 @@ type RconClient = {
 
 let rconInstance: RconClient | null = null;
 
-export function getRconConnection(): RconClient | null {
+export async function getRconConnection(): Promise<RconClient | null> {
   const host = process.env.MC_RCON_HOST;
   const port = process.env.MC_RCON_PORT;
   const password = process.env.MC_RCON_PASSWORD;
@@ -19,7 +19,10 @@ export function getRconConnection(): RconClient | null {
   if (rconInstance) return rconInstance;
 
   try {
-    const Rcon = require("rcon");
+    // Dynamic import for ESM/Workers compatibility (rcon is a CJS package using TCP sockets).
+    // On Cloudflare Workers this will likely fail (no raw TCP), so getRconConnection returns null.
+    const mod = await import("rcon");
+    const Rcon = mod.default ?? mod;
     const conn = new Rcon(host, parseInt(port), password);
 
     let authed = false;
@@ -67,7 +70,7 @@ export function getRconConnection(): RconClient | null {
 }
 
 export async function executeMcCommand(command: string): Promise<string | null> {
-  const rcon = getRconConnection();
+  const rcon = await getRconConnection();
   if (!rcon) {
     devlog(`[RCON] No connection — would run: ${command}`);
     return null;

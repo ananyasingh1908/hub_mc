@@ -35,7 +35,7 @@ export async function triggerDelivery(
   const commands: string[] = [];
   buildItemCommands(commands, data.minecraftUsername, data.items);
 
-  const rcon = getRconConnection();
+  const rcon = await getRconConnection();
 
   if (!rcon) {
     const commandLog = commands.join("\n");
@@ -150,7 +150,7 @@ export async function retryDelivery(orderId: string): Promise<boolean> {
     })),
   );
 
-  const rcon = getRconConnection();
+  const rcon = await getRconConnection();
 
   if (!rcon) {
     const commandLog = commands.join("\n");

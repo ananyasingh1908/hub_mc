@@ -14,5 +14,20 @@
     "DISCORD_INVITE": "https://discord.gg/CwNVBCuSbj",
     "MC_RCON_PORT": "25575",
     "BASE_URL": "https://hubmc.in"
-  }
+  },
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "your-hyperdrive-id",
+      "local": {
+        "url": "mysql://user:pass@host:3306/dbname"
+      }
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "UPLOADS_BUCKET",
+      "bucket_name": "hubmc-uploads"
+    }
+  ]
 }

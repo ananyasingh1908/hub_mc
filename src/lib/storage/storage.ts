@@ -3,11 +3,13 @@ export interface StorageProvider {
   delete(url: string): Promise<void>;
 }
 
-class LocalStorageProvider implements StorageProvider {
-  private async getUploadsDir(): Promise<string> {
-    const { join } = await import("path");
-    return join(process.cwd(), "public", "uploads");
-  }
+interface R2LikeBucket {
+  put(key: string, data: ArrayBuffer, opts?: { httpMetadata?: { contentType?: string } }): Promise<unknown>;
+  delete(key: string): Promise<void>;
+}
+
+class R2StorageProvider implements StorageProvider {
+  constructor(private bucket: R2LikeBucket) {}
 
   private assertSafeBasename(filename: string): string {
     if (filename.includes("..") || filename.includes("/") || filename.includes("\\")) {
@@ -16,39 +18,36 @@ class LocalStorageProvider implements StorageProvider {
     return filename;
   }
 
-  async save(filename: string, data: ArrayBuffer, _contentType: string): Promise<string> {
-    const { writeFile, mkdir } = await import("fs/promises");
-    const { join } = await import("path");
+  async save(filename: string, data: ArrayBuffer, contentType: string): Promise<string> {
     const safeName = this.assertSafeBasename(filename);
-    const dir = await this.getUploadsDir();
-    await mkdir(dir, { recursive: true });
-    const filepath = join(dir, safeName);
-    if (!filepath.startsWith(dir)) {
-      throw new Error("Path traversal detected");
-    }
-    await writeFile(filepath, Buffer.from(data));
+    await this.bucket.put(safeName, data, { httpMetadata: { contentType } });
     return `/uploads/${safeName}`;
   }
 
   async delete(url: string): Promise<void> {
-    const { unlink } = await import("fs/promises");
-    const { join } = await import("path");
     const filename = url.replace("/uploads/", "");
     const safeName = this.assertSafeBasename(filename);
-    const dir = await this.getUploadsDir();
-    const filepath = join(dir, safeName);
-    if (!filepath.startsWith(dir)) return;
-    try {
-      await unlink(filepath);
-    } catch {}
+    await this.bucket.delete(safeName);
   }
 }
 
 let provider: StorageProvider | null = null;
+let globalR2Bucket: R2LikeBucket | undefined;
+
+export function setR2Bucket(bucket: R2LikeBucket): void {
+  globalR2Bucket = bucket;
+}
 
 export function getStorage(): StorageProvider {
   if (!provider) {
-    provider = new LocalStorageProvider();
+    const bucket = globalR2Bucket;
+    if (bucket) {
+      provider = new R2StorageProvider(bucket);
+    } else {
+      throw new Error(
+        "No storage provider available. On Cloudflare, bind an R2 bucket as UPLOADS_BUCKET.",
+      );
+    }
   }
   return provider;
 }

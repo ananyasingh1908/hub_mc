@@ -1,17 +1,11 @@
-import { devlog } from "@/lib/dev-log"; 
+import { devlog } from "@/lib/dev-log";
 import "./lib/error-capture";
 import { handleUpload } from "@/lib/upload/upload-handler";
 import { checkRateLimit } from "@/lib/rate-limiter";
 import { cachedJson } from "@/lib/response-cache";
-
-// Warn about missing env vars at startup
-if (!process.env.JWT_SECRET) console.warn("[ENV] JWT_SECRET is not set");
-if (!process.env.GOOGLE_CLIENT_ID) console.warn("[ENV] GOOGLE_CLIENT_ID is not set");
-if (!process.env.GOOGLE_CLIENT_SECRET) console.warn("[ENV] GOOGLE_CLIENT_SECRET is not set");
-if (!process.env.SUPER_ADMIN_ID) console.warn("[ENV] SUPER_ADMIN_ID is not set");
-if (!process.env.SUPER_ADMIN_PASSWORD) console.warn("[ENV] SUPER_ADMIN_PASSWORD is not set");
-if (process.env.GOOGLE_CLIENT_ID) devlog("[ENV] GOOGLE_CLIENT_ID is configured");
-if (process.env.SUPER_ADMIN_ID && process.env.SUPER_ADMIN_PASSWORD) devlog("[ENV] Super admin credentials are configured");
+import { initDb, type CloudflareEnv } from "@/lib/db";
+import { setR2Bucket } from "@/lib/storage/storage";
+import { sql } from "drizzle-orm";
 
 import {
   getClientVisibleAuthState,
@@ -115,6 +109,21 @@ import { handleDiscordStatus, handleDiscordEvents } from "@/lib/discord/discord-
 import { handleGetNotifications, handleUnreadCount, handleMarkRead, handleMarkAllRead } from "@/lib/notifications/notification-handler";
 import { handleGetProfile } from "@/lib/profile/profile-handlers";
 
+// ─── RUNTIME ENV CHECK (once per isolate) ───────────────────
+let envChecked = false;
+
+function logMissingEnv(env: CloudflareEnv): void {
+  if (envChecked) return;
+  envChecked = true;
+  if (!env.JWT_SECRET) console.warn("[ENV] JWT_SECRET is not set");
+  if (!env.GOOGLE_CLIENT_ID) console.warn("[ENV] GOOGLE_CLIENT_ID is not set");
+  if (!env.GOOGLE_CLIENT_SECRET) console.warn("[ENV] GOOGLE_CLIENT_SECRET is not set");
+  if (!env.SUPER_ADMIN_ID) console.warn("[ENV] SUPER_ADMIN_ID is not set");
+  if (!env.SUPER_ADMIN_PASSWORD) console.warn("[ENV] SUPER_ADMIN_PASSWORD is not set");
+  if (env.GOOGLE_CLIENT_ID) devlog("[ENV] GOOGLE_CLIENT_ID is configured");
+  if (env.SUPER_ADMIN_ID && env.SUPER_ADMIN_PASSWORD) devlog("[ENV] Super admin credentials are configured");
+}
+
 // ─── SECURITY HEADERS ────────────────────────────────────────
 function applySecurityHeaders(response: Response, url: URL): Response {
   const headers = new Headers(response.headers);
@@ -141,15 +150,14 @@ const CSRF_EXEMPT_PATHS = new Set([
   "/api/server-reviews/submit",
 ]);
 
-function checkCsrf(request: Request, url: URL): Response | null {
+function checkCsrf(request: Request, url: URL, env: CloudflareEnv): Response | null{
   if (!CSRF_MUTABLE_METHODS.has(request.method)) return null;
   if (CSRF_EXEMPT_PATHS.has(url.pathname)) return null;
 
   const origin = request.headers.get("origin");
   const referer = request.headers.get("referer");
   const allowedHost = url.host;
-  const allowedOrigin = process.env.BASE_URL;
-
+  const allowedOrigin = env.BASE_URL;
   if (origin) {
     try {
       const originHost = new URL(origin).host;
@@ -241,8 +249,19 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 let cacheInitialized = false;
 
 export default {
-  async fetch(request: Request, env: unknown, ctx: unknown) {
+  async fetch(request: Request, env: CloudflareEnv, ctx: unknown) {
     const url = new URL(request.url);
+
+    // Wire Hyperdrive connection string (once per isolate)
+    initDb(env);
+
+    // Wire R2 bucket for uploads (once per isolate)
+    if (env.UPLOADS_BUCKET) {
+      setR2Bucket(env.UPLOADS_BUCKET);
+    }
+
+    // One-time env check
+    logMissingEnv(env);
 
     // Lazy-init YouTube cache on first request (not at module scope)
     if (!cacheInitialized) {
@@ -254,10 +273,10 @@ export default {
     return applySecurityHeaders(response, url);
   },
 
-  async handleRequest(request: Request, env: unknown, ctx: unknown, url: URL): Promise<Response> {
+  async handleRequest(request: Request, env: CloudflareEnv, ctx: unknown, url: URL): Promise<Response> {
     try {
       // CSRF check for all state-changing API routes
-      const csrfError = checkCsrf(request, url);
+      const csrfError = checkCsrf(request, url, env);
       if (csrfError) return csrfError;
 
       // Health check
@@ -265,14 +284,24 @@ export default {
         return Response.json({
           status: "ok",
           timestamp: new Date().toISOString(),
-          environment: process.env.NODE_ENV || "production",
-        });
+          environment: env.NODE_ENV || "production",        });
+      }
+
+      // DB health check — real query through Hyperdrive
+      if (url.pathname === "/api/health/db" && request.method === "GET") {
+        try {
+          const { db } = await import("@/lib/db");
+          await db.execute(sql`SELECT 1`);
+          return Response.json({ status: "ok", db: "connected", timestamp: new Date().toISOString() });
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          return Response.json({ status: "error", db: "disconnected", error: message }, { status: 503 });
+        }
       }
 
       // SEO: robots.txt
       if (url.pathname === "/robots.txt") {
-        const baseUrl = process.env.BASE_URL || "https://hubmc.in";
-        const robots = [
+          const baseUrl = env.BASE_URL || "https://hubmc.in";        const robots = [
           "User-agent: *",
           "Allow: /$",
           "Allow: /packages",
@@ -299,7 +328,7 @@ export default {
 
       // SEO: sitemap.xml
       if (url.pathname === "/sitemap.xml") {
-        const baseUrl = process.env.BASE_URL || "https://hubmc.in";
+        const baseUrl = env.BASE_URL || "https://hubmc.in";
         const urls = [
           { loc: "/", priority: "1.0", changefreq: "weekly" },
           { loc: "/packages", priority: "0.9", changefreq: "weekly" },
