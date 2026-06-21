@@ -4,7 +4,7 @@
   "compatibility_date": "2025-06-21",
   "compatibility_flags": ["nodejs_compat", "nodejs_als"],
 
-  "pages_build_output_dir": "dist/client",
+  "pages_build_output_dir": "dist/server",
 
   "vars": {
     "SUPER_ADMIN_ID": "HUB_MC_ADMIN",
