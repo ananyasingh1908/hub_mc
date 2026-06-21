@@ -55,7 +55,7 @@ type Announcement = {
 type Pagination = { page: number; limit: number; total: number; totalPages: number };
 
 const emptyForm = {
-  title: "", bannerUrl: "", type: "SOLO" as const, gameMode: "Bedwars",
+  title: "", bannerUrl: "", type: "SOLO" as "SOLO" | "DUO" | "SQUAD", gameMode: "Bedwars",
   dateTime: "", registrationDeadline: "", maxParticipants: "50", entryFee: "",
   prizePool: "", discordLink: "", rules: "", serverIp: "",
 };

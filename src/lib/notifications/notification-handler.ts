@@ -1,4 +1,6 @@
-import { getPrismaClient } from "@/lib/db/prisma";
+import { and, count, desc, eq, gte, isNull, lte, or } from "drizzle-orm";
+import { db } from "@/lib/db";
+import { siteNotifications } from "@/lib/db/schema";
 import { devlog } from "@/lib/dev-log";
 
 function json(data: unknown, status = 200): Response {
@@ -8,22 +10,27 @@ function json(data: unknown, status = 200): Response {
   });
 }
 
-export async function handleGetNotifications(request: Request): Promise<Response> {
+export async function handleGetNotifications(_request: Request): Promise<Response> {
   try {
-    const prisma = await getPrismaClient();
     const now = new Date();
-    const notifications = await prisma.siteNotification.findMany({
-      where: {
-        active: true,
-        startAt: { lte: now },
-        OR: [{ expireAt: null }, { expireAt: { gte: now } }],
-      },
-      orderBy: { createdAt: "desc" },
-      take: 50,
-    });
+    const rows = await db
+      .select()
+      .from(siteNotifications)
+      .where(
+        and(
+          eq(siteNotifications.active, true),
+          lte(siteNotifications.startAt, now),
+          or(
+            isNull(siteNotifications.expireAt),
+            gte(siteNotifications.expireAt, now),
+          ),
+        ),
+      )
+      .orderBy(desc(siteNotifications.createdAt))
+      .limit(50);
 
     return json({
-      notifications: notifications.map((n) => ({
+      notifications: rows.map((n) => ({
         id: n.id,
         title: n.title,
         message: n.message,
@@ -39,18 +46,24 @@ export async function handleGetNotifications(request: Request): Promise<Response
   }
 }
 
-export async function handleUnreadCount(request: Request): Promise<Response> {
+export async function handleUnreadCount(_request: Request): Promise<Response> {
   try {
-    const prisma = await getPrismaClient();
     const now = new Date();
-    const count = await prisma.siteNotification.count({
-      where: {
-        active: true,
-        startAt: { lte: now },
-        OR: [{ expireAt: null }, { expireAt: { gte: now } }],
-      },
-    });
-    return json({ unreadCount: count ?? 0 });
+    const result = await db
+      .select({ count: count() })
+      .from(siteNotifications)
+      .where(
+        and(
+          eq(siteNotifications.active, true),
+          lte(siteNotifications.startAt, now),
+          or(
+            isNull(siteNotifications.expireAt),
+            gte(siteNotifications.expireAt, now),
+          ),
+        ),
+      );
+
+    return json({ unreadCount: Number(result[0]?.count ?? 0) });
   } catch {
     return json({ unreadCount: 0 });
   }

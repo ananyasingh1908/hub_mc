@@ -1,5 +1,7 @@
+import { eq } from "drizzle-orm";
 import { devlog } from "@/lib/dev-log";
-import { getPrismaClient } from "@/lib/db/prisma";
+import { db } from "@/lib/db";
+import { featuredStreams, streamBlacklist, youTubeCache } from "@/lib/db/schema";
 
 // ─── Cache Types (processed data ready to serve) ──────────────
 
@@ -115,10 +117,15 @@ async function ytFetch<T>(label: string, url: string): Promise<T> {
 
 async function loadFromDB(key: string): Promise<{ data: unknown; cachedAt: number } | null> {
   try {
-    const prisma = await getPrismaClient();
-    const entry = await prisma.youTubeCache.findUnique({ where: { cacheKey: key } });
+    const rows = await db
+      .select()
+      .from(youTubeCache)
+      .where(eq(youTubeCache.cacheKey, key))
+      .limit(1);
+    const entry = rows[0];
     if (!entry) return null;
-    return { data: entry.data, cachedAt: entry.cachedAt.getTime() };
+    const cachedAt = entry.cachedAt instanceof Date ? entry.cachedAt.getTime() : new Date(entry.cachedAt).getTime();
+    return { data: entry.data, cachedAt };
   } catch (err) {
     console.error(`[YouTubeCache] DB load error (${key}):`, err);
     return null;
@@ -127,12 +134,28 @@ async function loadFromDB(key: string): Promise<{ data: unknown; cachedAt: numbe
 
 async function saveToDB(key: string, data: unknown): Promise<void> {
   try {
-    const prisma = await getPrismaClient();
-    await prisma.youTubeCache.upsert({
-      where: { cacheKey: key },
-      update: { data: data as any, cachedAt: new Date() },
-      create: { cacheKey: key, data: data as any, cachedAt: new Date() },
-    });
+    const now = new Date();
+    const existing = await db
+      .select({ id: youTubeCache.id })
+      .from(youTubeCache)
+      .where(eq(youTubeCache.cacheKey, key))
+      .limit(1);
+
+    if (existing[0]) {
+      await db
+        .update(youTubeCache)
+        .set({ data: data as any, cachedAt: now, updatedAt: now })
+        .where(eq(youTubeCache.id, existing[0].id));
+    } else {
+      await db.insert(youTubeCache).values({
+        id: crypto.randomUUID(),
+        cacheKey: key,
+        data: data as any,
+        cachedAt: now,
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
   } catch (err) {
     console.error(`[YouTubeCache] DB save error (${key}):`, err);
   }
@@ -343,10 +366,13 @@ async function refreshCommunityStreams(): Promise<void> {
           detailsMap.set(v.id, v);
         }
 
-        const prisma = await getPrismaClient();
         const [featured, blacklisted] = await Promise.all([
-          prisma.featuredStream.findMany({ select: { videoId: true, status: true, id: true } }),
-          prisma.streamBlacklist.findMany({ select: { channelId: true } }),
+          db
+            .select({ videoId: featuredStreams.videoId, status: featuredStreams.status, id: featuredStreams.id })
+            .from(featuredStreams),
+          db
+            .select({ channelId: streamBlacklist.channelId })
+            .from(streamBlacklist),
         ]);
 
         const featuredByVideo = new Map(featured.map((f) => [f.videoId, f]));

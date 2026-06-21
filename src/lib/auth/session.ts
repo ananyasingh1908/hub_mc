@@ -1,8 +1,10 @@
 import { SignJWT, jwtVerify } from "jose";
+import { and, eq } from "drizzle-orm";
 import type { HubMCSession } from "@/lib/auth/types";
 import { lookupMinecraftIdentity } from "@/lib/auth/minecraft";
 import { devlog } from "@/lib/dev-log";
-import { getPrismaClient } from "@/lib/db/prisma";
+import { db } from "@/lib/db";
+import { customers, employees, users } from "@/lib/db/schema";
 
 export const SESSION_COOKIE_NAME = "hubmc.customer.session";
 export const SESSION_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
@@ -19,7 +21,12 @@ function getEncodedSecret(): Uint8Array {
   return new TextEncoder().encode(getJwtSecret());
 }
 
-export function buildSetCookieHeader(cookieName: string, value: string, maxAge: number, secure: boolean): string {
+export function buildSetCookieHeader(
+  cookieName: string,
+  value: string,
+  maxAge: number,
+  secure: boolean,
+): string {
   return `${cookieName}=${value}; Max-Age=${maxAge}; Path=/; HttpOnly; SameSite=Strict${secure ? "; Secure" : ""}`;
 }
 
@@ -114,59 +121,130 @@ export async function handleLoginRequest(request: Request): Promise<Response> {
     }
 
     let customerId: string | null = null;
-    let userRole: string = "CUSTOMER";
+    let userRole: "CUSTOMER" | "EMPLOYEE" | "SUPER_ADMIN" = "CUSTOMER";
     let employeeId: string | null = null;
-    let userEmail: string = `${identity.uuid}@minecraft.hubmc`;
+    const userEmail = `${identity.uuid}@minecraft.hubmc`;
     let userId: string | null = null;
 
     try {
-      const prisma = await getPrismaClient();
-      const userUpsert = (prisma as any).user?.upsert;
-      const customerUpsert = (prisma as any).customer?.upsert;
+      // 1) find user by email
+      const existingUsers = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, userEmail))
+        .limit(1);
 
-      if (typeof userUpsert === "function" && typeof customerUpsert === "function") {
-        const user = await userUpsert({
-          where: { email: userEmail },
-          update: { name: identity.username, image: identity.avatarUrl },
-          create: {
-            email: userEmail,
+      let user = existingUsers[0];
+
+      if (!user) {
+        const newUserId = crypto.randomUUID();
+
+        await db.insert(users).values({
+          id: newUserId,
+          email: userEmail,
+          name: identity.username,
+          image: identity.avatarUrl,
+          role: "CUSTOMER",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+
+        const insertedUsers = await db
+          .select()
+          .from(users)
+          .where(eq(users.id, newUserId))
+          .limit(1);
+
+        user = insertedUsers[0];
+      } else {
+        await db
+          .update(users)
+          .set({
             name: identity.username,
             image: identity.avatarUrl,
-            role: "CUSTOMER",
-          },
+            updatedAt: new Date(),
+          })
+          .where(eq(users.id, user.id));
+
+        const refreshedUsers = await db
+          .select()
+          .from(users)
+          .where(eq(users.id, user.id))
+          .limit(1);
+
+        user = refreshedUsers[0];
+      }
+
+      if (user) {
+        userId = user.id;
+        userRole = (user.role as "CUSTOMER" | "EMPLOYEE" | "SUPER_ADMIN") ?? "CUSTOMER";
+      }
+
+      // 2) find customer by minecraft username
+      const existingCustomers = await db
+        .select()
+        .from(customers)
+        .where(eq(customers.minecraftUsername, identity.username))
+        .limit(1);
+
+      let customer = existingCustomers[0];
+
+      if (!customer) {
+        const newCustomerId = crypto.randomUUID();
+
+        await db.insert(customers).values({
+          id: newCustomerId,
+          userId: userId!,
+          minecraftUsername: identity.username,
+          minecraftUuid: identity.uuid,
+          avatarUrl: identity.avatarUrl,
+          skinUrl: identity.skinUrl,
+          lastLoginAt: new Date(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
         });
 
-        userId = (user as any).id;
-        userRole = (user as any).role ?? "CUSTOMER";
+        const insertedCustomers = await db
+          .select()
+          .from(customers)
+          .where(eq(customers.id, newCustomerId))
+          .limit(1);
 
-        const customer = await customerUpsert({
-          where: { minecraftUsername: identity.username },
-          update: {
+        customer = insertedCustomers[0];
+      } else {
+        await db
+          .update(customers)
+          .set({
             minecraftUuid: identity.uuid,
             avatarUrl: identity.avatarUrl,
             skinUrl: identity.skinUrl,
             lastLoginAt: new Date(),
-          },
-          create: {
-            minecraftUsername: identity.username,
-            minecraftUuid: identity.uuid,
-            avatarUrl: identity.avatarUrl,
-            skinUrl: identity.skinUrl,
-            lastLoginAt: new Date(),
-            userId: userId,
-          },
-        });
+            updatedAt: new Date(),
+          })
+          .where(eq(customers.id, customer.id));
 
-        customerId = (customer as any).id ?? null;
+        const refreshedCustomers = await db
+          .select()
+          .from(customers)
+          .where(eq(customers.id, customer.id))
+          .limit(1);
 
-        if (userRole === "EMPLOYEE" || userRole === "SUPER_ADMIN") {
-          const employeeFind = (prisma as any).employee?.findUnique;
-          if (typeof employeeFind === "function") {
-            const employee = await employeeFind({ where: { userId } });
-            if (employee) {
-              employeeId = employee.id;
-            }
-          }
+        customer = refreshedCustomers[0];
+      }
+
+      customerId = customer?.id ?? null;
+
+      // 3) if employee/super admin, find employee row
+      if ((userRole === "EMPLOYEE" || userRole === "SUPER_ADMIN") && userId) {
+        const employeeRows = await db
+          .select()
+          .from(employees)
+          .where(eq(employees.userId, userId))
+          .limit(1);
+
+        const employee = employeeRows[0];
+        if (employee) {
+          employeeId = employee.id;
         }
       }
     } catch (error) {
@@ -179,15 +257,18 @@ export async function handleLoginRequest(request: Request): Promise<Response> {
       minecraftUuid: identity.uuid,
       minecraftAvatarUrl: identity.avatarUrl,
       minecraftSkinUrl: identity.skinUrl,
-      customerId: customerId,
+      customerId,
       role: userRole,
-      employeeId: employeeId,
+      employeeId,
       email: userEmail,
       verified: identity.verified,
     });
 
     const headers = new Headers({ "content-type": "application/json" });
-    headers.append("set-cookie", buildSetCookieHeader(SESSION_COOKIE_NAME, token, SESSION_MAX_AGE_SECONDS, secure));
+    headers.append(
+      "set-cookie",
+      buildSetCookieHeader(SESSION_COOKIE_NAME, token, SESSION_MAX_AGE_SECONDS, secure),
+    );
 
     return new Response(JSON.stringify({ ok: true, redirectTo: "/" }), {
       status: 200,
@@ -201,13 +282,19 @@ export async function handleLoginRequest(request: Request): Promise<Response> {
   }
 }
 
-export async function createSession(payload: Record<string, unknown>, request: Request): Promise<{ token: string; headers: Headers }> {
+export async function createSession(
+  payload: Record<string, unknown>,
+  request: Request,
+): Promise<{ token: string; headers: Headers }> {
   const url = new URL(request.url);
   const secure = url.protocol === "https:";
 
   const token = await signToken(payload);
   const headers = new Headers({ "content-type": "application/json" });
-  headers.append("set-cookie", buildSetCookieHeader(SESSION_COOKIE_NAME, token, SESSION_MAX_AGE_SECONDS, secure));
+  headers.append(
+    "set-cookie",
+    buildSetCookieHeader(SESSION_COOKIE_NAME, token, SESSION_MAX_AGE_SECONDS, secure),
+  );
 
   return { token, headers };
 }

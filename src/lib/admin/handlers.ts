@@ -2,7 +2,31 @@ import { devlog } from "@/lib/dev-log";
 import { getEmployeeSession } from "@/lib/auth/employee-session";
 import { getAdminSession } from "@/lib/auth/admin-session";
 import { getHubMCSession } from "@/lib/auth/session";
-import { getPrismaClient } from "@/lib/db/prisma";
+import { db } from "@/lib/db";
+import {
+  products,
+  serverReviews,
+  activityLogs,
+  orders,
+  orderItems,
+  supportTickets,
+  ticketReplies,
+  customers,
+  employees,
+  users,
+  rolePermissions,
+  tournaments,
+} from "@/lib/db/schema";
+import {
+  count,
+  eq,
+  and,
+  or,
+  like,
+  desc,
+  inArray,
+  sql,
+} from "drizzle-orm";
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -43,9 +67,15 @@ function getStaffSession(request: Request): StaffSession | null {
 
 async function logActivity(employeeId: string | null | undefined, action: string, entity: string, entityId: string | null, details: string | null, severity = "INFO") {
   try {
-    const prisma = await getPrismaClient();
-    await prisma.activityLog.create({
-      data: { employeeId, action, entity, entityId, details, severity },
+    await db.insert(activityLogs).values({
+      id: crypto.randomUUID(),
+      employeeId: employeeId ?? null,
+      action,
+      entity,
+      entityId,
+      details,
+      severity,
+      createdAt: new Date(),
     });
   } catch (e) {
     console.warn("Failed to log activity:", e);
@@ -58,20 +88,17 @@ export async function handleAdminGetProducts(request: Request) {
   const url = new URL(request.url);
   const page = parseInt(url.searchParams.get("page") ?? "1");
   const limit = 20;
-  const skip = (page - 1) * limit;
+  const offset = (page - 1) * limit;
 
-  const prisma = await getPrismaClient();
-  const [products, total] = await Promise.all([
-    prisma.product.findMany({
-      orderBy: { createdAt: "desc" },
-      skip,
-      take: limit,
-    }),
-    prisma.product.count(),
+  const [productRows, totalRows] = await Promise.all([
+    db.select().from(products).orderBy(desc(products.createdAt)).limit(limit).offset(offset),
+    db.select({ count: count() }).from(products),
   ]);
 
+  const total = Number(totalRows[0]?.count ?? 0);
+
   return json({
-    products: products.map((p) => {
+    products: productRows.map((p) => {
       const meta = p.metadata as Record<string, any> | null;
       return { ...p, price: Number(p.price), badge: meta?.badge ?? "" };
     }),
@@ -118,24 +145,30 @@ export async function handleAdminCreateProduct(request: Request) {
   devlog("[AdminProducts] Validated fields OK — slug:", slug, "name:", name, "price:", price);
 
   try {
-    const prisma = await getPrismaClient();
-    devlog("[AdminProducts] Prisma client acquired, creating product...");
-    const product = await prisma.product.create({
-      data: {
-        slug, name, description, imageUrl, category,
-        price,
-        metadata: body.rewards ? { rewards: body.rewards, badge: body.badge ?? "" } : {},
-      },
+    const productId = crypto.randomUUID();
+    const now = new Date();
+    await db.insert(products).values({
+      id: productId,
+      slug,
+      name,
+      description,
+      imageUrl,
+      category,
+      price: String(price),
+      metadata: body.rewards ? { rewards: body.rewards, badge: body.badge ?? "" } : {},
+      active: true,
+      createdAt: now,
+      updatedAt: now,
     });
-    devlog("[AdminProducts] Product created successfully — id:", product.id, "slug:", product.slug);
+    devlog("[AdminProducts] Product created successfully — id:", productId, "slug:", slug);
 
-    await logActivity(staff?.employeeId, "CREATE", "product", product.id, `Created product ${name}`);
-    return json({ product: { ...product, price: Number(product.price) } }, 201);
+    const createdRows = await db.select().from(products).where(eq(products.id, productId)).limit(1);
+    const product = createdRows[0];
+
+    await logActivity(staff?.employeeId, "CREATE", "product", productId, `Created product ${name}`);
+    return json({ product: { ...product!, price: Number(product!.price) } }, 201);
   } catch (err: any) {
     console.error("[AdminProducts] Database create failed:", err?.message || err);
-    if (err?.code === "P2002") {
-      return error("Slug already exists", 409);
-    }
     return error("Database create failed: " + (err?.message || "unknown error"), 500);
   }
 }
@@ -167,22 +200,21 @@ export async function handleAdminUpdateProduct(request: Request) {
   }
   if (active !== undefined) data.active = active;
   if (badge !== undefined) {
-    const prisma = await getPrismaClient();
-    const existing = await prisma.product.findUnique({ where: { id }, select: { metadata: true } });
-    const existingMeta = (existing?.metadata as Record<string, unknown> | null) ?? {};
+    const existingRows = await db.select({ metadata: products.metadata }).from(products).where(eq(products.id, String(id))).limit(1);
+    const existingMeta = (existingRows[0]?.metadata as Record<string, unknown> | null) ?? {};
     data.metadata = { ...existingMeta, badge };
   }
 
   try {
-    const prisma = await getPrismaClient();
-    const product = await prisma.product.update({ where: { id }, data });
+    await db.update(products).set(data as Partial<typeof products.$inferInsert>).where(eq(products.id, String(id)));
+    const updatedRows = await db.select().from(products).where(eq(products.id, String(id))).limit(1);
+    const product = updatedRows[0];
+    if (!product) return error("Product not found", 404);
     devlog("[AdminProducts] Product updated:", product.id);
-    await logActivity(staff?.employeeId, "UPDATE", "product", id, `Updated product ${name ?? id}`);
+    await logActivity(staff?.employeeId, "UPDATE", "product", String(id), `Updated product ${name ?? id}`);
     return json({ product: { ...product, price: Number(product.price) } });
   } catch (err: any) {
     console.error("[AdminProducts] Database update failed:", err?.message || err);
-    if (err?.code === "P2025") return error("Product not found", 404);
-    if (err?.code === "P2002") return error("Slug already exists", 409);
     return error("Database update failed: " + (err?.message || "unknown error"), 500);
   }
 }
@@ -202,14 +234,14 @@ export async function handleAdminDeleteProduct(request: Request) {
   devlog("[AdminProducts] Deleting product:", id);
 
   try {
-    const prisma = await getPrismaClient();
-    await prisma.product.delete({ where: { id } });
+    const existingRows = await db.select({ id: products.id }).from(products).where(eq(products.id, String(id))).limit(1);
+    if (!existingRows[0]) return error("Product not found", 404);
+    await db.delete(products).where(eq(products.id, String(id)));
     devlog("[AdminProducts] Product deleted:", id);
-    await logActivity(staff?.employeeId, "DELETE", "product", id, `Deleted product ${id}`);
+    await logActivity(staff?.employeeId, "DELETE", "product", String(id), `Deleted product ${id}`);
     return json({ success: true });
   } catch (err: any) {
     console.error("[AdminProducts] Database delete failed:", err?.message || err);
-    if (err?.code === "P2025") return error("Product not found", 404);
     return error("Database delete failed: " + (err?.message || "unknown error"), 500);
   }
 }
@@ -226,41 +258,64 @@ export async function handleAdminGetOrders(request: Request) {
   const delivery = url.searchParams.get("delivery") ?? "";
   const page = parseInt(url.searchParams.get("page") ?? "1");
   const limit = 20;
+  const offset = (page - 1) * limit;
 
-  const prisma = await getPrismaClient();
-  const where: any = {};
+  const conditions = [];
   if (search) {
-    where.OR = [
-      { minecraftUsername: { contains: search } },
-      { email: { contains: search } },
-      { id: { contains: search } },
-      { razorpayPaymentId: { contains: search } },
-    ];
+    conditions.push(
+      or(
+        like(orders.minecraftUsername, `%${search}%`),
+        like(orders.email, `%${search}%`),
+        like(orders.id, `%${search}%`),
+        like(orders.razorpayPaymentId, `%${search}%`),
+      )!,
+    );
   }
-  if (status) where.status = status;
-  if (delivery) where.deliveryStatus = delivery;
+  if (status) conditions.push(eq(orders.status, status as any));
+  if (delivery) conditions.push(eq(orders.deliveryStatus, delivery as any));
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-  const [orders, total] = await Promise.all([
-    prisma.order.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      skip: (page - 1) * limit,
-      take: limit,
-      include: { items: true },
-    }),
-    prisma.order.count({ where }),
+  const [orderRows, totalRows] = await Promise.all([
+    db.select().from(orders).where(whereClause).orderBy(desc(orders.createdAt)).limit(limit).offset(offset),
+    db.select({ count: count() }).from(orders).where(whereClause),
   ]);
 
+  const total = Number(totalRows[0]?.count ?? 0);
+
+  const orderIds = orderRows.map((o) => o.id);
+  const itemRows = orderIds.length > 0
+    ? await db.select().from(orderItems).where(inArray(orderItems.orderId, orderIds))
+    : [];
+
+  const itemsByOrderId = new Map<string, typeof itemRows>();
+  for (const item of itemRows) {
+    const list = itemsByOrderId.get(item.orderId) ?? [];
+    list.push(item);
+    itemsByOrderId.set(item.orderId, list);
+  }
+
   return json({
-    orders: orders.map((o) => ({
-      id: o.id, minecraftUsername: o.minecraftUsername, minecraftUuid: o.minecraftUuid,
-      email: o.email, country: o.country, status: o.status, paymentMethod: o.paymentMethod,
-      subtotal: Number(o.subtotal), discountAmount: Number(o.discountAmount), total: Number(o.total),
-      razorpayPaymentId: o.razorpayPaymentId, deliveryStatus: o.deliveryStatus,
-      deliveredAt: o.deliveredAt, createdAt: o.createdAt,
-      items: (o.items ?? []).map((i) => ({
-        productId: i.productId, productName: i.productName, quantity: i.quantity,
-        unitPrice: Number(i.unitPrice), subtotal: Number(i.subtotal),
+    orders: orderRows.map((o) => ({
+      id: o.id,
+      minecraftUsername: o.minecraftUsername,
+      minecraftUuid: o.minecraftUuid,
+      email: o.email,
+      country: o.country,
+      status: o.status,
+      paymentMethod: o.paymentMethod,
+      subtotal: Number(o.subtotal),
+      discountAmount: Number(o.discountAmount),
+      total: Number(o.total),
+      razorpayPaymentId: o.razorpayPaymentId,
+      deliveryStatus: o.deliveryStatus,
+      deliveredAt: o.deliveredAt,
+      createdAt: o.createdAt,
+      items: (itemsByOrderId.get(o.id) ?? []).map((i) => ({
+        productId: i.productId,
+        productName: i.productName,
+        quantity: i.quantity,
+        unitPrice: Number(i.unitPrice),
+        subtotal: Number(i.subtotal),
       })),
     })),
     total,
@@ -278,14 +333,13 @@ export async function handleAdminUpdateOrderStatus(request: Request) {
   const { id, status, deliveryStatus } = body;
   if (!id) return error("id required", 400);
 
-  const prisma = await getPrismaClient();
-  const data: any = {};
+  const data: Record<string, unknown> = {};
   if (status) data.status = status;
   if (deliveryStatus) {
     data.deliveryStatus = deliveryStatus;
     if (deliveryStatus === "DELIVERED") data.deliveredAt = new Date();
   }
-  await prisma.order.update({ where: { id }, data });
+  await db.update(orders).set(data as any).where(eq(orders.id, id));
   await logActivity(staff?.employeeId, "UPDATE", "order", id,
     `Updated order ${id}: status=${status ?? ""} delivery=${deliveryStatus ?? ""}`);
   return json({ success: true });
@@ -299,26 +353,55 @@ export async function handleAdminGetTickets(request: Request) {
 
   const url = new URL(request.url);
   const status = url.searchParams.get("status") ?? "";
-  const where: any = {};
-  if (status) where.status = status;
 
-  const prisma = await getPrismaClient();
-  const tickets = await prisma.supportTicket.findMany({
-    where, orderBy: { createdAt: "desc" },
-    include: {
-      replies: { orderBy: { createdAt: "asc" } },
-      customer: { select: { minecraftUsername: true, minecraftUuid: true } },
-    },
-  });
+  const conditions = [];
+  if (status) conditions.push(eq(supportTickets.status, status as any));
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+  const ticketRows = await db
+    .select({
+      id: supportTickets.id,
+      subject: supportTickets.subject,
+      message: supportTickets.message,
+      status: supportTickets.status,
+      createdAt: supportTickets.createdAt,
+      updatedAt: supportTickets.updatedAt,
+      customerId: supportTickets.customerId,
+      minecraftUsername: customers.minecraftUsername,
+      minecraftUuid: customers.minecraftUuid,
+    })
+    .from(supportTickets)
+    .leftJoin(customers, eq(supportTickets.customerId, customers.id))
+    .where(whereClause)
+    .orderBy(desc(supportTickets.createdAt));
+
+  const ticketIds = ticketRows.map((t) => t.id);
+  const replyRows = ticketIds.length > 0
+    ? await db.select().from(ticketReplies).where(inArray(ticketReplies.ticketId, ticketIds)).orderBy(ticketReplies.createdAt)
+    : [];
+
+  const repliesByTicketId = new Map<string, typeof replyRows>();
+  for (const r of replyRows) {
+    const list = repliesByTicketId.get(r.ticketId) ?? [];
+    list.push(r);
+    repliesByTicketId.set(r.ticketId, list);
+  }
 
   return json({
-    tickets: tickets.map((t) => ({
-      id: t.id, subject: t.subject, message: t.message, status: t.status,
-      createdAt: t.createdAt, updatedAt: t.updatedAt,
-      minecraftUsername: t.customer?.minecraftUsername ?? "Unknown",
-      minecraftUuid: t.customer?.minecraftUuid ?? null,
-      replies: (t.replies ?? []).map((r) => ({
-        id: r.id, authorName: r.authorName, message: r.message, createdAt: r.createdAt,
+    tickets: ticketRows.map((t) => ({
+      id: t.id,
+      subject: t.subject,
+      message: t.message,
+      status: t.status,
+      createdAt: t.createdAt,
+      updatedAt: t.updatedAt,
+      minecraftUsername: t.minecraftUsername ?? "Unknown",
+      minecraftUuid: t.minecraftUuid ?? null,
+      replies: (repliesByTicketId.get(t.id) ?? []).map((r) => ({
+        id: r.id,
+        authorName: r.authorName,
+        message: r.message,
+        createdAt: r.createdAt,
       })),
     })),
   });
@@ -333,20 +416,16 @@ export async function handleAdminReplyTicket(request: Request) {
   const { ticketId, message } = body;
   if (!ticketId || !message) return error("ticketId and message required", 400);
 
-  const prisma = await getPrismaClient();
-  await prisma.ticketReply.create({
-    data: {
-      ticketId,
-      employeeId: staff?.employeeId,
-      authorName: staff?.email ?? "Staff",
-      message,
-    },
+  await db.insert(ticketReplies).values({
+    id: crypto.randomUUID(),
+    ticketId,
+    employeeId: staff?.employeeId ?? null,
+    authorName: staff?.email ?? "Staff",
+    message,
+    createdAt: new Date(),
   });
 
-  await prisma.supportTicket.update({
-    where: { id: ticketId },
-    data: { status: "IN_PROGRESS" },
-  });
+  await db.update(supportTickets).set({ status: "IN_PROGRESS" }).where(eq(supportTickets.id, ticketId));
 
   await logActivity(staff?.employeeId, "REPLY", "ticket", ticketId, `Replied to ticket ${ticketId}`);
   return json({ success: true }, 201);
@@ -361,8 +440,7 @@ export async function handleAdminResolveTicket(request: Request) {
   const { ticketId, status } = body;
   if (!ticketId || !status) return error("ticketId and status required", 400);
 
-  const prisma = await getPrismaClient();
-  await prisma.supportTicket.update({ where: { id: ticketId }, data: { status } });
+  await db.update(supportTickets).set({ status: status as any }).where(eq(supportTickets.id, ticketId));
   await logActivity(staff?.employeeId, "RESOLVE", "ticket", ticketId, `Ticket ${ticketId} -> ${status}`);
   return json({ success: true });
 }
@@ -376,33 +454,64 @@ export async function handleAdminGetCustomers(request: Request) {
   const url = new URL(request.url);
   const page = parseInt(url.searchParams.get("page") ?? "1");
   const limit = 20;
-  const skip = (page - 1) * limit;
+  const offset = (page - 1) * limit;
 
-  const prisma = await getPrismaClient();
-  const [customers, total] = await Promise.all([
-    prisma.customer.findMany({
-      orderBy: { createdAt: "desc" },
-      skip,
-      take: limit,
-      include: {
-        orders: { select: { id: true, total: true, status: true, createdAt: true } },
-        user: { select: { email: true } },
-      },
-    }),
-    prisma.customer.count(),
+  const [customerRows, totalRows] = await Promise.all([
+    db
+      .select({
+        id: customers.id,
+        minecraftUsername: customers.minecraftUsername,
+        minecraftUuid: customers.minecraftUuid,
+        avatarUrl: customers.avatarUrl,
+        country: customers.country,
+        lastLoginAt: customers.lastLoginAt,
+        createdAt: customers.createdAt,
+        email: users.email,
+      })
+      .from(customers)
+      .leftJoin(users, eq(customers.userId, users.id))
+      .orderBy(desc(customers.createdAt))
+      .limit(limit)
+      .offset(offset),
+    db.select({ count: count() }).from(customers),
   ]);
 
+  const total = Number(totalRows[0]?.count ?? 0);
+  const customerIds = customerRows.map((c) => c.id);
+
+  const orderRows = customerIds.length > 0
+    ? await db.select({ customerId: orders.customerId, id: orders.id, total: orders.total, status: orders.status, createdAt: orders.createdAt })
+        .from(orders)
+        .where(inArray(orders.customerId, customerIds))
+    : [];
+
+  const ordersByCustomer = new Map<string, typeof orderRows>();
+  for (const o of orderRows) {
+    if (!o.customerId) continue;
+    const list = ordersByCustomer.get(o.customerId) ?? [];
+    list.push(o);
+    ordersByCustomer.set(o.customerId, list);
+  }
+
   return json({
-    customers: customers.map((c) => ({
-      id: c.id, minecraftUsername: c.minecraftUsername, minecraftUuid: c.minecraftUuid,
-      avatarUrl: c.avatarUrl, country: c.country, lastLoginAt: c.lastLoginAt,
-      createdAt: c.createdAt, email: c.user?.email ?? "",
-      totalSpent: (c.orders ?? []).reduce((sum, o) =>
-        o.status === "PAID" || o.status === "FULFILLED" ? sum + Number(o.total) : sum, 0),
-      purchaseCount: (c.orders ?? []).filter((o) =>
-        o.status === "PAID" || o.status === "FULFILLED").length,
-      orders: c.orders ?? [],
-    })),
+    customers: customerRows.map((c) => {
+      const custOrders = ordersByCustomer.get(c.id) ?? [];
+      return {
+        id: c.id,
+        minecraftUsername: c.minecraftUsername,
+        minecraftUuid: c.minecraftUuid,
+        avatarUrl: c.avatarUrl,
+        country: c.country,
+        lastLoginAt: c.lastLoginAt,
+        createdAt: c.createdAt,
+        email: c.email ?? "",
+        totalSpent: custOrders.reduce((sum, o) =>
+          o.status === "PAID" || o.status === "FULFILLED" ? sum + Number(o.total) : sum, 0),
+        purchaseCount: custOrders.filter((o) =>
+          o.status === "PAID" || o.status === "FULFILLED").length,
+        orders: custOrders,
+      };
+    }),
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   });
 }
@@ -413,24 +522,57 @@ export async function handleAdminGetEmployees(request: Request) {
   const authErr = await requireRole(request, ["SUPER_ADMIN"]);
   if (authErr) return authErr;
 
-  const prisma = await getPrismaClient();
-  const employees = await prisma.employee.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      user: { select: { email: true, name: true, image: true, role: true } },
-      permissions: true,
-      _count: { select: { assignedTickets: true } },
-    },
-  });
+  const employeeRows = await db
+    .select({
+      id: employees.id,
+      displayName: employees.displayName,
+      department: employees.department,
+      isActive: employees.isActive,
+      disabledAt: employees.disabledAt,
+      createdAt: employees.createdAt,
+      userId: employees.userId,
+      email: users.email,
+      minecraftUsername: users.name,
+      avatarUrl: users.image,
+      role: users.role,
+    })
+    .from(employees)
+    .leftJoin(users, eq(employees.userId, users.id))
+    .orderBy(desc(employees.createdAt));
+
+  const employeeIds = employeeRows.map((e) => e.id);
+
+  const [permRows, ticketCountRows] = await Promise.all([
+    employeeIds.length > 0
+      ? db.select().from(rolePermissions).where(inArray(rolePermissions.employeeId, employeeIds))
+      : [],
+    employeeIds.length > 0
+      ? db
+          .select({ assignedToId: supportTickets.assignedToId, count: count() })
+          .from(supportTickets)
+          .where(inArray(supportTickets.assignedToId, employeeIds))
+          .groupBy(supportTickets.assignedToId)
+      : [],
+  ]);
+
+  const permMap = new Map(permRows.map((p) => [p.employeeId, p]));
+  const ticketCountMap = new Map(ticketCountRows.map((r) => [r.assignedToId, Number(r.count)]));
 
   return json({
-    employees: employees.map((e) => ({
-      id: e.id, displayName: e.displayName, department: e.department,
-      isActive: e.isActive, disabledAt: e.disabledAt, createdAt: e.createdAt,
-      email: e.user?.email ?? "", minecraftUsername: e.user?.name ?? "",
-      avatarUrl: e.user?.image ?? "", role: e.user?.role ?? "EMPLOYEE",
-      userId: e.userId, ticketCount: e._count?.assignedTickets ?? 0,
-      permissions: e.permissions ?? null,
+    employees: employeeRows.map((e) => ({
+      id: e.id,
+      displayName: e.displayName,
+      department: e.department,
+      isActive: e.isActive,
+      disabledAt: e.disabledAt,
+      createdAt: e.createdAt,
+      email: e.email ?? "",
+      minecraftUsername: e.minecraftUsername ?? "",
+      avatarUrl: e.avatarUrl ?? "",
+      role: e.role ?? "EMPLOYEE",
+      userId: e.userId,
+      ticketCount: ticketCountMap.get(e.id) ?? 0,
+      permissions: permMap.get(e.id) ?? null,
     })),
   });
 }
@@ -444,27 +586,51 @@ export async function handleAdminCreateEmployee(request: Request) {
   const { email, displayName, department, role, minecraftUsername } = body;
   if (!email || !displayName) return error("email and displayName required", 400);
 
-  const prisma = await getPrismaClient();
-  const user = await prisma.user.create({
-    data: {
-      email,
-      name: minecraftUsername ?? displayName,
-      role: role ?? "EMPLOYEE",
-    },
+  const now = new Date();
+  const userId = crypto.randomUUID();
+  const employeeId = crypto.randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email,
+    name: minecraftUsername ?? displayName,
+    role: role ?? "EMPLOYEE",
+    createdAt: now,
+    updatedAt: now,
   });
 
-  const employee = await prisma.employee.create({
-    data: {
-      userId: user.id,
-      displayName,
-      department: department ?? null,
-      permissions: { create: {} },
-    },
+  await db.insert(employees).values({
+    id: employeeId,
+    userId,
+    displayName,
+    department: department ?? null,
+    isActive: true,
+    createdAt: now,
+    updatedAt: now,
   });
 
-  await logActivity(staff?.employeeId, "CREATE", "employee", employee.id,
+  await db.insert(rolePermissions).values({
+    id: crypto.randomUUID(),
+    employeeId,
+    products: true,
+    orders: true,
+    support: true,
+    customers: false,
+    employees: false,
+    logs: false,
+    settings: false,
+    tournaments: true,
+    notifications: true,
+    playerManage: true,
+    employeeMonitor: false,
+    platformLogs: true,
+    createdAt: now,
+    updatedAt: now,
+  });
+
+  await logActivity(staff?.employeeId, "CREATE", "employee", employeeId,
     `Created employee ${displayName}`);
-  return json({ employee: { id: employee.id, displayName, department, isActive: true } }, 201);
+  return json({ employee: { id: employeeId, displayName, department, isActive: true } }, 201);
 }
 
 export async function handleAdminUpdateEmployee(request: Request) {
@@ -476,8 +642,7 @@ export async function handleAdminUpdateEmployee(request: Request) {
   const { id, displayName, department, isActive, role } = body;
   if (!id) return error("id required", 400);
 
-  const prisma = await getPrismaClient();
-  const empData: any = {};
+  const empData: Record<string, unknown> = { updatedAt: new Date() };
   if (displayName !== undefined) empData.displayName = displayName;
   if (department !== undefined) empData.department = department;
   if (isActive !== undefined) {
@@ -485,12 +650,12 @@ export async function handleAdminUpdateEmployee(request: Request) {
     if (!isActive) empData.disabledAt = new Date();
     else empData.disabledAt = null;
   }
-  await prisma.employee.update({ where: { id }, data: empData });
+  await db.update(employees).set(empData as any).where(eq(employees.id, id));
 
   if (role !== undefined) {
-    const emp = await prisma.employee.findUnique({ where: { id } });
-    if (emp) {
-      await prisma.user.update({ where: { id: emp.userId }, data: { role } });
+    const empRows = await db.select({ userId: employees.userId }).from(employees).where(eq(employees.id, id)).limit(1);
+    if (empRows[0]) {
+      await db.update(users).set({ role }).where(eq(users.id, empRows[0].userId));
     }
   }
 
@@ -507,8 +672,7 @@ export async function handleAdminDeleteEmployee(request: Request) {
   const { id } = body;
   if (!id) return error("id required", 400);
 
-  const prisma = await getPrismaClient();
-  await prisma.employee.delete({ where: { id } });
+  await db.delete(employees).where(eq(employees.id, id));
   await logActivity(staff?.employeeId, "DELETE", "employee", id, `Deleted employee ${id}`);
   return json({ success: true });
 }
@@ -524,30 +688,51 @@ export async function handleAdminGetLogs(request: Request) {
   const action = url.searchParams.get("action") ?? "";
   const page = parseInt(url.searchParams.get("page") ?? "1");
   const limit = 50;
+  const offset = (page - 1) * limit;
 
-  const prisma = await getPrismaClient();
-  const where: any = {};
-  if (entity) where.entity = entity;
-  if (action) where.action = action;
+  const conditions = [];
+  if (entity) conditions.push(eq(activityLogs.entity, entity));
+  if (action) conditions.push(eq(activityLogs.action, action));
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-  const [logs, total] = await Promise.all([
-    prisma.activityLog.findMany({
-      where, orderBy: { createdAt: "desc" },
-      skip: (page - 1) * limit,
-      take: limit,
-      include: { employee: { select: { displayName: true } } },
-    }),
-    prisma.activityLog.count({ where }),
+  const [logRows, totalRows] = await Promise.all([
+    db
+      .select({
+        id: activityLogs.id,
+        action: activityLogs.action,
+        entity: activityLogs.entity,
+        entityId: activityLogs.entityId,
+        details: activityLogs.details,
+        severity: activityLogs.severity,
+        ipAddress: activityLogs.ipAddress,
+        createdAt: activityLogs.createdAt,
+        employeeName: employees.displayName,
+      })
+      .from(activityLogs)
+      .leftJoin(employees, eq(activityLogs.employeeId, employees.id))
+      .where(whereClause)
+      .orderBy(desc(activityLogs.createdAt))
+      .limit(limit)
+      .offset(offset),
+    db.select({ count: count() }).from(activityLogs).where(whereClause),
   ]);
 
+  const total = Number(totalRows[0]?.count ?? 0);
+
   return json({
-    logs: logs.map((l) => ({
-      id: l.id, action: l.action, entity: l.entity, entityId: l.entityId,
-      details: l.details, severity: l.severity, ipAddress: l.ipAddress,
+    logs: logRows.map((l) => ({
+      id: l.id,
+      action: l.action,
+      entity: l.entity,
+      entityId: l.entityId,
+      details: l.details,
+      severity: l.severity,
+      ipAddress: l.ipAddress,
       createdAt: l.createdAt,
-      employeeName: l.employee?.displayName ?? "System",
+      employeeName: l.employeeName ?? "System",
     })),
-    total, page,
+    total,
+    page,
     totalPages: Math.ceil(total / limit),
   });
 }
@@ -562,9 +747,8 @@ export async function handleAdminGetPermissions(request: Request) {
   const employeeId = url.searchParams.get("employeeId");
   if (!employeeId) return error("employeeId required", 400);
 
-  const prisma = await getPrismaClient();
-  const perms = await prisma.rolePermission.findUnique({ where: { employeeId } });
-  return json({ permissions: perms });
+  const permRows = await db.select().from(rolePermissions).where(eq(rolePermissions.employeeId, employeeId)).limit(1);
+  return json({ permissions: permRows[0] ?? null });
 }
 
 export async function handleAdminUpdatePermissions(request: Request) {
@@ -573,36 +757,48 @@ export async function handleAdminUpdatePermissions(request: Request) {
   const staff = getStaffSession(request);
 
   const body = await request.json();
-  const { employeeId, products, orders, support, customers, employees, logs, settings } = body;
+  const { employeeId, products: prodPerms, orders: orderPerms, support, customers: custPerms, employees: empPerms, logs: logPerms, settings } = body;
   if (!employeeId) return error("employeeId required", 400);
 
-  const prisma = await getPrismaClient();
-  const perms = await prisma.rolePermission.upsert({
-    where: { employeeId },
-    update: {
-      ...(products !== undefined ? { products } : {}),
-      ...(orders !== undefined ? { orders } : {}),
-      ...(support !== undefined ? { support } : {}),
-      ...(customers !== undefined ? { customers } : {}),
-      ...(employees !== undefined ? { employees } : {}),
-      ...(logs !== undefined ? { logs } : {}),
-      ...(settings !== undefined ? { settings } : {}),
-    },
-    create: {
+  const existingRows = await db.select().from(rolePermissions).where(eq(rolePermissions.employeeId, employeeId)).limit(1);
+  const now = new Date();
+
+  if (existingRows[0]) {
+    const updateData: Record<string, unknown> = { updatedAt: now };
+    if (prodPerms !== undefined) updateData.products = prodPerms;
+    if (orderPerms !== undefined) updateData.orders = orderPerms;
+    if (support !== undefined) updateData.support = support;
+    if (custPerms !== undefined) updateData.customers = custPerms;
+    if (empPerms !== undefined) updateData.employees = empPerms;
+    if (logPerms !== undefined) updateData.logs = logPerms;
+    if (settings !== undefined) updateData.settings = settings;
+    await db.update(rolePermissions).set(updateData as any).where(eq(rolePermissions.employeeId, employeeId));
+  } else {
+    await db.insert(rolePermissions).values({
+      id: crypto.randomUUID(),
       employeeId,
-      products: products ?? true,
-      orders: orders ?? true,
+      products: prodPerms ?? true,
+      orders: orderPerms ?? true,
       support: support ?? true,
-      customers: customers ?? false,
-      employees: employees ?? false,
-      logs: logs ?? false,
+      customers: custPerms ?? false,
+      employees: empPerms ?? false,
+      logs: logPerms ?? false,
       settings: settings ?? false,
-    },
-  });
+      tournaments: true,
+      notifications: true,
+      playerManage: true,
+      employeeMonitor: false,
+      platformLogs: true,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
+
+  const updatedRows = await db.select().from(rolePermissions).where(eq(rolePermissions.employeeId, employeeId)).limit(1);
 
   await logActivity(staff?.employeeId, "UPDATE", "permissions", employeeId,
     `Updated permissions for employee ${employeeId}`);
-  return json({ permissions: perms });
+  return json({ permissions: updatedRows[0] ?? null });
 }
 
 // ─── DASHBOARD STATS ─────────────────────────────────────────
@@ -611,29 +807,28 @@ export async function handleAdminDashboardStats(request: Request) {
   const authErr = await requireRole(request, ["EMPLOYEE", "SUPER_ADMIN"]);
   if (authErr) return authErr;
 
-  const prisma = await getPrismaClient();
-
-  const [totalOrders, pendingOrders, paidOrders, totalCustomers, openTickets, totalProducts] =
+  const [totalOrders, pendingOrders, paidOrders, totalCustomers, openTickets, totalProducts, revenueRows] =
     await Promise.all([
-      prisma.order.count(),
-      prisma.order.count({ where: { status: "PENDING" } }),
-      prisma.order.count({ where: { status: "PAID" } }),
-      prisma.customer.count(),
-      prisma.supportTicket.count({ where: { status: { in: ["OPEN", "IN_PROGRESS"] } } }),
-      prisma.product.count(),
+      db.select({ count: count() }).from(orders),
+      db.select({ count: count() }).from(orders).where(eq(orders.status, "PENDING")),
+      db.select({ count: count() }).from(orders).where(eq(orders.status, "PAID")),
+      db.select({ count: count() }).from(customers),
+      db.select({ count: count() }).from(supportTickets).where(inArray(supportTickets.status, ["OPEN", "IN_PROGRESS"])),
+      db.select({ count: count() }).from(products),
+      db.select({ total: sql<string | null>`cast(sum(${orders.total}) as char)` })
+        .from(orders)
+        .where(inArray(orders.status, ["PAID", "FULFILLED"])),
     ]);
-
-  const recentOrders = await prisma.order.findMany({
-    where: { status: { in: ["PAID", "FULFILLED"] } },
-    select: { total: true },
-  });
-  const totalRevenue = recentOrders.reduce((sum, o) => sum + Number(o.total ?? 0), 0);
 
   return json({
     stats: {
-      totalOrders, pendingOrders, paidOrders,
-      totalCustomers, openTickets, totalProducts,
-      totalRevenue,
+      totalOrders: Number(totalOrders[0]?.count ?? 0),
+      pendingOrders: Number(pendingOrders[0]?.count ?? 0),
+      paidOrders: Number(paidOrders[0]?.count ?? 0),
+      totalCustomers: Number(totalCustomers[0]?.count ?? 0),
+      openTickets: Number(openTickets[0]?.count ?? 0),
+      totalProducts: Number(totalProducts[0]?.count ?? 0),
+      totalRevenue: Number(revenueRows[0]?.total ?? 0),
     },
   });
 }
@@ -642,31 +837,35 @@ export async function handleAdminDashboardStats(request: Request) {
 
 export async function handleGetServerReviews() {
   try {
-    const prisma = await getPrismaClient();
-    const reviews = await prisma.serverReview.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 50,
-      include: {
-        customer: { select: { minecraftUsername: true, avatarUrl: true } },
-      },
-    });
+    const reviewRows = await db
+      .select({
+        id: serverReviews.id,
+        minecraftUsername: serverReviews.minecraftUsername,
+        avatarUrl: customers.avatarUrl,
+        rating: serverReviews.rating,
+        title: serverReviews.title,
+        message: serverReviews.message,
+        createdAt: serverReviews.createdAt,
+      })
+      .from(serverReviews)
+      .leftJoin(customers, eq(serverReviews.customerId, customers.id))
+      .orderBy(desc(serverReviews.createdAt))
+      .limit(50);
 
-    const allReviews = await prisma.serverReview.findMany({
-      select: { rating: true },
-    });
-    const totalReviews = allReviews.length;
+    const allRatings = await db.select({ rating: serverReviews.rating }).from(serverReviews);
+    const totalReviews = allRatings.length;
     const overallRating = totalReviews > 0
-      ? allReviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews
+      ? allRatings.reduce((sum, r) => sum + r.rating, 0) / totalReviews
       : 0;
 
     const starBreakdown = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-    allReviews.forEach((r) => { starBreakdown[r.rating as keyof typeof starBreakdown]++; });
+    allRatings.forEach((r) => { starBreakdown[r.rating as keyof typeof starBreakdown]++; });
 
     return json({
-      reviews: reviews.map((r) => ({
+      reviews: reviewRows.map((r) => ({
         id: r.id,
         minecraftUsername: r.minecraftUsername,
-        avatarUrl: r.customer?.avatarUrl ?? null,
+        avatarUrl: r.avatarUrl ?? null,
         rating: r.rating,
         title: r.title,
         message: r.message,
@@ -703,28 +902,32 @@ export async function handleSubmitServerReview(request: Request) {
   devlog("[ServerReviews] Validated — rating:", rating, "title:", title);
 
   try {
-    const prisma = await getPrismaClient();
     const customerId = session.user.customerId;
     const userId = session.user.minecraftUuid;
 
-    const existing = await prisma.serverReview.findUnique({ where: { userId: userId } });
+    const existingRows = userId
+      ? await db.select().from(serverReviews).where(eq(serverReviews.userId, userId)).limit(1)
+      : [];
+    const existing = existingRows[0] ?? null;
     if (existing) { devlog("[ServerReviews] Duplicate review from", session.user.minecraftUsername); return error("You have already submitted a review", 409); }
 
-    const review = await prisma.serverReview.create({
-      data: {
-        userId,
-        customerId: customerId ?? null,
-        minecraftUsername: session.user.minecraftUsername,
-        rating,
-        title,
-        message,
-      },
+    const reviewId = crypto.randomUUID();
+    const now = new Date();
+    await db.insert(serverReviews).values({
+      id: reviewId,
+      userId,
+      customerId: customerId ?? null,
+      minecraftUsername: session.user.minecraftUsername,
+      rating,
+      title,
+      message,
+      createdAt: now,
+      updatedAt: now,
     });
-    devlog("[ServerReviews] Review created:", review.id);
-    return json({ review: { id: review.id, rating, title, message } }, 201);
+    devlog("[ServerReviews] Review created:", reviewId);
+    return json({ review: { id: reviewId, rating, title, message } }, 201);
   } catch (err: any) {
     console.error("[ServerReviews] Database create failed:", err?.message || err);
-    if (err?.code === "P2002") return error("You have already submitted a review", 409);
     return error("Failed to submit review: " + (err?.message || "unknown error"), 500);
   }
 }
@@ -748,61 +951,71 @@ export async function handleAdminGetDeliveries(request: Request): Promise<Respon
   const search = url.searchParams.get("search") ?? "";
   const page = parseInt(url.searchParams.get("page") ?? "1");
   const limit = 20;
+  const offset = (page - 1) * limit;
 
-  const prisma = await getPrismaClient();
-  const where: any = {};
-  if (deliveryFilter) where.deliveryStatus = deliveryFilter;
+  const conditions = [];
+  if (deliveryFilter) conditions.push(eq(orders.deliveryStatus, deliveryFilter as any));
   if (search) {
-    where.OR = [
-      { minecraftUsername: { contains: search } },
-      { email: { contains: search } },
-      { id: { contains: search } },
-    ];
+    conditions.push(
+      or(
+        like(orders.minecraftUsername, `%${search}%`),
+        like(orders.email, `%${search}%`),
+        like(orders.id, `%${search}%`),
+      )!,
+    );
   }
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-  const [orders, total] = await Promise.all([
-    prisma.order.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      skip: (page - 1) * limit,
-      take: limit,
-      include: { items: true },
-    }),
-    prisma.order.count({ where }),
+  const [orderRows, totalRows] = await Promise.all([
+    db.select().from(orders).where(whereClause).orderBy(desc(orders.createdAt)).limit(limit).offset(offset),
+    db.select({ count: count() }).from(orders).where(whereClause),
   ]);
 
-  const orderIds = orders.map((o) => o.id);
-  const logs = orderIds.length > 0
-    ? await prisma.activityLog.findMany({
-        where: {
-          entityId: { in: orderIds },
-          action: { startsWith: "DELIVERY" },
-        },
-        orderBy: { createdAt: "desc" },
-        take: 500,
-      })
-    : [];
+  const total = Number(totalRows[0]?.count ?? 0);
+  const orderIds = orderRows.map((o) => o.id);
 
-  const logsByOrderId: Record<string, typeof logs> = {};
-  for (const log of logs) {
-    if (!logsByOrderId[log.entityId!]) logsByOrderId[log.entityId!] = [];
-    logsByOrderId[log.entityId!].push(log);
+  const [itemRows, logRows] = await Promise.all([
+    orderIds.length > 0
+      ? db.select().from(orderItems).where(inArray(orderItems.orderId, orderIds))
+      : [] as typeof orderItems.$inferSelect[],
+    orderIds.length > 0
+      ? db
+          .select()
+          .from(activityLogs)
+          .where(and(inArray(activityLogs.entityId, orderIds), like(activityLogs.action, "DELIVERY%")))
+          .orderBy(desc(activityLogs.createdAt))
+          .limit(500)
+      : [] as typeof activityLogs.$inferSelect[],
+  ]);
+
+  const itemsByOrderId = new Map<string, typeof itemRows>();
+  for (const item of itemRows) {
+    const list = itemsByOrderId.get(item.orderId) ?? [];
+    list.push(item);
+    itemsByOrderId.set(item.orderId, list);
+  }
+
+  const logsByOrderId: Record<string, typeof logRows> = {};
+  for (const log of logRows) {
+    if (!log.entityId) continue;
+    if (!logsByOrderId[log.entityId]) logsByOrderId[log.entityId] = [];
+    logsByOrderId[log.entityId].push(log);
   }
 
   return json({
-    deliveries: orders.map((o) => ({
+    deliveries: orderRows.map((o) => ({
       id: o.id,
       orderNumber: o.orderNumber,
       minecraftUsername: o.minecraftUsername,
       minecraftUuid: o.minecraftUuid,
       email: o.email,
-      items: (o.items ?? []).map((i) => ({
+      items: (itemsByOrderId.get(o.id) ?? []).map((i) => ({
         productName: i.productName,
         quantity: i.quantity,
         unitPrice: Number(i.unitPrice),
         subtotal: Number(i.subtotal),
       })),
-      commands: buildDeliveryCommands(o.minecraftUsername, o.items ?? []),
+      commands: buildDeliveryCommands(o.minecraftUsername, itemsByOrderId.get(o.id) ?? []),
       paymentStatus: o.status,
       deliveryStatus: o.deliveryStatus,
       deliveredAt: o.deliveredAt?.toISOString() ?? null,

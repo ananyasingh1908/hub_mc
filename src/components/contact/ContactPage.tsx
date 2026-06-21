@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { Send, MessageCircle, Mail, Clock, CheckCircle, HelpCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { StorePageLayout } from "@/components/commerce/StorePageLayout";
 import { JsonLd } from "@/components/JsonLd";
@@ -17,9 +17,17 @@ const FAQS: FaqItem[] = [
   { q: "Account help", a: "If you're having trouble logging in or linking your Minecraft account, make sure you're using the correct email associated with your purchase. Contact support for account recovery." },
 ];
 
-const SUCCESS_VARIANTS = {
-  hidden: { opacity: 0, scale: 0.8, y: 20 },
-  visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+const SUCCESS_VARIANTS: Variants = {
+  hidden: { opacity: 0, scale: 0.9, y: 20 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+    },
+  },
 };
 
 export default function ContactPage() {

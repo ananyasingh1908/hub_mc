@@ -1,4 +1,5 @@
-import { getPrismaClient } from "@/lib/db/prisma";
+import { db } from "@/lib/db";
+import { supportTickets } from "@/lib/db/schema";
 
 export async function handleContactRequest(request: Request): Promise<Response> {
   try {
@@ -18,12 +19,12 @@ export async function handleContactRequest(request: Request): Promise<Response> 
 
     const fullMessage = `[Contact Form]\nFrom: ${body.name} (${body.email})\nMinecraft: ${body.minecraftUsername || "N/A"}\nSubject: ${body.subject}\n\n${body.message}`;
 
-    const prisma = await getPrismaClient();
-    await prisma.supportTicket.create({
-      data: {
-        subject: `[Contact] ${body.subject}`,
-        message: fullMessage,
-      },
+    await db.insert(supportTickets).values({
+      id: crypto.randomUUID(),
+      subject: `[Contact] ${body.subject}`,
+      message: fullMessage,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
     return Response.json({ ok: true, message: "Your message has been sent. We'll get back to you soon." });

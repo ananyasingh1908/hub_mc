@@ -1,5 +1,8 @@
+import { desc, eq, inArray } from "drizzle-orm";
 import { getHubMCSession } from "@/lib/auth/session";
-import { getPrismaClient } from "@/lib/db/prisma";
+import { db } from "@/lib/db";
+import { orderItems, orders } from "@/lib/db/schema";
+import { toNumber } from "@/lib/db/drizzle-helpers";
 
 export async function handleGetProfile(request: Request): Promise<Response> {
   try {
@@ -11,33 +14,53 @@ export async function handleGetProfile(request: Request): Promise<Response> {
       );
     }
 
-    const prisma = await getPrismaClient();
     const username = session.user.minecraftUsername;
 
-    const orders = await prisma.order.findMany({
-      where: { minecraftUsername: username },
-      orderBy: { createdAt: "desc" },
-      include: { items: true },
-    });
+    const userOrders = await db
+      .select()
+      .from(orders)
+      .where(eq(orders.minecraftUsername, username))
+      .orderBy(desc(orders.createdAt));
+
+    const orderIds = userOrders.map((o) => o.id);
+    const items =
+      orderIds.length > 0
+        ? await db
+            .select()
+            .from(orderItems)
+            .where(inArray(orderItems.orderId, orderIds))
+        : [];
+
+    const itemsByOrderId = new Map<string, typeof items>();
+    for (const item of items) {
+      const existing = itemsByOrderId.get(item.orderId) ?? [];
+      existing.push(item);
+      itemsByOrderId.set(item.orderId, existing);
+    }
 
     const ownedPackages = new Map<string, { name: string; quantity: number; lastPurchased: string }>();
     let totalSpent = 0;
 
-    for (const order of orders) {
+    for (const order of userOrders) {
       if (order.status === "PAID" || order.status === "FULFILLED") {
-        totalSpent += Number(order.total);
-        for (const item of order.items) {
+        totalSpent += toNumber(order.total);
+        const orderItemList = itemsByOrderId.get(order.id) ?? [];
+        for (const item of orderItemList) {
           const existing = ownedPackages.get(item.productId);
+          const orderDate =
+            order.createdAt instanceof Date
+              ? order.createdAt.toISOString()
+              : new Date(order.createdAt).toISOString();
           if (existing) {
             existing.quantity += item.quantity;
-            if (order.createdAt.toISOString() > existing.lastPurchased) {
-              existing.lastPurchased = order.createdAt.toISOString();
+            if (orderDate > existing.lastPurchased) {
+              existing.lastPurchased = orderDate;
             }
           } else {
             ownedPackages.set(item.productId, {
               name: item.productName,
               quantity: item.quantity,
-              lastPurchased: order.createdAt.toISOString(),
+              lastPurchased: orderDate,
             });
           }
         }
@@ -49,18 +72,21 @@ export async function handleGetProfile(request: Request): Promise<Response> {
         profile: {
           minecraftUsername: username,
           minecraftUuid: session.user.minecraftUuid,
-          email: orders[0]?.email || session.user.email || "",
-          totalOrders: orders.length,
+          email: userOrders[0]?.email || session.user.email || "",
+          totalOrders: userOrders.length,
           totalSpent,
           ownedPackages: Array.from(ownedPackages.values()),
-          recentOrders: orders.slice(0, 5).map((o) => ({
+          recentOrders: userOrders.slice(0, 5).map((o) => ({
             id: o.id,
             orderNumber: o.orderNumber,
-            total: Number(o.total),
+            total: toNumber(o.total),
             status: o.status,
             deliveryStatus: o.deliveryStatus,
-            createdAt: o.createdAt.toISOString(),
-            items: o.items.map((i) => i.productName),
+            createdAt:
+              o.createdAt instanceof Date
+                ? o.createdAt.toISOString()
+                : new Date(o.createdAt).toISOString(),
+            items: (itemsByOrderId.get(o.id) ?? []).map((i) => i.productName),
           })),
         },
       }),

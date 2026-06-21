@@ -1,4 +1,9 @@
+import { desc, eq } from "drizzle-orm";
 import { getStatusData, getVideosData, getLivestreamData, getCommunityStreamsData, isQuotaExceeded } from "@/lib/youtube/youtube-cache";
+import { getEmployeeSession } from "@/lib/auth/employee-session";
+import { getAdminSession } from "@/lib/auth/admin-session";
+import { db } from "@/lib/db";
+import { featuredStreams, streamBlacklist } from "@/lib/db/schema";
 
 function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
@@ -53,10 +58,6 @@ export async function handleYouTubeCommunityStreams(): Promise<Response> {
 
 // ─── ADMIN STREAM MODERATION (unchanged) ────────────────────
 
-import { getEmployeeSession } from "@/lib/auth/employee-session";
-import { getAdminSession } from "@/lib/auth/admin-session";
-import { getPrismaClient } from "@/lib/db/prisma";
-
 async function getStaffSession(request: Request): Promise<{ employeeId: string | null; email: string | null } | null> {
   const admin = await getAdminSession(request);
   if (admin) return { employeeId: admin.sub, email: admin.email };
@@ -80,28 +81,40 @@ export async function handleAdminApproveStream(request: Request): Promise<Respon
   try { body = await request.json(); } catch { return error("Invalid request body", 400); }
   if (!body.videoId) return error("videoId required", 400);
 
-  const prisma = await getPrismaClient();
-  const existing = await prisma.featuredStream.findUnique({ where: { videoId: body.videoId } });
+  const existingRows = await db
+    .select({ id: featuredStreams.id })
+    .from(featuredStreams)
+    .where(eq(featuredStreams.videoId, body.videoId))
+    .limit(1);
+  const existing = existingRows[0];
+
+  const now = new Date();
 
   if (existing) {
-    await prisma.featuredStream.update({
-      where: { id: existing.id },
-      data: { status: "APPROVED", moderatedById: staff.employeeId, moderatedAt: new Date() },
-    });
-  } else {
-    await prisma.featuredStream.create({
-      data: {
-        videoId: body.videoId,
-        channelId: body.channelId ?? "",
-        channelTitle: body.channelTitle ?? "",
-        title: body.title ?? "",
-        description: body.description ?? "",
-        thumbnailUrl: body.thumbnailUrl ?? null,
-        liveViewers: body.liveViewers ?? 0,
+    await db
+      .update(featuredStreams)
+      .set({
         status: "APPROVED",
         moderatedById: staff.employeeId,
-        moderatedAt: new Date(),
-      },
+        moderatedAt: now,
+        updatedAt: now,
+      })
+      .where(eq(featuredStreams.id, existing.id));
+  } else {
+    await db.insert(featuredStreams).values({
+      id: crypto.randomUUID(),
+      videoId: body.videoId,
+      channelId: body.channelId ?? "",
+      channelTitle: body.channelTitle ?? "",
+      title: body.title ?? "",
+      description: body.description ?? "",
+      thumbnailUrl: body.thumbnailUrl ?? null,
+      liveViewers: body.liveViewers ?? 0,
+      status: "APPROVED",
+      moderatedById: staff.employeeId,
+      moderatedAt: now,
+      createdAt: now,
+      updatedAt: now,
     });
   }
 
@@ -116,14 +129,23 @@ export async function handleAdminRemoveStream(request: Request): Promise<Respons
   try { body = await request.json(); } catch { return error("Invalid request body", 400); }
   if (!body.videoId) return error("videoId required", 400);
 
-  const prisma = await getPrismaClient();
-  const existing = await prisma.featuredStream.findUnique({ where: { videoId: body.videoId } });
+  const existingRows = await db
+    .select({ id: featuredStreams.id })
+    .from(featuredStreams)
+    .where(eq(featuredStreams.videoId, body.videoId))
+    .limit(1);
+  const existing = existingRows[0];
 
   if (existing) {
-    await prisma.featuredStream.update({
-      where: { id: existing.id },
-      data: { status: "REMOVED", moderatedById: staff.employeeId, moderatedAt: new Date() },
-    });
+    await db
+      .update(featuredStreams)
+      .set({
+        status: "REMOVED",
+        moderatedById: staff.employeeId,
+        moderatedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(featuredStreams.id, existing.id));
   }
 
   return json({ success: true });
@@ -137,17 +159,32 @@ export async function handleAdminBlacklistChannel(request: Request): Promise<Res
   try { body = await request.json(); } catch { return error("Invalid request body", 400); }
   if (!body.channelId) return error("channelId required", 400);
 
-  const prisma = await getPrismaClient();
-  await prisma.streamBlacklist.upsert({
-    where: { channelId: body.channelId },
-    update: { reason: body.reason ?? null, channelTitle: body.channelTitle ?? null },
-    create: {
+  const existingRows = await db
+    .select({ id: streamBlacklist.id })
+    .from(streamBlacklist)
+    .where(eq(streamBlacklist.channelId, body.channelId))
+    .limit(1);
+  const existing = existingRows[0];
+  const now = new Date();
+
+  if (existing) {
+    await db
+      .update(streamBlacklist)
+      .set({
+        reason: body.reason ?? null,
+        channelTitle: body.channelTitle ?? null,
+      })
+      .where(eq(streamBlacklist.id, existing.id));
+  } else {
+    await db.insert(streamBlacklist).values({
+      id: crypto.randomUUID(),
       channelId: body.channelId,
       channelTitle: body.channelTitle ?? null,
       reason: body.reason ?? null,
       createdById: staff.employeeId,
-    },
-  });
+      createdAt: now,
+    });
+  }
 
   return json({ success: true });
 }
@@ -156,11 +193,11 @@ export async function handleAdminGetFeaturedStreams(request: Request): Promise<R
   const staff = await getStaffSession(request);
   if (!staff) return error("Unauthorized", 401);
 
-  const prisma = await getPrismaClient();
-  const streams = await prisma.featuredStream.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 100,
-  });
+  const streams = await db
+    .select()
+    .from(featuredStreams)
+    .orderBy(desc(featuredStreams.createdAt))
+    .limit(100);
 
   return json({
     streams: streams.map((s) => ({
@@ -173,8 +210,16 @@ export async function handleAdminGetFeaturedStreams(request: Request): Promise<R
       thumbnailUrl: s.thumbnailUrl,
       liveViewers: s.liveViewers,
       status: s.status,
-      moderatedAt: s.moderatedAt?.toISOString() ?? null,
-      createdAt: s.createdAt.toISOString(),
+      moderatedAt:
+        s.moderatedAt instanceof Date
+          ? s.moderatedAt.toISOString()
+          : s.moderatedAt
+            ? new Date(s.moderatedAt).toISOString()
+            : null,
+      createdAt:
+        s.createdAt instanceof Date
+          ? s.createdAt.toISOString()
+          : new Date(s.createdAt).toISOString(),
     })),
   });
 }

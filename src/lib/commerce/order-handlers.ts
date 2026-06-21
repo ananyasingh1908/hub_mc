@@ -1,8 +1,11 @@
+import { eq } from "drizzle-orm";
 import { getHubMCSession } from "@/lib/auth/session";
 import { getAdminSession } from "@/lib/auth/admin-session";
 import { getEmployeeSession } from "@/lib/auth/employee-session";
 import { getOrdersForUser, retryDelivery } from "@/lib/commerce/delivery";
-import { getPrismaClient } from "@/lib/db/prisma";
+import { db } from "@/lib/db";
+import { activityLogs, orderItems, orders } from "@/lib/db/schema";
+import { toNumber } from "@/lib/db/drizzle-helpers";
 
 export async function handleGetOrders(request: Request): Promise<Response> {
   try {
@@ -10,24 +13,24 @@ export async function handleGetOrders(request: Request): Promise<Response> {
     const username = session?.user?.minecraftUsername;
 
     if (!username) {
-      return new Response(
-        JSON.stringify({ error: "Authentication required." }),
-        { status: 401, headers: { "content-type": "application/json" } },
-      );
+      return new Response(JSON.stringify({ error: "Authentication required." }), {
+        status: 401,
+        headers: { "content-type": "application/json" },
+      });
     }
 
-    const orders = await getOrdersForUser(username);
+    const userOrders = await getOrdersForUser(username);
 
-    return new Response(
-      JSON.stringify({ orders }),
-      { status: 200, headers: { "content-type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ orders: userOrders }), {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
   } catch (error) {
     console.error("handleGetOrders error:", error);
-    return new Response(
-      JSON.stringify({ error: "Internal server error." }),
-      { status: 500, headers: { "content-type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ error: "Internal server error." }), {
+      status: 500,
+      headers: { "content-type": "application/json" },
+    });
   }
 }
 
@@ -35,112 +38,128 @@ export async function handleRetryDelivery(request: Request): Promise<Response> {
   try {
     const session = await getHubMCSession(request);
     if (!session?.user?.minecraftUsername) {
-      return new Response(
-        JSON.stringify({ error: "Authentication required." }),
-        { status: 401, headers: { "content-type": "application/json" } },
-      );
+      return new Response(JSON.stringify({ error: "Authentication required." }), {
+        status: 401,
+        headers: { "content-type": "application/json" },
+      });
     }
 
     const body = (await request.json()) as { orderId?: string };
     if (!body.orderId) {
-      return new Response(
-        JSON.stringify({ error: "orderId is required." }),
-        { status: 400, headers: { "content-type": "application/json" } },
-      );
+      return new Response(JSON.stringify({ error: "orderId is required." }), {
+        status: 400,
+        headers: { "content-type": "application/json" },
+      });
     }
 
     const success = await retryDelivery(body.orderId);
 
     if (!success) {
-      return new Response(
-        JSON.stringify({ error: "Order not found." }),
-        { status: 404, headers: { "content-type": "application/json" } },
-      );
+      return new Response(JSON.stringify({ error: "Order not found." }), {
+        status: 404,
+        headers: { "content-type": "application/json" },
+      });
     }
 
     return new Response(
       JSON.stringify({ success: true, message: "Delivery retry initiated." }),
-      { status: 200, headers: { "content-type": "application/json" } },
+      {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      },
     );
   } catch (error) {
     console.error("handleRetryDelivery error:", error);
-    return new Response(
-      JSON.stringify({ error: "Internal server error." }),
-      { status: 500, headers: { "content-type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ error: "Internal server error." }), {
+      status: 500,
+      headers: { "content-type": "application/json" },
+    });
   }
 }
 
 async function isStaffSession(request: Request): Promise<boolean> {
   const admin = await getAdminSession(request);
   if (admin) return true;
+
   const employee = await getEmployeeSession(request);
   if (employee) return true;
+
   return false;
 }
 
 export async function handleRefundOrder(request: Request): Promise<Response> {
   try {
-    if (!await isStaffSession(request)) {
+    if (!(await isStaffSession(request))) {
       return new Response(
         JSON.stringify({ error: "Unauthorized. Admin or employee session required." }),
-        { status: 401, headers: { "content-type": "application/json" } },
+        {
+          status: 401,
+          headers: { "content-type": "application/json" },
+        },
       );
     }
 
     const body = (await request.json()) as { orderId: string; reason?: string };
     if (!body.orderId) {
-      return new Response(
-        JSON.stringify({ error: "orderId is required." }),
-        { status: 400, headers: { "content-type": "application/json" } },
-      );
+      return new Response(JSON.stringify({ error: "orderId is required." }), {
+        status: 400,
+        headers: { "content-type": "application/json" },
+      });
     }
 
-    const prisma = await getPrismaClient();
-    const order = await prisma.order.findUnique({ where: { id: body.orderId } });
+    const orderRows = await db
+      .select()
+      .from(orders)
+      .where(eq(orders.id, body.orderId))
+      .limit(1);
+
+    const order = orderRows[0];
     if (!order) {
-      return new Response(
-        JSON.stringify({ error: "Order not found." }),
-        { status: 404, headers: { "content-type": "application/json" } },
-      );
+      return new Response(JSON.stringify({ error: "Order not found." }), {
+        status: 404,
+        headers: { "content-type": "application/json" },
+      });
     }
 
     if (order.status === "REFUNDED") {
-      return new Response(
-        JSON.stringify({ error: "Order has already been refunded." }),
-        { status: 409, headers: { "content-type": "application/json" } },
-      );
+      return new Response(JSON.stringify({ error: "Order has already been refunded." }), {
+        status: 409,
+        headers: { "content-type": "application/json" },
+      });
     }
 
-    await prisma.order.update({
-      where: { id: body.orderId },
-      data: {
+    await db
+      .update(orders)
+      .set({
         status: "REFUNDED",
         refundedAt: new Date(),
         refundReason: body.reason || "No reason provided",
-      },
-    });
+      })
+      .where(eq(orders.id, body.orderId));
 
-    await prisma.activityLog.create({
-      data: {
-        action: "REFUND",
-        entity: "Order",
-        entityId: body.orderId,
-        details: `Order ${order.orderNumber} refunded. Reason: ${body.reason || "No reason provided"}`,
-        severity: "WARN",
-      },
+    await db.insert(activityLogs).values({
+      id: crypto.randomUUID(),
+      action: "REFUND",
+      entity: "Order",
+      entityId: body.orderId,
+      details: `Order ${order.orderNumber} refunded. Reason: ${body.reason || "No reason provided"}`,
+      severity: "WARN",
+      createdAt: new Date(),
     });
 
     return new Response(
       JSON.stringify({ success: true, message: "Order refunded successfully." }),
-      { status: 200, headers: { "content-type": "application/json" } },
+      {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      },
     );
   } catch (error) {
     console.error("handleRefundOrder error:", error);
-    return new Response(
-      JSON.stringify({ error: "Internal server error." }),
-      { status: 500, headers: { "content-type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ error: "Internal server error." }), {
+      status: 500,
+      headers: { "content-type": "application/json" },
+    });
   }
 }
 
@@ -148,39 +167,52 @@ export async function handleGetOrderInvoice(request: Request): Promise<Response>
   try {
     const url = new URL(request.url);
     const orderId = url.searchParams.get("orderId");
+
     if (!orderId) {
-      return new Response(
-        JSON.stringify({ error: "orderId is required." }),
-        { status: 400, headers: { "content-type": "application/json" } },
-      );
+      return new Response(JSON.stringify({ error: "orderId is required." }), {
+        status: 400,
+        headers: { "content-type": "application/json" },
+      });
     }
 
-    const prisma = await getPrismaClient();
-    const order = await prisma.order.findUnique({
-      where: { id: orderId },
-      include: { items: true },
-    });
+    const orderRows = await db
+      .select()
+      .from(orders)
+      .where(eq(orders.id, orderId))
+      .limit(1);
+
+    const order = orderRows[0];
 
     if (!order) {
-      return new Response(
-        JSON.stringify({ error: "Order not found." }),
-        { status: 404, headers: { "content-type": "application/json" } },
-      );
+      return new Response(JSON.stringify({ error: "Order not found." }), {
+        status: 404,
+        headers: { "content-type": "application/json" },
+      });
     }
+
+    const itemRows = await db
+      .select()
+      .from(orderItems)
+      .where(eq(orderItems.orderId, orderId));
 
     const customerSession = await getHubMCSession(request);
     const isStaff = await isStaffSession(request);
     const isOwner = customerSession?.user?.minecraftUsername === order.minecraftUsername;
+
     if (!isStaff && !isOwner) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized." }),
-        { status: 401, headers: { "content-type": "application/json" } },
-      );
+      return new Response(JSON.stringify({ error: "Unauthorized." }), {
+        status: 401,
+        headers: { "content-type": "application/json" },
+      });
     }
 
     const html = generateInvoiceHtml({
       orderNumber: order.orderNumber,
-      createdAt: order.createdAt.toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" }),
+      createdAt: new Date(order.createdAt).toLocaleDateString("en-IN", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
       minecraftUsername: order.minecraftUsername,
       email: order.email,
       country: order.country,
@@ -188,15 +220,15 @@ export async function handleGetOrderInvoice(request: Request): Promise<Response>
       razorpayPaymentId: order.razorpayPaymentId,
       status: order.status,
       deliveryStatus: order.deliveryStatus,
-      items: order.items.map((i) => ({
+      items: itemRows.map((i) => ({
         name: i.productName,
         quantity: i.quantity,
-        unitPrice: Number(i.unitPrice),
-        subtotal: Number(i.subtotal),
+        unitPrice: toNumber(i.unitPrice),
+        subtotal: toNumber(i.subtotal),
       })),
-      subtotal: Number(order.subtotal),
-      discountAmount: Number(order.discountAmount),
-      total: Number(order.total),
+      subtotal: toNumber(order.subtotal),
+      discountAmount: toNumber(order.discountAmount),
+      total: toNumber(order.total),
     });
 
     return new Response(html, {
@@ -208,10 +240,10 @@ export async function handleGetOrderInvoice(request: Request): Promise<Response>
     });
   } catch (error) {
     console.error("handleGetOrderInvoice error:", error);
-    return new Response(
-      JSON.stringify({ error: "Internal server error." }),
-      { status: 500, headers: { "content-type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ error: "Internal server error." }), {
+      status: 500,
+      headers: { "content-type": "application/json" },
+    });
   }
 }
 
@@ -230,14 +262,18 @@ function generateInvoiceHtml(data: {
   discountAmount: number;
   total: number;
 }): string {
-  const itemsHtml = data.items.map((item) => `
+  const itemsHtml = data.items
+    .map(
+      (item) => `
     <tr>
       <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.08);">${item.name}</td>
       <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.08);text-align:center;">${item.quantity}</td>
       <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.08);text-align:right;">₹${item.unitPrice.toFixed(2)}</td>
       <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.08);text-align:right;">₹${item.subtotal.toFixed(2)}</td>
     </tr>
-  `).join("");
+  `,
+    )
+    .join("");
 
   return `<!DOCTYPE html>
 <html>

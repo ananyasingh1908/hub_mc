@@ -39,7 +39,7 @@ type Registration = {
 };
 
 const emptyForm = {
-  title: "", bannerUrl: "", type: "SOLO" as const, gameMode: "Bedwars",
+  title: "", bannerUrl: "", type: "SOLO" as "SOLO" | "DUO" | "SQUAD", gameMode: "Bedwars",
   dateTime: "", registrationDeadline: "", maxParticipants: "50", entryFee: "",
   prizePool: "", discordLink: "", rules: "", serverIp: "",
 };
@@ -88,7 +88,7 @@ export default function AdminTournaments() {
     setForm({
       title: t.title,
       bannerUrl: t.bannerUrl || "",
-      type: t.type,
+      type: t.type as "SOLO" | "DUO" | "SQUAD",
       gameMode: t.gameMode,
       dateTime: new Date(t.dateTime).toISOString().slice(0, 16),
       registrationDeadline: new Date(t.registrationDeadline).toISOString().slice(0, 16),

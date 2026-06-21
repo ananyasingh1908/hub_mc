@@ -1,5 +1,21 @@
 import { getAdminSession } from "@/lib/auth/admin-session";
-import { getPrismaClient } from "@/lib/db/prisma";
+import { db } from "@/lib/db";
+import {
+  tournaments,
+  tournamentRegistrations,
+  customers,
+  employees,
+  rolePermissions,
+  orders,
+  supportTickets,
+  siteNotifications,
+  playerBans,
+  activityLogs,
+  tournamentAnnouncements,
+  playerRanks,
+  users,
+} from "@/lib/db/schema";
+import { count, eq, inArray, like, desc, and, or, sql, gte } from "drizzle-orm";
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -26,51 +42,97 @@ export async function handleAdminPlatformStats(request: Request) {
   const authErr = await requireSuperAdmin(request);
   if (authErr) return authErr;
 
-  const prisma = await getPrismaClient();
-
   const [
-    totalTournaments, upcomingTournaments, liveTournaments, completedTournaments,
-    totalRegistrations, totalCustomers, totalEmployees, activeEmployees,
-    totalOrders, totalRevenue, openTickets, totalNotifications,
-    activeBans, recentLogs, recentRegistrations,
+    totalTournaments,
+    upcomingTournaments,
+    liveTournaments,
+    completedTournaments,
+    totalRegistrations,
+    totalCustomers,
+    totalEmployees,
+    activeEmployees,
+    totalOrders,
+    revenueRows,
+    openTickets,
+    totalNotifications,
+    activeBans,
   ] = await Promise.all([
-    prisma.tournament.count(),
-    prisma.tournament.count({ where: { status: "UPCOMING" } }),
-    prisma.tournament.count({ where: { status: "LIVE" } }),
-    prisma.tournament.count({ where: { status: "COMPLETED" } }),
-    prisma.tournamentRegistration.count(),
-    prisma.customer.count(),
-    prisma.employee.count(),
-    prisma.employee.count({ where: { isActive: true } }),
-    prisma.order.count(),
-    prisma.order.aggregate({ _sum: { total: true } }),
-    prisma.supportTicket.count({ where: { status: { in: ["OPEN", "IN_PROGRESS"] } } }),
-    prisma.siteNotification.count({ where: { active: true } }),
-    prisma.playerBan.count({ where: { active: true } }),
-    prisma.activityLog.findMany({ orderBy: { createdAt: "desc" }, take: 10, include: { employee: { select: { displayName: true } } } }),
-    prisma.tournamentRegistration.findMany({ orderBy: { createdAt: "desc" }, take: 5, include: { tournament: { select: { title: true } } } }),
+    db.select({ count: count() }).from(tournaments),
+    db.select({ count: count() }).from(tournaments).where(eq(tournaments.status, "UPCOMING")),
+    db.select({ count: count() }).from(tournaments).where(eq(tournaments.status, "LIVE")),
+    db.select({ count: count() }).from(tournaments).where(eq(tournaments.status, "COMPLETED")),
+    db.select({ count: count() }).from(tournamentRegistrations),
+    db.select({ count: count() }).from(customers),
+    db.select({ count: count() }).from(employees),
+    db.select({ count: count() }).from(employees).where(eq(employees.isActive, true)),
+    db.select({ count: count() }).from(orders),
+    db.select({ total: sql<string | null>`cast(sum(${orders.total}) as char)` }).from(orders),
+    db.select({ count: count() }).from(supportTickets).where(inArray(supportTickets.status, ["OPEN", "IN_PROGRESS"])),
+    db.select({ count: count() }).from(siteNotifications).where(eq(siteNotifications.active, true)),
+    db.select({ count: count() }).from(playerBans).where(eq(playerBans.active, true)),
   ]);
+
+  const recentLogs = await db
+    .select({
+      id: activityLogs.id,
+      action: activityLogs.action,
+      entity: activityLogs.entity,
+      details: activityLogs.details,
+      severity: activityLogs.severity,
+      createdAt: activityLogs.createdAt,
+      employeeName: employees.displayName,
+    })
+    .from(activityLogs)
+    .leftJoin(employees, eq(activityLogs.employeeId, employees.id))
+    .orderBy(desc(activityLogs.createdAt))
+    .limit(10);
+
+  const recentRegistrations = await db
+    .select({
+      id: tournamentRegistrations.id,
+      minecraftUsername: tournamentRegistrations.minecraftUsername,
+      tournamentTitle: tournaments.title,
+      createdAt: tournamentRegistrations.createdAt,
+    })
+    .from(tournamentRegistrations)
+    .leftJoin(tournaments, eq(tournamentRegistrations.tournamentId, tournaments.id))
+    .orderBy(desc(tournamentRegistrations.createdAt))
+    .limit(5);
 
   return json({
     stats: {
-      tournaments: { total: totalTournaments, upcoming: upcomingTournaments, live: liveTournaments, completed: completedTournaments },
-      registrations: totalRegistrations,
-      customers: totalCustomers,
-      employees: { total: totalEmployees, active: activeEmployees },
-      orders: totalOrders,
-      revenue: Number(totalRevenue._sum.total ?? 0),
-      openTickets,
-      activeNotifications: totalNotifications,
-      activeBans,
+      tournaments: {
+        total: Number(totalTournaments[0]?.count ?? 0),
+        upcoming: Number(upcomingTournaments[0]?.count ?? 0),
+        live: Number(liveTournaments[0]?.count ?? 0),
+        completed: Number(completedTournaments[0]?.count ?? 0),
+      },
+      registrations: Number(totalRegistrations[0]?.count ?? 0),
+      customers: Number(totalCustomers[0]?.count ?? 0),
+      employees: {
+        total: Number(totalEmployees[0]?.count ?? 0),
+        active: Number(activeEmployees[0]?.count ?? 0),
+      },
+      orders: Number(totalOrders[0]?.count ?? 0),
+      revenue: Number(revenueRows[0]?.total ?? 0),
+      openTickets: Number(openTickets[0]?.count ?? 0),
+      activeNotifications: Number(totalNotifications[0]?.count ?? 0),
+      activeBans: Number(activeBans[0]?.count ?? 0),
     },
     recentLogs: recentLogs.map((l) => ({
-      id: l.id, action: l.action, entity: l.entity, details: l.details,
-      severity: l.severity, createdAt: l.createdAt,
-      employeeName: l.employee?.displayName ?? "System",
+      id: l.id,
+      action: l.action,
+      entity: l.entity,
+      details: l.details,
+      severity: l.severity,
+      createdAt: l.createdAt,
+      employeeName: l.employeeName ?? "System",
     })),
     recentRegistrations: recentRegistrations.map((r) => ({
-      id: r.id, minecraftUsername: r.minecraftUsername,
-      tournamentTitle: r.tournament.title, createdAt: r.createdAt,
+      id: r.id,
+      minecraftUsername: r.minecraftUsername,
+      tournamentTitle: r.tournamentTitle ?? "",
+      createdAt: r.createdAt,
     })),
   });
 }
@@ -86,42 +148,74 @@ export async function handleAdminMonitorTournaments(request: Request) {
   const search = url.searchParams.get("search") || "";
   const page = parseInt(url.searchParams.get("page") || "1");
   const limit = Math.min(parseInt(url.searchParams.get("limit") || "50"), 200);
-  const skip = (page - 1) * limit;
+  const offset = (page - 1) * limit;
 
-  const prisma = await getPrismaClient();
+  const conditions = [];
+  if (status) conditions.push(eq(tournaments.status, status as "UPCOMING" | "LIVE" | "COMPLETED"));
+  if (search) conditions.push(like(tournaments.title, `%${search}%`));
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-  const where: any = {};
-  if (status) where.status = status;
-  if (search) where.title = { contains: search };
-
-  const [tournaments, total] = await Promise.all([
-    prisma.tournament.findMany({
-      where,
-      orderBy: { dateTime: "desc" },
-      skip,
-      take: limit,
-      include: {
-        _count: { select: { registrations: true } },
-        registrations: { orderBy: { createdAt: "desc" }, take: 5 },
-      },
-    }),
-    prisma.tournament.count({ where }),
+  const [tournamentRows, totalRows] = await Promise.all([
+    db.select().from(tournaments).where(whereClause).orderBy(desc(tournaments.dateTime)).limit(limit).offset(offset),
+    db.select({ count: count() }).from(tournaments).where(whereClause),
   ]);
 
+  const total = Number(totalRows[0]?.count ?? 0);
+  const tournamentIds = tournamentRows.map((t) => t.id);
+
+  const [countRows, recentRegRows] = await Promise.all([
+    tournamentIds.length > 0
+      ? db
+          .select({ tournamentId: tournamentRegistrations.tournamentId, count: count() })
+          .from(tournamentRegistrations)
+          .where(inArray(tournamentRegistrations.tournamentId, tournamentIds))
+          .groupBy(tournamentRegistrations.tournamentId)
+      : [],
+    tournamentIds.length > 0
+      ? db
+          .select()
+          .from(tournamentRegistrations)
+          .where(inArray(tournamentRegistrations.tournamentId, tournamentIds))
+          .orderBy(desc(tournamentRegistrations.createdAt))
+      : [],
+  ]);
+
+  const countMap = new Map(countRows.map((r) => [r.tournamentId, Number(r.count)]));
+
+  const recentByTournament = new Map<string, typeof recentRegRows>();
+  for (const r of recentRegRows) {
+    const list = recentByTournament.get(r.tournamentId) ?? [];
+    if (list.length < 5) {
+      list.push(r);
+      recentByTournament.set(r.tournamentId, list);
+    }
+  }
+
   return json({
-    tournaments: tournaments.map((t) => ({
-      id: t.id, title: t.title, bannerUrl: t.bannerUrl, type: t.type,
-      gameMode: t.gameMode, dateTime: t.dateTime,
+    tournaments: tournamentRows.map((t) => ({
+      id: t.id,
+      title: t.title,
+      bannerUrl: t.bannerUrl,
+      type: t.type,
+      gameMode: t.gameMode,
+      dateTime: t.dateTime,
       registrationDeadline: t.registrationDeadline,
       maxParticipants: t.maxParticipants,
       entryFee: t.entryFee ? Number(t.entryFee) : null,
-      prizePool: t.prizePool, discordLink: t.discordLink, rules: t.rules,
-      serverIp: t.serverIp, status: t.status,
-      registrationsCount: t._count.registrations,
-      recentRegistrations: t.registrations.map((r) => ({
-        id: r.id, minecraftUsername: r.minecraftUsername,
-        discordUsername: r.discordUsername, teamName: r.teamName,
-        email: r.email, region: r.region, createdAt: r.createdAt,
+      prizePool: t.prizePool,
+      discordLink: t.discordLink,
+      rules: t.rules,
+      serverIp: t.serverIp,
+      status: t.status,
+      registrationsCount: countMap.get(t.id) ?? 0,
+      recentRegistrations: (recentByTournament.get(t.id) ?? []).map((r) => ({
+        id: r.id,
+        minecraftUsername: r.minecraftUsername,
+        discordUsername: r.discordUsername,
+        teamName: r.teamName,
+        email: r.email,
+        region: r.region,
+        createdAt: r.createdAt,
       })),
     })),
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
@@ -138,52 +232,112 @@ export async function handleAdminMonitorEmployees(request: Request) {
   const search = url.searchParams.get("search") || "";
   const page = parseInt(url.searchParams.get("page") || "1");
   const limit = Math.min(parseInt(url.searchParams.get("limit") || "50"), 200);
-  const skip = (page - 1) * limit;
+  const offset = (page - 1) * limit;
 
-  const prisma = await getPrismaClient();
-
-  const where: any = {};
+  const conditions = [];
   if (search) {
-    where.OR = [
-      { displayName: { contains: search } },
-      { department: { contains: search } },
-      { user: { email: { contains: search } } },
-    ];
+    conditions.push(
+      or(
+        like(employees.displayName, `%${search}%`),
+        like(employees.department, `%${search}%`),
+      )!,
+    );
   }
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-  const [employees, total] = await Promise.all([
-    prisma.employee.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      skip,
-      take: limit,
-      include: {
-        user: { select: { email: true, name: true, image: true, role: true } },
-        permissions: true,
-        activityLogs: { orderBy: { createdAt: "desc" }, take: 10 },
-        _count: { select: { assignedTickets: true } },
-      },
-    }),
-    prisma.employee.count({ where }),
+  const [employeeRows, totalRows] = await Promise.all([
+    db
+      .select({
+        id: employees.id,
+        userId: employees.userId,
+        displayName: employees.displayName,
+        department: employees.department,
+        isActive: employees.isActive,
+        disabledAt: employees.disabledAt,
+        createdAt: employees.createdAt,
+        email: users.email,
+        role: users.role,
+      })
+      .from(employees)
+      .leftJoin(users, eq(employees.userId, users.id))
+      .where(whereClause)
+      .orderBy(desc(employees.createdAt))
+      .limit(limit)
+      .offset(offset),
+    db.select({ count: count() }).from(employees).where(whereClause),
   ]);
 
+  const total = Number(totalRows[0]?.count ?? 0);
+  const employeeIds = employeeRows.map((e) => e.id);
+
+  const [permRows, activityRows, ticketCountRows] = await Promise.all([
+    employeeIds.length > 0
+      ? db.select().from(rolePermissions).where(inArray(rolePermissions.employeeId, employeeIds))
+      : [],
+    employeeIds.length > 0
+      ? db
+          .select()
+          .from(activityLogs)
+          .where(inArray(activityLogs.employeeId, employeeIds))
+          .orderBy(desc(activityLogs.createdAt))
+      : [],
+    employeeIds.length > 0
+      ? db
+          .select({ assignedToId: supportTickets.assignedToId, count: count() })
+          .from(supportTickets)
+          .where(inArray(supportTickets.assignedToId, employeeIds))
+          .groupBy(supportTickets.assignedToId)
+      : [],
+  ]);
+
+  const permMap = new Map(permRows.map((p) => [p.employeeId, p]));
+  const ticketCountMap = new Map(ticketCountRows.map((r) => [r.assignedToId, Number(r.count)]));
+
+  const activityByEmployee = new Map<string, typeof activityRows>();
+  for (const a of activityRows) {
+    if (!a.employeeId) continue;
+    const list = activityByEmployee.get(a.employeeId) ?? [];
+    if (list.length < 10) {
+      list.push(a);
+      activityByEmployee.set(a.employeeId, list);
+    }
+  }
+
   return json({
-    employees: employees.map((e) => ({
-      id: e.id, userId: e.userId, displayName: e.displayName,
-      department: e.department, isActive: e.isActive,
-      disabledAt: e.disabledAt, createdAt: e.createdAt,
-      email: e.user?.email ?? "", role: e.user?.role ?? "EMPLOYEE",
-      ticketCount: e._count.assignedTickets,
-      permissions: e.permissions ? {
-        products: e.permissions.products, orders: e.permissions.orders,
-        support: e.permissions.support, customers: e.permissions.customers,
-        employees: e.permissions.employees, logs: e.permissions.logs,
-        settings: e.permissions.settings, tournaments: e.permissions.tournaments,
-        notifications: e.permissions.notifications, playerManage: e.permissions.playerManage,
-      } : null,
-      recentActivity: e.activityLogs.map((l) => ({
-        id: l.id, action: l.action, entity: l.entity,
-        details: l.details, severity: l.severity, createdAt: l.createdAt,
+    employees: employeeRows.map((e) => ({
+      id: e.id,
+      userId: e.userId,
+      displayName: e.displayName,
+      department: e.department,
+      isActive: e.isActive,
+      disabledAt: e.disabledAt,
+      createdAt: e.createdAt,
+      email: e.email ?? "",
+      role: e.role ?? "EMPLOYEE",
+      ticketCount: ticketCountMap.get(e.id) ?? 0,
+      permissions: (() => {
+        const p = permMap.get(e.id);
+        if (!p) return null;
+        return {
+          products: p.products,
+          orders: p.orders,
+          support: p.support,
+          customers: p.customers,
+          employees: p.employees,
+          logs: p.logs,
+          settings: p.settings,
+          tournaments: p.tournaments,
+          notifications: p.notifications,
+          playerManage: p.playerManage,
+        };
+      })(),
+      recentActivity: (activityByEmployee.get(e.id) ?? []).map((l) => ({
+        id: l.id,
+        action: l.action,
+        entity: l.entity,
+        details: l.details,
+        severity: l.severity,
+        createdAt: l.createdAt,
       })),
     })),
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
@@ -203,46 +357,63 @@ export async function handleAdminPlatformLogs(request: Request) {
   const search = url.searchParams.get("search") || "";
   const page = parseInt(url.searchParams.get("page") || "1");
   const limit = Math.min(parseInt(url.searchParams.get("limit") || "50"), 200);
-  const skip = (page - 1) * limit;
+  const offset = (page - 1) * limit;
 
-  const prisma = await getPrismaClient();
-
-  const where: any = {};
-  if (entity) where.entity = entity;
-  if (action) where.action = action;
-  if (severity) where.severity = severity;
+  const conditions = [];
+  if (entity) conditions.push(eq(activityLogs.entity, entity));
+  if (action) conditions.push(eq(activityLogs.action, action));
+  if (severity) conditions.push(eq(activityLogs.severity, severity));
   if (search) {
-    where.OR = [
-      { details: { contains: search } },
-      { entityId: { contains: search } },
-      { employee: { displayName: { contains: search } } },
-    ];
+    conditions.push(
+      or(
+        like(activityLogs.details, `%${search}%`),
+        like(activityLogs.entityId, `%${search}%`),
+      )!,
+    );
   }
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-  const [logs, total] = await Promise.all([
-    prisma.activityLog.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      skip,
-      take: limit,
-      include: { employee: { select: { displayName: true } } },
-    }),
-    prisma.activityLog.count({ where }),
+  const [logRows, totalRows] = await Promise.all([
+    db
+      .select({
+        id: activityLogs.id,
+        action: activityLogs.action,
+        entity: activityLogs.entity,
+        entityId: activityLogs.entityId,
+        details: activityLogs.details,
+        severity: activityLogs.severity,
+        ipAddress: activityLogs.ipAddress,
+        createdAt: activityLogs.createdAt,
+        employeeName: employees.displayName,
+      })
+      .from(activityLogs)
+      .leftJoin(employees, eq(activityLogs.employeeId, employees.id))
+      .where(whereClause)
+      .orderBy(desc(activityLogs.createdAt))
+      .limit(limit)
+      .offset(offset),
+    db.select({ count: count() }).from(activityLogs).where(whereClause),
   ]);
 
+  const total = Number(totalRows[0]?.count ?? 0);
+
   return json({
-    logs: logs.map((l) => ({
-      id: l.id, action: l.action, entity: l.entity,
-      entityId: l.entityId, details: l.details,
-      severity: l.severity, ipAddress: l.ipAddress,
+    logs: logRows.map((l) => ({
+      id: l.id,
+      action: l.action,
+      entity: l.entity,
+      entityId: l.entityId,
+      details: l.details,
+      severity: l.severity,
+      ipAddress: l.ipAddress,
       createdAt: l.createdAt,
-      employeeName: l.employee?.displayName ?? "System",
+      employeeName: l.employeeName ?? "System",
     })),
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   });
 }
 
-// ─── PLATFORM OVERVIEW (for admin index) ──────────────────────
+// ─── TOURNAMENT ACTIONS (for admin overview) ──────────────────
 
 export async function handleAdminTournamentActions(request: Request) {
   const authErr = await requireSuperAdmin(request);
@@ -250,34 +421,50 @@ export async function handleAdminTournamentActions(request: Request) {
 
   const url = new URL(request.url);
   const days = parseInt(url.searchParams.get("days") || "7");
-
-  const prisma = await getPrismaClient();
   const since = new Date(Date.now() - days * 86400000);
 
-  const tournamentLogs = await prisma.activityLog.findMany({
-    where: {
-      entity: "tournament",
-      createdAt: { gte: since },
-    },
-    orderBy: { createdAt: "desc" },
-    include: { employee: { select: { displayName: true } } },
-  });
-
-  const announcementLogs = await prisma.tournamentAnnouncement.findMany({
-    where: { createdAt: { gte: since } },
-    orderBy: { createdAt: "desc" },
-    include: { tournament: { select: { title: true } } },
-  });
+  const [tournamentLogs, announcementLogs] = await Promise.all([
+    db
+      .select({
+        id: activityLogs.id,
+        action: activityLogs.action,
+        details: activityLogs.details,
+        createdAt: activityLogs.createdAt,
+        employeeName: employees.displayName,
+      })
+      .from(activityLogs)
+      .leftJoin(employees, eq(activityLogs.employeeId, employees.id))
+      .where(and(eq(activityLogs.entity, "tournament"), gte(activityLogs.createdAt, since)))
+      .orderBy(desc(activityLogs.createdAt)),
+    db
+      .select({
+        id: tournamentAnnouncements.id,
+        title: tournamentAnnouncements.title,
+        message: tournamentAnnouncements.message,
+        type: tournamentAnnouncements.type,
+        tournamentTitle: tournaments.title,
+        createdAt: tournamentAnnouncements.createdAt,
+      })
+      .from(tournamentAnnouncements)
+      .leftJoin(tournaments, eq(tournamentAnnouncements.tournamentId, tournaments.id))
+      .where(gte(tournamentAnnouncements.createdAt, since))
+      .orderBy(desc(tournamentAnnouncements.createdAt)),
+  ]);
 
   return json({
     tournamentActions: tournamentLogs.map((l) => ({
-      id: l.id, action: l.action, details: l.details,
-      employeeName: l.employee?.displayName ?? "System",
+      id: l.id,
+      action: l.action,
+      details: l.details,
+      employeeName: l.employeeName ?? "System",
       createdAt: l.createdAt,
     })),
     recentAnnouncements: announcementLogs.map((a) => ({
-      id: a.id, title: a.title, message: a.message, type: a.type,
-      tournamentTitle: a.tournament.title,
+      id: a.id,
+      title: a.title,
+      message: a.message,
+      type: a.type,
+      tournamentTitle: a.tournamentTitle ?? "",
       createdAt: a.createdAt,
     })),
   });
@@ -293,55 +480,83 @@ export async function handleAdminAllPlayers(request: Request) {
   const search = url.searchParams.get("search") || "";
   const page = parseInt(url.searchParams.get("page") || "1");
   const limit = Math.min(parseInt(url.searchParams.get("limit") || "50"), 200);
-  const skip = (page - 1) * limit;
+  const offset = (page - 1) * limit;
 
-  const prisma = await getPrismaClient();
-
-  const where: any = {};
+  const conditions = [];
   if (search) {
-    where.OR = [
-      { minecraftUsername: { contains: search } },
-      { minecraftUuid: { contains: search } },
-      { user: { email: { contains: search } } },
-    ];
+    conditions.push(
+      or(
+        like(customers.minecraftUsername, `%${search}%`),
+        like(customers.minecraftUuid, `%${search}%`),
+      )!,
+    );
   }
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-  const [customers, total] = await Promise.all([
-    prisma.customer.findMany({
-      where,
-      orderBy: { lastLoginAt: "desc" },
-      skip,
-      take: limit,
-      include: {
-        user: { select: { id: true, email: true, role: true } },
-        _count: { select: { orders: true } },
-      },
-    }),
-    prisma.customer.count({ where }),
+  const [customerRows, totalRows] = await Promise.all([
+    db
+      .select({
+        id: customers.id,
+        minecraftUsername: customers.minecraftUsername,
+        minecraftUuid: customers.minecraftUuid,
+        country: customers.country,
+        avatarUrl: customers.avatarUrl,
+        lastLoginAt: customers.lastLoginAt,
+        createdAt: customers.createdAt,
+        email: users.email,
+        role: users.role,
+      })
+      .from(customers)
+      .leftJoin(users, eq(customers.userId, users.id))
+      .where(whereClause)
+      .orderBy(desc(customers.lastLoginAt))
+      .limit(limit)
+      .offset(offset),
+    db.select({ count: count() }).from(customers).where(whereClause),
   ]);
 
-  const customerIds = customers.map((c) => c.id);
+  const total = Number(totalRows[0]?.count ?? 0);
+  const customerIds = customerRows.map((c) => c.id);
+
+  const [orderCountRows, rankRows] = await Promise.all([
+    customerIds.length > 0
+      ? db
+          .select({ customerId: orders.customerId, count: count() })
+          .from(orders)
+          .where(inArray(orders.customerId, customerIds))
+          .groupBy(orders.customerId)
+      : [],
+    customerIds.length > 0
+      ? db
+          .select()
+          .from(playerRanks)
+          .where(and(inArray(playerRanks.customerId, customerIds), eq(playerRanks.active, true)))
+      : [],
+  ]);
+
+  const orderCountMap = new Map(orderCountRows.map((r) => [r.customerId, Number(r.count)]));
+
   const rankMap = new Map<string, string[]>();
-  if (customerIds.length > 0) {
-    const ranks = await prisma.playerRank.findMany({
-      where: { customerId: { in: customerIds }, active: true },
-    });
-    for (const r of ranks) {
-      const existing = rankMap.get(r.customerId!) || [];
-      existing.push(r.rank);
-      rankMap.set(r.customerId!, existing);
-    }
+  for (const r of rankRows) {
+    if (!r.customerId) continue;
+    const existing = rankMap.get(r.customerId) ?? [];
+    existing.push(r.rank);
+    rankMap.set(r.customerId, existing);
   }
 
   return json({
-    players: customers.map((c) => ({
-      id: c.id, minecraftUsername: c.minecraftUsername,
-      minecraftUuid: c.minecraftUuid, country: c.country,
-      avatarUrl: c.avatarUrl, lastLoginAt: c.lastLoginAt,
-      createdAt: c.createdAt, email: c.user?.email ?? "",
-      role: c.user?.role ?? "CUSTOMER",
-      ordersCount: c._count.orders,
-      ranks: rankMap.get(c.id) || [],
+    players: customerRows.map((c) => ({
+      id: c.id,
+      minecraftUsername: c.minecraftUsername,
+      minecraftUuid: c.minecraftUuid,
+      country: c.country,
+      avatarUrl: c.avatarUrl,
+      lastLoginAt: c.lastLoginAt,
+      createdAt: c.createdAt,
+      email: c.email ?? "",
+      role: c.role ?? "CUSTOMER",
+      ordersCount: orderCountMap.get(c.id) ?? 0,
+      ranks: rankMap.get(c.id) ?? [],
     })),
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   });
@@ -359,16 +574,22 @@ export async function handleAdminSendGlobalNotification(request: Request) {
   const { title, message, type, link } = body;
   if (!title || !message) return error("Missing title or message", 400);
 
-  const prisma = await getPrismaClient();
-  const notif = await prisma.siteNotification.create({
-    data: {
-      title,
-      message,
-      type: type || "INFO",
-      link: link || undefined,
-      startAt: new Date(),
-    },
+  const now = new Date();
+  const id = crypto.randomUUID();
+
+  await db.insert(siteNotifications).values({
+    id,
+    title,
+    message,
+    type: type || "INFO",
+    link: link || null,
+    startAt: now,
+    active: true,
+    createdAt: now,
+    updatedAt: now,
   });
 
-  return json({ ok: true, notification: notif }, 201);
+  const notifRows = await db.select().from(siteNotifications).where(eq(siteNotifications.id, id)).limit(1);
+
+  return json({ ok: true, notification: notifRows[0] }, 201);
 }
