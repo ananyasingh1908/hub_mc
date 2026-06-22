@@ -3,7 +3,7 @@ import "./lib/error-capture";
 import { handleUpload } from "@/lib/upload/upload-handler";
 import { checkRateLimit } from "@/lib/rate-limiter";
 import { cachedJson } from "@/lib/response-cache";
-import { initDb, type CloudflareEnv } from "@/lib/db";
+import { initDb, db, testDbConnection, type CloudflareEnv } from "@/lib/db";
 import { setR2Bucket } from "@/lib/storage/storage";
 import { sql } from "drizzle-orm";
 import { createStartHandler, defaultStreamHandler } from "@tanstack/react-start/server";
@@ -14,10 +14,19 @@ import {
   handleLogoutRequest,
   handleSessionRequest,
 } from "@/lib/auth/session";
-import { handleEmployeeLoginRequest, handleGoogleClientIdRequest } from "@/lib/auth/employee-auth";
+import {
+  handleEmployeeLoginRequest,
+  handleGoogleClientIdRequest,
+} from "@/lib/auth/employee-auth";
 import { handleAdminLoginRequest } from "@/lib/auth/admin-auth";
-import { handleEmployeeSessionRequest, handleEmployeeLogoutRequest } from "@/lib/auth/employee-session";
-import { handleAdminSessionRequest, handleAdminLogoutRequest } from "@/lib/auth/admin-session";
+import {
+  handleEmployeeSessionRequest,
+  handleEmployeeLogoutRequest,
+} from "@/lib/auth/employee-session";
+import {
+  handleAdminSessionRequest,
+  handleAdminLogoutRequest,
+} from "@/lib/auth/admin-session";
 import { handleAllSessionsRequest } from "@/lib/auth/all-sessions";
 import { commerceApiHandlers } from "@/lib/commerce/api-handlers";
 import {
@@ -33,7 +42,6 @@ import {
   handleAdminDeleteProduct,
   handleAdminGetOrders,
   handleAdminUpdateOrderStatus,
-  handleAdminGetTickets,
   handleAdminReplyTicket,
   handleAdminResolveTicket,
   handleAdminGetCustomers,
@@ -99,54 +107,94 @@ import {
   handleAddPlayerNote,
   handleBanPlayer,
   handleUnbanPlayer,
-  handleGetPlayerBans,
   handleAssignRank,
   handleRemoveRank,
   handleEmployeeDashboardStats,
 } from "@/lib/employee/employee-handlers";
-import { handleYouTubeStatus, handleYouTubeVideos, handleYouTubeLivestream, handleYouTubeCommunityStreams, handleAdminApproveStream, handleAdminRemoveStream, handleAdminBlacklistChannel, handleAdminGetFeaturedStreams } from "@/lib/youtube/youtube-handler";
+import {
+  handleYouTubeStatus,
+  handleYouTubeVideos,
+  handleYouTubeLivestream,
+  handleYouTubeCommunityStreams,
+  handleAdminApproveStream,
+  handleAdminRemoveStream,
+  handleAdminBlacklistChannel,
+  handleAdminGetFeaturedStreams,
+} from "@/lib/youtube/youtube-handler";
 import { scheduleRefresh, initializeCache } from "@/lib/youtube/youtube-cache";
 import { handleDiscordStatus, handleDiscordEvents } from "@/lib/discord/discord-handler";
-import { handleGetNotifications, handleUnreadCount, handleMarkRead, handleMarkAllRead } from "@/lib/notifications/notification-handler";
+import {
+  handleGetNotifications,
+  handleUnreadCount,
+  handleMarkRead,
+  handleMarkAllRead,
+} from "@/lib/notifications/notification-handler";
 import { handleGetProfile } from "@/lib/profile/profile-handlers";
 
-// ─── Cloudflare Execution Context ─────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// Types
+// ─────────────────────────────────────────────────────────────
 type ExecutionContextLike = {
   waitUntil?: (promise: Promise<unknown>) => void;
 };
 
-// ─── TANSTACK SSR HANDLER (created once) ─────────────────────
+// ─────────────────────────────────────────────────────────────
+// TanStack SSR handler
+// IMPORTANT: We keep the standard fetch handler here.
+// Custom API routes are handled BEFORE this.
+// ─────────────────────────────────────────────────────────────
 const tanstackFetch = createStartHandler(defaultStreamHandler);
 
-// ─── RUNTIME ENV CHECK (once per isolate) ───────────────────
+// ─────────────────────────────────────────────────────────────
+// Runtime state
+// ─────────────────────────────────────────────────────────────
 let envChecked = false;
+let cacheInitialized = false;
 
+// ─────────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────────
 function logMissingEnv(env: CloudflareEnv): void {
   if (envChecked) return;
   envChecked = true;
+
+  if (!env.HYPERDRIVE?.connectionString) {
+    console.warn("[ENV] HYPERDRIVE connection string is not set");
+  }
   if (!env.JWT_SECRET) console.warn("[ENV] JWT_SECRET is not set");
   if (!env.GOOGLE_CLIENT_ID) console.warn("[ENV] GOOGLE_CLIENT_ID is not set");
   if (!env.GOOGLE_CLIENT_SECRET) console.warn("[ENV] GOOGLE_CLIENT_SECRET is not set");
   if (!env.SUPER_ADMIN_ID) console.warn("[ENV] SUPER_ADMIN_ID is not set");
   if (!env.SUPER_ADMIN_PASSWORD) console.warn("[ENV] SUPER_ADMIN_PASSWORD is not set");
+
   if (env.GOOGLE_CLIENT_ID) devlog("[ENV] GOOGLE_CLIENT_ID is configured");
-  if (env.SUPER_ADMIN_ID && env.SUPER_ADMIN_PASSWORD) devlog("[ENV] Super admin credentials are configured");
+  if (env.SUPER_ADMIN_ID && env.SUPER_ADMIN_PASSWORD) {
+    devlog("[ENV] Super admin credentials are configured");
+  }
 }
 
-// ─── SECURITY HEADERS ────────────────────────────────────────
 function applySecurityHeaders(response: Response, url: URL): Response {
   const headers = new Headers(response.headers);
+
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set("X-Frame-Options", "DENY");
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()");
+  headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), payment=()"
+  );
+
   if (url.protocol === "https:") {
     headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains");
   }
-  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
 }
 
-// ─── CSRF PROTECTION ─────────────────────────────────────────
 const CSRF_MUTABLE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 const CSRF_EXEMPT_PATHS = new Set([
   "/api/auth/login",
@@ -167,32 +215,32 @@ function checkCsrf(request: Request, url: URL, env: CloudflareEnv): Response | n
   const referer = request.headers.get("referer");
   const allowedHost = url.host;
   const allowedOrigin = env.BASE_URL;
+
   if (origin) {
     try {
       const originHost = new URL(origin).host;
       if (originHost === allowedHost || (allowedOrigin && origin === allowedOrigin)) {
         return null;
       }
-    } catch { /* invalid origin header — reject */ }
+    } catch {
+      // invalid origin => reject
+    }
   } else if (referer) {
     try {
       const refererHost = new URL(referer).host;
       if (refererHost === allowedHost) {
         return null;
       }
-    } catch { /* invalid referer header — reject */ }
+    } catch {
+      // invalid referer => reject
+    }
   }
 
-  // Allow requests with no origin AND no referer (curl / same-origin cookie requests
-  // from a first-party page that strips Referer via Referrer-Policy are fine — they
-  // have the cookie and the browser won't send the header, which is the expected
-  // behavior for SameSite=Strict cookies).
   if (!origin && !referer) return null;
 
   return Response.json({ error: "CSRF validation failed" }, { status: 403 });
 }
 
-// ─── ERROR HELPERS ───────────────────────────────────────────
 function brandedErrorResponse(): Response {
   return new Response(renderErrorPage(), {
     status: 500,
@@ -202,6 +250,7 @@ function brandedErrorResponse(): Response {
 
 function isCatastrophicSsrErrorBody(body: string, responseStatus: number): boolean {
   let payload: unknown;
+
   try {
     payload = JSON.parse(body);
   } catch {
@@ -213,22 +262,22 @@ function isCatastrophicSsrErrorBody(body: string, responseStatus: number): boole
   }
 
   const fields = payload as Record<string, unknown>;
-  const expectedKeys = new Set(["message", "status", "unhandled"]);
+  const expectedKeys = new Set(["message", "status", "unhandled", "error"]);
+
   if (!Object.keys(fields).every((key) => expectedKeys.has(key))) {
     return false;
   }
 
   return (
     fields.unhandled === true &&
-    fields.message === "HTTPError" &&
+    (fields.message === "HTTPError" || fields.error === true) &&
     (fields.status === undefined || fields.status === responseStatus)
   );
 }
 
-// h3 swallows in-handler throws into a normal 500 Response with body
-// {"unhandled":true,"message":"HTTPError"} — try/catch alone never fires for those.
 async function normalizeCatastrophicSsrResponse(response: Response): Promise<Response> {
   if (response.status < 500) return response;
+
   const contentType = response.headers.get("content-type") ?? "";
   if (!contentType.includes("application/json")) return response;
 
@@ -237,22 +286,26 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
     return response;
   }
 
-  console.error(consumeLastCapturedError() ?? new Error(`h3 swallowed SSR error: ${body}`));
+  console.error(
+    consumeLastCapturedError() ?? new Error(`h3 swallowed SSR error: ${body}`)
+  );
+
   return brandedErrorResponse();
 }
 
-// ─── CUSTOM REQUEST HANDLER (API + utility routes) ───────────
+// ─────────────────────────────────────────────────────────────
+// Custom route handler
+// ─────────────────────────────────────────────────────────────
 async function handleCustomRequest(
   request: Request,
   env: CloudflareEnv,
   ctx: ExecutionContextLike,
-  url: URL,
+  url: URL
 ): Promise<Response | null> {
-  // CSRF check for all state-changing API routes
   const csrfError = checkCsrf(request, url, env);
   if (csrfError) return csrfError;
 
-  // Health check
+  // Health
   if (url.pathname === "/api/health" && request.method === "GET") {
     return Response.json({
       status: "ok",
@@ -261,19 +314,40 @@ async function handleCustomRequest(
     });
   }
 
-  // DB health check — real query through Hyperdrive
   if (url.pathname === "/api/health/db" && request.method === "GET") {
     try {
-      const { db } = await import("@/lib/db");
-      await db.execute(sql`SELECT 1`);
-      return Response.json({ status: "ok", db: "connected", timestamp: new Date().toISOString() });
+      const result = await testDbConnection();
+      return Response.json({
+        status: "ok",
+        db: "connected",
+        result,
+        timestamp: new Date().toISOString(),
+      });
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : "Unknown error";
-      return Response.json({ status: "error", db: "disconnected", error: message }, { status: 503 });
+      const errObj: Record<string, unknown> = {};
+      if (error instanceof Error) {
+        errObj.message = error.message;
+        errObj.name = error.name;
+        errObj.stack = error.stack;
+      }
+      if (error && typeof error === "object") {
+        for (const k of Object.keys(error)) {
+          errObj[k] = (error as Record<string, unknown>)[k];
+        }
+      }
+      console.error("[DB HEALTH ERROR]", JSON.stringify(errObj));
+      return Response.json(
+        {
+          status: "error",
+          db: "disconnected",
+          error: errObj,
+        },
+        { status: 503 }
+      );
     }
   }
 
-  // SEO: robots.txt
+  // robots.txt
   if (url.pathname === "/robots.txt") {
     const baseUrl = env.BASE_URL || "https://hubmc.in";
     const robots = [
@@ -296,12 +370,13 @@ async function handleCustomRequest(
       "Disallow: /api/",
       `Sitemap: ${baseUrl}/sitemap.xml`,
     ].join("\n");
+
     return new Response(robots, {
       headers: { "content-type": "text/plain; charset=utf-8" },
     });
   }
 
-  // SEO: sitemap.xml
+  // sitemap.xml
   if (url.pathname === "/sitemap.xml") {
     const baseUrl = env.BASE_URL || "https://hubmc.in";
     const urls = [
@@ -312,21 +387,23 @@ async function handleCustomRequest(
       { loc: "/livestream", priority: "0.7", changefreq: "daily" },
       { loc: "/login", priority: "0.3", changefreq: "monthly" },
     ];
+
     const sitemap = [
       `<?xml version="1.0" encoding="UTF-8"?>`,
       `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
       ...urls.map(
         (u) =>
-          `  <url><loc>${baseUrl}${u.loc}</loc><priority>${u.priority}</priority><changefreq>${u.changefreq}</changefreq></url>`,
+          `  <url><loc>${baseUrl}${u.loc}</loc><priority>${u.priority}</priority><changefreq>${u.changefreq}</changefreq></url>`
       ),
       `</urlset>`,
     ].join("\n");
+
     return new Response(sitemap, {
       headers: { "content-type": "application/xml; charset=utf-8" },
     });
   }
 
-  // Auth API routes
+  // Auth
   if (url.pathname.startsWith("/api/auth/")) {
     if (url.pathname === "/api/auth/login" && request.method === "POST") {
       return await handleLoginRequest(request);
@@ -371,7 +448,7 @@ async function handleCustomRequest(
     return new Response("Not found", { status: 404 });
   }
 
-  // Order & Delivery API routes
+  // Orders / delivery
   if (url.pathname === "/api/orders" && request.method === "GET") {
     return await handleGetOrders(request);
   }
@@ -385,24 +462,26 @@ async function handleCustomRequest(
     return await handleRetryDelivery(request);
   }
 
-  // Profile API route
+  // Profile
   if (url.pathname === "/api/profile" && request.method === "GET") {
     return await handleGetProfile(request);
   }
 
-  // Upload API route
+  // Upload
   if (url.pathname === "/api/upload" && request.method === "POST") {
     const rl = checkRateLimit(request, { limit: 20, label: "upload" });
     if (rl) return rl;
     return await handleUpload(request);
   }
 
-  // Admin & Employee API routes
+  // Admin
   if (url.pathname.startsWith("/api/admin/")) {
     const route = url.pathname;
     const method = request.method;
+
     if (route === "/api/admin/stats" && method === "GET") return await handleAdminDashboardStats(request);
     if (route === "/api/admin/products" && method === "GET") return await handleAdminGetProducts(request);
+
     if (route === "/api/admin/products/create" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 10, label: "admin-product-create" });
       if (rl) return rl;
@@ -418,6 +497,7 @@ async function handleCustomRequest(
       if (rl) return rl;
       return await handleAdminDeleteProduct(request);
     }
+
     if (route === "/api/admin/orders" && method === "GET") return await handleAdminGetOrders(request);
     if (route === "/api/admin/orders/update" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 20, label: "admin-order-update" });
@@ -429,6 +509,7 @@ async function handleCustomRequest(
       if (rl) return rl;
       return await handleRefundOrder(request);
     }
+
     if (route === "/api/admin/tickets/reply" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 30, label: "admin-ticket-reply" });
       if (rl) return rl;
@@ -439,8 +520,10 @@ async function handleCustomRequest(
       if (rl) return rl;
       return await handleAdminResolveTicket(request);
     }
+
     if (route === "/api/admin/customers" && method === "GET") return await handleAdminGetCustomers(request);
     if (route === "/api/admin/employees" && method === "GET") return await handleAdminGetEmployees(request);
+
     if (route === "/api/admin/employees/create" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 5, label: "admin-employee-create" });
       if (rl) return rl;
@@ -456,6 +539,7 @@ async function handleCustomRequest(
       if (rl) return rl;
       return await handleAdminDeleteEmployee(request);
     }
+
     if (route === "/api/admin/logs" && method === "GET") return await handleAdminGetLogs(request);
     if (route === "/api/admin/permissions" && method === "GET") return await handleAdminGetPermissions(request);
     if (route === "/api/admin/permissions/update" && method === "POST") {
@@ -470,6 +554,7 @@ async function handleCustomRequest(
     if (route === "/api/admin/platform/logs" && method === "GET") return await handleAdminPlatformLogs(request);
     if (route === "/api/admin/platform/tournament-actions" && method === "GET") return await handleAdminTournamentActions(request);
     if (route === "/api/admin/platform/players" && method === "GET") return await handleAdminAllPlayers(request);
+
     if (route === "/api/admin/platform/send-notification" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 5, label: "admin-send-notif" });
       if (rl) return rl;
@@ -498,19 +583,21 @@ async function handleCustomRequest(
       if (rl) return rl;
       return await handleAdminBlacklistChannel(request);
     }
-    if (route === "/api/admin/streams/featured" && method === "GET") return await handleAdminGetFeaturedStreams(request);
+    if (route === "/api/admin/streams/featured" && method === "GET") {
+      return await handleAdminGetFeaturedStreams(request);
+    }
 
     return new Response("Not found", { status: 404 });
   }
 
-  // Contact API route
+  // Contact
   if (url.pathname === "/api/contact" && request.method === "POST") {
     const rl = checkRateLimit(request, { limit: 5, label: "contact" });
     if (rl) return rl;
     return await handleContactRequest(request);
   }
 
-  // Server Reviews API routes — cached 120s
+  // Reviews
   if (url.pathname === "/api/server-reviews" && request.method === "GET") {
     return cachedJson(request, 120, () => handleGetServerReviews());
   }
@@ -520,35 +607,54 @@ async function handleCustomRequest(
     return await handleSubmitServerReview(request);
   }
 
-  // YouTube API routes
+  // YouTube
   if (url.pathname.startsWith("/api/youtube/")) {
-    // Trigger background cache refresh if data is stale (never blocks the response)
     scheduleRefresh(ctx as { waitUntil: (p: Promise<unknown>) => void });
 
-    if (url.pathname === "/api/youtube/status" && request.method === "GET") return await handleYouTubeStatus();
-    if (url.pathname === "/api/youtube/videos" && request.method === "GET") return await handleYouTubeVideos();
-    if (url.pathname === "/api/youtube/livestream" && request.method === "GET") return await handleYouTubeLivestream();
-    if (url.pathname === "/api/youtube/community-streams" && request.method === "GET") return await handleYouTubeCommunityStreams();
+    if (url.pathname === "/api/youtube/status" && request.method === "GET") {
+      return await handleYouTubeStatus();
+    }
+    if (url.pathname === "/api/youtube/videos" && request.method === "GET") {
+      return await handleYouTubeVideos();
+    }
+    if (url.pathname === "/api/youtube/livestream" && request.method === "GET") {
+      return await handleYouTubeLivestream();
+    }
+    if (url.pathname === "/api/youtube/community-streams" && request.method === "GET") {
+      return await handleYouTubeCommunityStreams();
+    }
     return new Response("Not found", { status: 404 });
   }
 
-  // Discord API routes
+  // Discord
   if (url.pathname.startsWith("/api/discord/")) {
-    if (url.pathname === "/api/discord/status" && request.method === "GET") return await handleDiscordStatus();
-    if (url.pathname === "/api/discord/events" && request.method === "GET") return await handleDiscordEvents();
+    if (url.pathname === "/api/discord/status" && request.method === "GET") {
+      return await handleDiscordStatus();
+    }
+    if (url.pathname === "/api/discord/events" && request.method === "GET") {
+      return await handleDiscordEvents();
+    }
     return new Response("Not found", { status: 404 });
   }
 
-  // Notification API routes
+  // Notifications
   if (url.pathname === "/api/notifications" || url.pathname.startsWith("/api/notifications/")) {
-    if (url.pathname === "/api/notifications" && request.method === "GET") return cachedJson(request, 30, () => handleGetNotifications(request));
-    if (url.pathname === "/api/notifications/unread-count" && request.method === "GET") return await handleUnreadCount(request);
-    if (url.pathname === "/api/notifications/mark-read" && request.method === "POST") return await handleMarkRead(request);
-    if (url.pathname === "/api/notifications/mark-all-read" && request.method === "POST") return await handleMarkAllRead(request);
+    if (url.pathname === "/api/notifications" && request.method === "GET") {
+      return cachedJson(request, 30, () => handleGetNotifications(request));
+    }
+    if (url.pathname === "/api/notifications/unread-count" && request.method === "GET") {
+      return await handleUnreadCount(request);
+    }
+    if (url.pathname === "/api/notifications/mark-read" && request.method === "POST") {
+      return await handleMarkRead(request);
+    }
+    if (url.pathname === "/api/notifications/mark-all-read" && request.method === "POST") {
+      return await handleMarkAllRead(request);
+    }
     return new Response("Not found", { status: 404 });
   }
 
-  // Tournament API routes
+  // Tournaments
   if (url.pathname.startsWith("/api/tournaments/")) {
     const route = url.pathname;
     const method = request.method;
@@ -557,16 +663,24 @@ async function handleCustomRequest(
       await autoUpdateStatuses();
       return cachedJson(request, 60, () => handleGetPublicTournaments());
     }
-    if (route === "/api/tournaments/detail" && method === "GET") return await handleGetTournamentById(request);
+    if (route === "/api/tournaments/detail" && method === "GET") {
+      return await handleGetTournamentById(request);
+    }
     if (route === "/api/tournaments/register" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 10, label: "tournament-register" });
       if (rl) return rl;
       return await handleRegisterForTournament(request);
     }
-    if (route === "/api/tournaments/registrations" && method === "GET") return await handleGetTournamentRegistrations(request);
-    if (route === "/api/tournaments/brackets" && method === "GET") return await handleGetTournamentBrackets(request);
+    if (route === "/api/tournaments/registrations" && method === "GET") {
+      return await handleGetTournamentRegistrations(request);
+    }
+    if (route === "/api/tournaments/brackets" && method === "GET") {
+      return await handleGetTournamentBrackets(request);
+    }
 
-    if (route === "/api/tournaments/staff" && method === "GET") return await handleStaffGetTournaments(request);
+    if (route === "/api/tournaments/staff" && method === "GET") {
+      return await handleStaffGetTournaments(request);
+    }
     if (route === "/api/tournaments/staff/create" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 10, label: "tournament-create" });
       if (rl) return rl;
@@ -587,8 +701,12 @@ async function handleCustomRequest(
       if (rl) return rl;
       return await handleDeleteTournamentRegistration(request);
     }
-    if (route === "/api/tournaments/staff/search-registrations" && method === "GET") return await handleStaffSearchRegistrations(request);
-    if (route === "/api/tournaments/staff/export-registrations" && method === "GET") return await handleStaffExportRegistrations(request);
+    if (route === "/api/tournaments/staff/search-registrations" && method === "GET") {
+      return await handleStaffSearchRegistrations(request);
+    }
+    if (route === "/api/tournaments/staff/export-registrations" && method === "GET") {
+      return await handleStaffExportRegistrations(request);
+    }
     if (route === "/api/tournaments/staff/start" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 5, label: "tournament-start" });
       if (rl) return rl;
@@ -600,8 +718,12 @@ async function handleCustomRequest(
       return await handleStaffEndTournament(request);
     }
 
-    if (route === "/api/tournaments/leaderboard" && method === "GET") return await handleGetTournamentLeaderboard(request);
-    if (route === "/api/tournaments/matches" && method === "GET") return await handleGetTournamentMatches(request);
+    if (route === "/api/tournaments/leaderboard" && method === "GET") {
+      return await handleGetTournamentLeaderboard(request);
+    }
+    if (route === "/api/tournaments/matches" && method === "GET") {
+      return await handleGetTournamentMatches(request);
+    }
 
     if (route === "/api/tournaments/staff/generate-bracket" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 5, label: "tournament-gen-bracket" });
@@ -627,14 +749,18 @@ async function handleCustomRequest(
     return new Response("Not found", { status: 404 });
   }
 
-  // Employee Management API routes
+  // Employee
   if (url.pathname.startsWith("/api/employee/")) {
     const route = url.pathname;
     const method = request.method;
 
-    if (route === "/api/employee/stats" && method === "GET") return await handleEmployeeDashboardStats(request);
+    if (route === "/api/employee/stats" && method === "GET") {
+      return await handleEmployeeDashboardStats(request);
+    }
 
-    if (route === "/api/employee/announcements" && method === "GET") return await handleGetAnnouncements(request);
+    if (route === "/api/employee/announcements" && method === "GET") {
+      return await handleGetAnnouncements(request);
+    }
     if (route === "/api/employee/announcements/create" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 10, label: "emp-announce-create" });
       if (rl) return rl;
@@ -646,8 +772,12 @@ async function handleCustomRequest(
       return await handleDeleteAnnouncement(request);
     }
 
-    if (route === "/api/employee/notifications" && method === "GET") return await handleGetSiteNotifications(request);
-    if (route === "/api/employee/notifications/active" && method === "GET") return await handleGetActiveSiteNotifications();
+    if (route === "/api/employee/notifications" && method === "GET") {
+      return await handleGetSiteNotifications(request);
+    }
+    if (route === "/api/employee/notifications/active" && method === "GET") {
+      return await handleGetActiveSiteNotifications();
+    }
     if (route === "/api/employee/notifications/create" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 10, label: "emp-notif-create" });
       if (rl) return rl;
@@ -664,8 +794,12 @@ async function handleCustomRequest(
       return await handleDeleteSiteNotification(request);
     }
 
-    if (route === "/api/employee/players/search" && method === "GET") return await handleSearchPlayers(request);
-    if (route === "/api/employee/players/profile" && method === "GET") return await handleGetPlayerProfile(request);
+    if (route === "/api/employee/players/search" && method === "GET") {
+      return await handleSearchPlayers(request);
+    }
+    if (route === "/api/employee/players/profile" && method === "GET") {
+      return await handleGetPlayerProfile(request);
+    }
     if (route === "/api/employee/players/note" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 20, label: "emp-player-note" });
       if (rl) return rl;
@@ -692,7 +826,9 @@ async function handleCustomRequest(
       return await handleRemoveRank(request);
     }
 
-    if (route === "/api/employee/products" && method === "GET") return await handleAdminGetProducts(request);
+    if (route === "/api/employee/products" && method === "GET") {
+      return await handleAdminGetProducts(request);
+    }
     if (route === "/api/employee/products/create" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 10, label: "emp-product-create" });
       if (rl) return rl;
@@ -709,7 +845,9 @@ async function handleCustomRequest(
       return await handleAdminDeleteProduct(request);
     }
 
-    if (route === "/api/employee/orders" && method === "GET") return await handleAdminGetOrders(request);
+    if (route === "/api/employee/orders" && method === "GET") {
+      return await handleAdminGetOrders(request);
+    }
     if (route === "/api/employee/orders/update" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 20, label: "emp-order-update" });
       if (rl) return rl;
@@ -735,10 +873,10 @@ async function handleCustomRequest(
     return new Response("Not found", { status: 404 });
   }
 
-  // Public products — cached 5 min
+  // Public products
   if (url.pathname === "/api/products" && request.method === "GET") {
     return await cachedJson(request, 300, () =>
-      commerceApiHandlers["/api/products"]!.GET!(request) as Promise<Response>,
+      commerceApiHandlers["/api/products"]!.GET!(request) as Promise<Response>
     );
   }
 
@@ -747,53 +885,63 @@ async function handleCustomRequest(
     return await apiHandler(request);
   }
 
-  // Not a custom route — fall through to TanStack SSR
   return null;
 }
 
-// ─── YOUTUBE CACHE INIT ─────────────────────────────────────
-let cacheInitialized = false;
-
-// ─── DEFAULT EXPORT: Cloudflare Pages Functions entry ────────
-// The @cloudflare/vite-plugin expects a default export with a fetch method
-// that matches the Cloudflare Workers entry point contract:
-//   fetch(request: Request, env: Env, ctx: ExecutionContext) => Promise<Response>
-//
-// Our custom API routes are handled first; everything else falls through
-// to TanStack Start's SSR handler for page rendering.
+// ─────────────────────────────────────────────────────────────
+// Default export
+// ─────────────────────────────────────────────────────────────
 export default {
-  async fetch(request: Request, env: CloudflareEnv, ctx: ExecutionContextLike): Promise<Response> {
+  async fetch(
+    request: Request,
+    env: CloudflareEnv,
+    ctx: ExecutionContextLike
+  ): Promise<Response> {
+    // In the Nitro build, lazyService calls server.fetch(req) with only
+    // the request — env arrives as undefined. The outer Nitro entry sets
+    // globalThis.__env__ = env before routing, so fall back to that.
+    if (!env) {
+      env = (globalThis as Record<string, unknown>).__env__ as CloudflareEnv | undefined;
+    }
+    if (!env) {
+      console.error("[SERVER] No env available — not even globalThis.__env__");
+      return applySecurityHeaders(brandedErrorResponse(), new URL(request.url));
+    }
+
     const url = new URL(request.url);
 
-    // Wire Hyperdrive connection string (once per isolate)
-    initDb(env);
-
-    // Wire R2 bucket for uploads (once per isolate)
-    if (env.UPLOADS_BUCKET) {
-      setR2Bucket(env.UPLOADS_BUCKET);
-    }
-
-    // One-time env check
-    logMissingEnv(env);
-
-    // Lazy-init YouTube cache on first request (not at module scope)
-    if (!cacheInitialized) {
-      cacheInitialized = true;
-      initializeCache();
-    }
-
     try {
-      // Step 1: Try custom API/utility routes
+      // Always initialize env-backed services first
+      initDb(env);
+
+      if (env.UPLOADS_BUCKET) {
+        setR2Bucket(env.UPLOADS_BUCKET);
+      }
+
+      logMissingEnv(env);
+
+      if (!cacheInitialized) {
+        cacheInitialized = true;
+        initializeCache();
+      }
+
+      // 1) Handle custom API/utility routes first
       const customResponse = await handleCustomRequest(request, env, ctx, url);
       if (customResponse) {
         return applySecurityHeaders(customResponse, url);
       }
 
-      // Step 2: Fall through to TanStack SSR for page routes
+      // 2) Fall through to TanStack SSR
+      // IMPORTANT: We call the handler with the standard Request object.
+      // Env is already initialized above for all shared server modules.
       const ssrResponse = await tanstackFetch(request);
-      return applySecurityHeaders(await normalizeCatastrophicSsrResponse(ssrResponse), url);
+
+      return applySecurityHeaders(
+        await normalizeCatastrophicSsrResponse(ssrResponse),
+        url
+      );
     } catch (error) {
-      console.error(error);
+      console.error("[SERVER FETCH ERROR]", error);
       return applySecurityHeaders(brandedErrorResponse(), url);
     }
   },

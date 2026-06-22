@@ -1,15 +1,22 @@
-import mysql from "mysql2/promise";
 import { drizzle, type MySql2Database } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
 import * as schema from "@/lib/db/schema";
 
-/**
- * Cloudflare Pages/Workers env shape for this project.
- * Hyperdrive provides the MySQL connection string through this binding.
- */
 export interface CloudflareEnv {
-  HYPERDRIVE?: { connectionString: string };
+  HYPERDRIVE?: {
+    connectionString?: string;
+    host?: string;
+    port?: number;
+    user?: string;
+    password?: string;
+    database?: string;
+  };
   UPLOADS_BUCKET?: {
-    put(key: string, data: ArrayBuffer, opts?: { httpMetadata?: { contentType?: string } }): Promise<unknown>;
+    put(
+      key: string,
+      data: ArrayBuffer,
+      opts?: { httpMetadata?: { contentType?: string } }
+    ): Promise<unknown>;
     delete(key: string): Promise<void>;
   };
   BASE_URL?: string;
@@ -22,57 +29,99 @@ export interface CloudflareEnv {
   [key: string]: unknown;
 }
 
-// ─── Lazy DB initialization ─────────────────────────────────
-// On Cloudflare, `process.env.DATABASE_URL` is NOT available.
-// The DB connection string comes from `env.HYPERDRIVE.connectionString`
-// at request time (passed through the fetch handler).
-//
-// For local dev, we fall back to `process.env.DATABASE_URL`.
+// Store env reference for use by getDbInstance().
+// This is safe because env is a plain object (not an I/O object).
+let _env: CloudflareEnv | null = null;
 
-let _db: MySql2Database<typeof schema> | null = null;
-let _connectionString: string | null = null;
-
-/**
- * Wire the Hyperdrive connection string from Cloudflare's env binding.
- * Must be called once per request lifecycle (from the fetch handler).
- * Safe to call multiple times — only the first call takes effect.
- */
 export function initDb(env: CloudflareEnv): void {
-  if (_connectionString) return;
-  _connectionString = env.HYPERDRIVE?.connectionString ?? process.env.DATABASE_URL ?? "";
-  if (!_connectionString) {
-    console.warn(
-      "[DB] No connection string available. Set HYPERDRIVE binding (Cloudflare) or DATABASE_URL (local).",
-    );
+  if (!env) {
+    throw new Error("[DB] Cannot initialize DB: env is undefined.");
   }
+  // Just store the env reference. Pool creation is deferred to each request.
+  _env = env;
 }
 
-/**
- * Returns the Drizzle `db` instance. Lazily created on first access.
- * The `db` export is a stable reference — all 14+ import sites can keep
- * `import { db } from "@/lib/db"` unchanged.
- */
-function createDb(): MySql2Database<typeof schema> {
-  if (!_connectionString) {
-    initDb({});
-  }
-  if (!_connectionString) {
-    throw new Error(
-      "[DB] No connection string. Set HYPERDRIVE binding (Cloudflare) or DATABASE_URL (local).",
-    );
-  }
-  const pool = mysql.createPool(_connectionString);
-  _db = drizzle(pool, { schema, mode: "default" });
-  return _db;
-}
-
-export const db: MySql2Database<typeof schema> = new Proxy({} as MySql2Database<typeof schema>, {
-  get(_target, prop, receiver) {
-    const instance = _db ?? createDb();
-    const value = Reflect.get(instance, prop, receiver);
-    if (typeof value === "function") {
-      return value.bind(instance);
+function createPool(): mysql.Pool {
+  if (!_env) {
+    // Try globalThis fallback (set by Nitro entry before routing)
+    const globalEnv = (globalThis as Record<string, unknown>).__env__ as
+      | CloudflareEnv
+      | undefined;
+    if (globalEnv) {
+      _env = globalEnv;
     }
-    return value;
-  },
-});
+  }
+
+  if (!_env) {
+    throw new Error("[DB] No env available. Cannot create pool.");
+  }
+
+  const hd = _env.HYPERDRIVE;
+  if (!hd) {
+    throw new Error("[DB] Hyperdrive binding missing.");
+  }
+
+  // Use individual properties when available (required for Workers + Hyperdrive)
+  if (hd.host && hd.port && hd.user && hd.password && hd.database) {
+    return mysql.createPool({
+      host: hd.host,
+      port: hd.port,
+      user: hd.user,
+      password: hd.password,
+      database: hd.database,
+      connectionLimit: 2,
+      enableKeepAlive: true,
+      waitForConnections: true,
+      queueLimit: 0,
+      disableEval: true,
+    });
+  }
+
+  // Fallback to connection string
+  const cs = hd.connectionString;
+  if (!cs || typeof cs !== "string") {
+    throw new Error("[DB] Hyperdrive connection string missing.");
+  }
+
+  return mysql.createPool({
+    uri: cs,
+    connectionLimit: 2,
+    enableKeepAlive: true,
+    waitForConnections: true,
+    queueLimit: 0,
+    disableEval: true,
+  });
+}
+
+// Each call creates a fresh pool. In Cloudflare Workers, pools (and their
+// TCP sockets) are request-scoped — they cannot be shared across requests.
+function getDbInstance(): MySql2Database<typeof schema> {
+  const pool = createPool();
+  return drizzle(pool, { schema, mode: "default" });
+}
+
+export const db: MySql2Database<typeof schema> = new Proxy(
+  {} as MySql2Database<typeof schema>,
+  {
+    get(_target, prop, receiver) {
+      const instance = getDbInstance();
+      const value = Reflect.get(instance, prop, receiver);
+
+      if (typeof value === "function") {
+        return value.bind(instance);
+      }
+
+      return value;
+    },
+  }
+);
+
+export async function testDbConnection() {
+  const pool = createPool();
+  try {
+    const [rows] = await pool.query("SELECT 1 AS ok");
+    return rows;
+  } finally {
+    await pool.end().catch(() => {});
+  }
+}

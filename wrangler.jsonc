@@ -4,7 +4,12 @@
   "compatibility_date": "2025-06-21",
   "compatibility_flags": ["nodejs_compat", "nodejs_als"],
 
-  "pages_build_output_dir": "dist/server",
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "c414aa25468f4c74a65bee5e8f74f1e5"
+    }
+  ],
 
   "vars": {
     "SUPER_ADMIN_ID": "HUB_MC_ADMIN",
@@ -12,20 +17,7 @@
     "DISCORD_SERVER_ID": "1425411040329465878",
     "DISCORD_INVITE": "https://discord.gg/CwNVBCuSbj",
     "MC_RCON_PORT": "25575",
-    "BASE_URL": "https://hubmc.in"
-  },
-
-  "hyperdrive": [
-    {
-      "binding": "HYPERDRIVE",
-      "id": "ACTUAL_HYPERDRIVE_ID"
-    }
-  ],
-
-  "r2_buckets": [
-    {
-      "binding": "UPLOADS_BUCKET",
-      "bucket_name": "hubmc-uploads"
-    }
-  ]
+    "BASE_URL": "https://hubmc-live.varunvishwakarma1411.workers.dev",
+    "NODE_ENV": "production"
+  }
 }

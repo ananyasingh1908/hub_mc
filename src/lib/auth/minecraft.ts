@@ -1,9 +1,11 @@
 import { devlog } from "@/lib/dev-log";
-import type { MinecraftIdentity, MinecraftProfile } from "@/lib/auth/types";
+import type { MinecraftIdentity } from "@/lib/auth/types";
 
-function formatMojangUuid(raw: string): string {
+const PLAYERDB_API = "https://playerdb.co/api/player/minecraft";
+
+function formatMinecraftUuid(raw: string): string {
   if (raw.length === 32 && !raw.includes("-")) {
-    return `${raw.slice(0,8)}-${raw.slice(8,12)}-${raw.slice(12,16)}-${raw.slice(16,20)}-${raw.slice(20)}`;
+    return `${raw.slice(0, 8)}-${raw.slice(8, 12)}-${raw.slice(12, 16)}-${raw.slice(16, 20)}-${raw.slice(20)}`;
   }
   return raw;
 }
@@ -12,124 +14,127 @@ function createMinecraftAvatarUrl(uuid: string): string {
   return `https://mc-heads.net/avatar/${uuid}/160`;
 }
 
-async function lookupMojangProfile(username: string): Promise<{ id: string; name: string } | { error: string; status: number }> {
-  const url = `https://api.mojang.com/users/profiles/minecraft/${encodeURIComponent(username)}`;
+interface PlayerDbPlayer {
+  username: string;
+  id: string;
+  raw_id: string;
+  avatar: string;
+  skin_texture: string;
+}
+
+interface PlayerDbSuccess {
+  success: true;
+  data: { player: PlayerDbPlayer };
+}
+
+interface PlayerDbError {
+  success: false;
+  code: string;
+  message: string;
+}
+
+type PlayerDbResponse = PlayerDbSuccess | PlayerDbError;
+
+async function lookupPlayerDb(
+  username: string,
+): Promise<PlayerDbPlayer | { error: string; status: number }> {
+  const url = `${PLAYERDB_API}/${encodeURIComponent(username)}`;
 
   for (let attempt = 1; attempt <= 2; attempt++) {
-    devlog("[Mojang] Attempt", attempt, "for:", username);
+    devlog("[PlayerDB] Attempt", attempt, "for:", username);
     try {
       const response = await fetch(url, {
-        signal: AbortSignal.timeout(20000),
-        headers: {
-        "Accept": "application/json",
-        },
+        signal: AbortSignal.timeout(15000),
+        headers: { Accept: "application/json" },
       });
 
-      devlog("[Mojang] HTTP", response.status, response.statusText, "for", username);
+      devlog("[PlayerDB] HTTP", response.status, "for", username);
 
-      if (response.status === 204 || response.status === 404) {
-        devlog("[Mojang] Player not found (", response.status, "):", username);
+      if (response.status === 404 || response.status === 400) {
         return { error: "Player not found", status: 404 };
       }
 
       if (response.status === 429) {
-        devlog("[Mojang] Rate limited (429) for", username);
-        return { error: "Too many requests", status: 429 };
+        return { error: "Too many requests. Please try again.", status: 429 };
       }
 
       if (!response.ok) {
-        const text = await response.text().catch(() => "");
-        devlog("[Mojang] API error", response.status, "for", username, "body:", text.slice(0, 200));
-        if (attempt < 2) {
-          devlog("[Mojang] Retrying after error", response.status, "...");
-          continue;
-        }
-        return { error: "Mojang API temporarily unavailable", status: 503 };
+        if (attempt < 2) continue;
+        return {
+          error: "Player lookup service temporarily unavailable",
+          status: 503,
+        };
       }
 
-      let data: unknown;
+      let data: PlayerDbResponse;
       try {
-        data = await response.json();
+        data = (await response.json()) as PlayerDbResponse;
       } catch {
-        devlog("[Mojang] Empty body for", username);
-        if (attempt < 2) {
-          devlog("[Mojang] Retrying after empty body...");
-          continue;
-        }
-        return { error: "Mojang API temporarily unavailable", status: 503 };
+        if (attempt < 2) continue;
+        return {
+          error: "Player lookup service temporarily unavailable",
+          status: 503,
+        };
       }
 
-      if (!data || typeof data !== "object" || !("id" in data) || !("name" in data)) {
-        devlog("[Mojang] Invalid response for", username, ":", data);
-        if (attempt < 2) {
-          devlog("[Mojang] Retrying after invalid response...");
-          continue;
-        }
-        return { error: "Mojang API temporarily unavailable", status: 503 };
+      if (!data || typeof data !== "object") {
+        if (attempt < 2) continue;
+        return {
+          error: "Player lookup service temporarily unavailable",
+          status: 503,
+        };
       }
 
-      const profile = data as { id: string; name: string };
-      devlog("[Mojang] Found:", profile.name, "UUID:", profile.id);
-      return { id: profile.id, name: profile.name };
+      if (!data.success || !data.data?.player) {
+        devlog("[PlayerDB] Player not found:", username, data);
+        return { error: "Player not found", status: 404 };
+      }
+
+      devlog(
+        "[PlayerDB] Found:",
+        data.data.player.name,
+        "UUID:",
+        data.data.player.raw_id,
+      );
+      return data.data.player;
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-
-      devlog("[Mojang] FULL ERROR:", {
-  username,
-  message: msg,
-  stack: err instanceof Error ? err.stack : null,
-});
-      if (attempt < 2) {
-        devlog("[Mojang] Retrying after network error...");
-        continue;
-      }
-      return { error: "Mojang API temporarily unavailable", status: 503 };
+      devlog("[PlayerDB] Error:", { username, message: msg });
+      if (attempt < 2) continue;
+      return {
+        error: "Player lookup service temporarily unavailable",
+        status: 503,
+      };
     }
   }
 
-  return { error: "Mojang API temporarily unavailable", status: 503 };
-}
-
-async function fetchMinecraftProfile(uuid: string): Promise<MinecraftProfile | null> {
-  const url = `https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`;
-  let response: Response;
-  try {
-    response = await fetch(url, {
-      signal: AbortSignal.timeout(20000),
-      headers: {
-        "Accept": "application/json",
-      },
-    });
-  } catch {
-    console.warn("[Mojang] Session server unreachable for UUID:", uuid);
-    return null;
-  }
-  if (!response.ok) return null;
-  try {
-    return (await response.json()) as MinecraftProfile;
-  } catch {
-    return null;
-  }
+  return {
+    error: "Player lookup service temporarily unavailable",
+    status: 503,
+  };
 }
 
 export async function lookupMinecraftIdentity(
   username: string,
 ): Promise<MinecraftIdentity | { error: string; status: number }> {
-  const result = await lookupMojangProfile(username);
+  const result = await lookupPlayerDb(username);
   if ("error" in result) {
-    console.warn("[Mojang] Verification FAILED for:", username, "-", result.error);
+    console.warn(
+      "[Minecraft] Verification FAILED for:",
+      username,
+      "-",
+      result.error,
+    );
     return { error: result.error, status: result.status };
   }
 
-  const uuid = formatMojangUuid(result.id);
-  const fullProfile = await fetchMinecraftProfile(result.id);
-  const skinUrl = fullProfile?.skins?.[0]?.url ?? null;
+  const uuid = formatMinecraftUuid(result.raw_id);
 
   return {
-    username: result.name,
+    username: result.username,
     uuid,
-    avatarUrl: createMinecraftAvatarUrl(uuid),
-    skinUrl,
+    avatarUrl: result.avatar || createMinecraftAvatarUrl(uuid),
+    skinUrl: result.skin_texture || null,
     verified: true,
   };
 }
