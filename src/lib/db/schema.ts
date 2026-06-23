@@ -45,19 +45,22 @@ export const customers = mysqlTable(
   {
     id: varchar("id", { length: 191 }).primaryKey(),
     userId: varchar("userId", { length: 191 }).notNull(),
-    minecraftUsername: varchar("minecraftUsername", { length: 191 }).notNull(),
-    minecraftUuid: varchar("minecraftUuid", { length: 191 }).notNull(),
+    fullName: varchar("fullName", { length: 191 }),
+    phoneNumber: varchar("phoneNumber", { length: 20 }),
+    phoneVerifiedAt: datetime("phoneVerifiedAt"),
+    authProvider: varchar("authProvider", { length: 50 }).notNull().default("phone"),
+    minecraftUsername: varchar("minecraftUsername", { length: 191 }).notNull().default(""),
+    minecraftUuid: varchar("minecraftUuid", { length: 191 }).notNull().default(""),
     avatarUrl: varchar("avatarUrl", { length: 500 }),
     skinUrl: varchar("skinUrl", { length: 500 }),
     lastLoginAt: datetime("lastLoginAt"),
     country: varchar("country", { length: 191 }),
-    createdAt: datetime("createdAt").notNull(),
-    updatedAt: datetime("updatedAt").notNull(),
+    createdAt: varchar("createdAt", { length: 191 }).notNull(),
+    updatedAt: varchar("updatedAt", { length: 191 }).notNull(),
   },
   (table) => ({
     userIdUnique: uniqueIndex("Customer_userId_key").on(table.userId),
-    minecraftUsernameUnique: uniqueIndex("Customer_minecraftUsername_key").on(table.minecraftUsername),
-    minecraftUuidUnique: uniqueIndex("Customer_minecraftUuid_key").on(table.minecraftUuid),
+    phoneNumberUnique: uniqueIndex("Customer_phoneNumber_key").on(table.phoneNumber),
   }),
 );
 

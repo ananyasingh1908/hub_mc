@@ -85,7 +85,7 @@ export default function PurchasesPage() {
   }, []);
 
   useEffect(() => {
-    if (user?.minecraftUsername) {
+    if (user?.customerId) {
       fetchOrders();
     } else {
       setLoading(false);
@@ -123,7 +123,7 @@ export default function PurchasesPage() {
     window.open(`/api/orders/invoice?orderId=${orderId}`, "_blank");
   };
 
-  if (!user?.minecraftUsername) {
+  if (!user?.customerId) {
     return (
       <StorePageLayout>
         <section className="mx-auto flex min-h-[60vh] max-w-xl items-center justify-center px-6 pb-20 pt-16">

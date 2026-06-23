@@ -10,10 +10,10 @@ import { createStartHandler, defaultStreamHandler } from "@tanstack/react-start/
 
 import {
   getClientVisibleAuthState,
-  handleLoginRequest,
   handleLogoutRequest,
   handleSessionRequest,
 } from "@/lib/auth/session";
+import { handlePlayerLogin } from "@/lib/auth/player-auth";
 import {
   handleEmployeeLoginRequest,
   handleGoogleClientIdRequest,
@@ -197,11 +197,11 @@ function applySecurityHeaders(response: Response, url: URL): Response {
 
 const CSRF_MUTABLE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 const CSRF_EXEMPT_PATHS = new Set([
-  "/api/auth/login",
+  "/api/auth/player/login",
   "/api/auth/admin-login",
   "/api/auth/employee-login",
   "/api/contact",
-  "/api/auth/logout",
+  "/api/auth/player/logout",
   "/api/auth/employee/logout",
   "/api/auth/admin/logout",
   "/api/server-reviews/submit",
@@ -405,8 +405,13 @@ async function handleCustomRequest(
 
   // Auth
   if (url.pathname.startsWith("/api/auth/")) {
-    if (url.pathname === "/api/auth/login" && request.method === "POST") {
-      return await handleLoginRequest(request);
+    if (url.pathname === "/api/auth/player/login" && request.method === "POST") {
+      const rl = checkRateLimit(request, { limit: 10, label: "player-login" });
+      if (rl) return rl;
+      return await handlePlayerLogin(request);
+    }
+    if (url.pathname === "/api/auth/player/logout" && request.method === "POST") {
+      return await handleLogoutRequest(request);
     }
     if (url.pathname === "/api/auth/logout" && request.method === "POST") {
       return await handleLogoutRequest(request);

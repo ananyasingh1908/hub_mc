@@ -10,16 +10,16 @@ import { toNumber } from "@/lib/db/drizzle-helpers";
 export async function handleGetOrders(request: Request): Promise<Response> {
   try {
     const session = await getHubMCSession(request);
-    const username = session?.user?.minecraftUsername;
+    const customerId = session?.user?.customerId;
 
-    if (!username) {
+    if (!customerId) {
       return new Response(JSON.stringify({ error: "Authentication required." }), {
         status: 401,
         headers: { "content-type": "application/json" },
       });
     }
 
-    const userOrders = await getOrdersForUser(username);
+    const userOrders = await getOrdersForUser(customerId);
 
     return new Response(JSON.stringify({ orders: userOrders }), {
       status: 200,
@@ -37,7 +37,7 @@ export async function handleGetOrders(request: Request): Promise<Response> {
 export async function handleRetryDelivery(request: Request): Promise<Response> {
   try {
     const session = await getHubMCSession(request);
-    if (!session?.user?.minecraftUsername) {
+    if (!session?.user?.customerId) {
       return new Response(JSON.stringify({ error: "Authentication required." }), {
         status: 401,
         headers: { "content-type": "application/json" },
@@ -197,7 +197,7 @@ export async function handleGetOrderInvoice(request: Request): Promise<Response>
 
     const customerSession = await getHubMCSession(request);
     const isStaff = await isStaffSession(request);
-    const isOwner = customerSession?.user?.minecraftUsername === order.minecraftUsername;
+    const isOwner = customerSession?.user?.customerId && customerSession.user.customerId === order.customerId;
 
     if (!isStaff && !isOwner) {
       return new Response(JSON.stringify({ error: "Unauthorized." }), {

@@ -29,6 +29,9 @@ export type HubMCSessionUser = {
   employeeId: string | null;
   email: string | null;
   verified: boolean;
+  fullName: string | null;
+  phoneNumber: string | null;
+  authProvider: string | null;
 };
 
 export type HubMCSession = {

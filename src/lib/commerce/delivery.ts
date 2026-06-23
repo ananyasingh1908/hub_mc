@@ -241,11 +241,11 @@ export async function retryDelivery(orderId: string): Promise<boolean> {
   }
 }
 
-export async function getOrdersForUser(username: string) {
+export async function getOrdersForUser(customerId: string) {
   const orderRows = await db
     .select()
     .from(orders)
-    .where(eq(orders.minecraftUsername, username))
+    .where(eq(orders.customerId, customerId))
     .orderBy(desc(orders.createdAt));
 
   if (orderRows.length === 0) return [];

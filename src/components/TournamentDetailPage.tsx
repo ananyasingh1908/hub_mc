@@ -171,8 +171,8 @@ export default function TournamentDetailPage({ tournamentId }: { tournamentId: s
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!session?.user?.minecraftUsername) {
-      toast.error("Please log in with your Minecraft account first.");
+    if (!session?.user?.customerId) {
+      toast.error("Please log in first.");
       return;
     }
     if (!form.agreedToRules) {
@@ -690,20 +690,20 @@ export default function TournamentDetailPage({ tournamentId }: { tournamentId: s
                   <p className="mt-1 text-sm text-red-400">Tournament is full!</p>
                 )}
 
-                {!session?.user?.minecraftUsername ? (
+                {!session?.user?.customerId ? (
                   <div className="mt-4 rounded-xl bg-white/5 p-4 text-center">
                     <AlertCircle className="mx-auto h-6 w-6 text-[var(--hub-orange)]" />
                     <p className="mt-2 text-sm text-white/60">
-                      Please <Link to="/login" className="text-[var(--hub-blue)] underline">log in</Link> with your Minecraft account to register.
+                      Please <Link to="/login" className="text-[var(--hub-blue)] underline">log in</Link> to register.
                     </p>
                   </div>
                 ) : slotsLeft > 0 ? (
                   <form onSubmit={handleRegister} className="mt-4 space-y-3">
                     <div>
-                      <label className="text-xs font-medium text-white/50">Your Minecraft Username</label>
+                      <label className="text-xs font-medium text-white/50">Your Name</label>
                       <div className="mt-1 flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
                         <User className="h-4 w-4 text-[var(--hub-blue)]" />
-                        <span className="text-sm text-white">{session.user.minecraftUsername}</span>
+                        <span className="text-sm text-white">{session.user.fullName || session.user.phoneNumber}</span>
                       </div>
                     </div>
                     <div>

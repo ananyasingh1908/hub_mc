@@ -184,7 +184,7 @@ export async function handleGetTournamentById(request: Request) {
   const session = await getHubMCSession(request);
   let userRegistration = null;
 
-  if (session?.user?.minecraftUsername) {
+  if (session?.user?.customerId) {
     const regRows = await db
       .select()
       .from(tournamentRegistrations)
@@ -192,8 +192,8 @@ export async function handleGetTournamentById(request: Request) {
         and(
           eq(tournamentRegistrations.tournamentId, id),
           eq(
-            tournamentRegistrations.minecraftUsername,
-            session.user.minecraftUsername,
+            tournamentRegistrations.userId,
+            session.user.customerId,
           ),
         ),
       )
@@ -214,7 +214,7 @@ export async function handleGetTournamentById(request: Request) {
 
 export async function handleRegisterForTournament(request: Request) {
   const session = await getHubMCSession(request);
-  if (!session?.user?.minecraftUsername) {
+  if (!session?.user?.customerId) {
     return error("You must be logged in to register for a tournament.", 401);
   }
 
@@ -282,8 +282,8 @@ export async function handleRegisterForTournament(request: Request) {
       and(
         eq(tournamentRegistrations.tournamentId, tournamentId),
         eq(
-          tournamentRegistrations.minecraftUsername,
-          session.user.minecraftUsername,
+          tournamentRegistrations.userId,
+          session.user.customerId,
         ),
       ),
     )
@@ -300,8 +300,8 @@ export async function handleRegisterForTournament(request: Request) {
     id: registrationId,
     tournamentId,
     userId: session.user.customerId ?? null,
-    minecraftUsername: session.user.minecraftUsername,
-    minecraftUuid: session.user.minecraftUuid ?? null,
+    minecraftUsername: session.user.fullName || session.user.phoneNumber || "",
+    minecraftUuid: session.user.customerId || "",
     discordUsername,
     discordId: discordId || null,
     teamName: teamName || null,

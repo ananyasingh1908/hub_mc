@@ -1,15 +1,15 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { LoaderCircle, UserRound, AlertCircle, CheckCircle } from "lucide-react";
+import { LoaderCircle, User, Phone, AlertCircle, CheckCircle } from "lucide-react";
 import { StorePageLayout } from "@/components/commerce/StorePageLayout";
-import { loginWithMinecraft, useAuthSession, useInvalidateAuthSession } from "@/lib/auth/client";
+import { loginWithPhone, useAuthSession, useInvalidateAuthSession } from "@/lib/auth/client";
 
 function AlreadySignedIn({
-  username,
+  name,
   onGoToProfile,
 }: {
-  username: string;
+  name: string;
   onGoToProfile: () => void;
 }) {
   return (
@@ -27,7 +27,7 @@ function AlreadySignedIn({
           <div className="mt-8 text-center">
             <h1 className="text-4xl font-black tracking-tight text-white md:text-5xl">Already Signed In</h1>
             <p className="mt-4 text-base leading-8 text-white/66">
-              You are logged in as <span className="font-semibold text-white">{username}</span>.
+              You are logged in as <span className="font-semibold text-white">{name}</span>.
             </p>
           </div>
           <div className="mt-8">
@@ -49,7 +49,8 @@ function LoginForm() {
   const navigate = useNavigate();
   const invalidateAuth = useInvalidateAuthSession();
 
-  const [username, setUsername] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -57,24 +58,31 @@ function LoginForm() {
     e.preventDefault();
     setError(null);
 
-    const trimmed = username.trim();
-    if (!trimmed || trimmed.length < 3 || trimmed.length > 16) {
-      setError("Enter a valid Minecraft username (3-16 characters).");
+    const trimmedName = fullName.trim();
+    const trimmedPhone = phoneNumber.trim();
+
+    if (!trimmedName || trimmedName.length < 2) {
+      setError("Please enter your full name.");
+      return;
+    }
+
+    if (!trimmedPhone || trimmedPhone.length < 8) {
+      setError("Please enter a valid phone number.");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const result = await loginWithMinecraft(trimmed);
+      const result = await loginWithPhone(trimmedPhone, trimmedName);
       if (result.ok) {
         await invalidateAuth();
-        navigate({ to: "/" });
+        navigate({ to: result.redirectTo ?? "/" });
       } else {
-        setError(result.error ?? "Could not sign in. Please try again.");
+        setError(result.error ?? "Login failed. Please try again.");
       }
     } catch {
-      setError("Network error. Please check your connection and try again.");
+      setError("Network error. Please check your connection.");
     } finally {
       setIsSubmitting(false);
     }
@@ -95,7 +103,7 @@ function LoginForm() {
           className="relative z-10 w-full max-w-xl rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(16,16,16,0.96),rgba(8,8,8,0.96))] p-8 shadow-[0_40px_120px_-42px_rgba(62,162,255,0.55)] backdrop-blur-xl md:p-10"
         >
           <div className="mx-auto flex h-18 w-18 items-center justify-center rounded-[22px] border border-[rgba(62,162,255,0.22)] bg-black/65 shadow-[0_0_40px_rgba(62,162,255,0.2)]">
-            <UserRound className="h-9 w-9 text-[var(--hub-blue)]" />
+            <User className="h-9 w-9 text-[var(--hub-blue)]" />
           </div>
 
           <div className="mt-8 text-center">
@@ -106,60 +114,71 @@ function LoginForm() {
               Login to HUBMC
             </h1>
             <p className="mt-4 text-base leading-8 text-white/66">
-              Enter your Minecraft username to verify your identity.
+              Enter your name and phone number to continue.
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="mt-8">
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-white/72">Minecraft Username</label>
+          <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-white/72">Full Name</label>
               <input
                 type="text"
-                value={username}
-                onChange={(e) => { setUsername(e.target.value); if (error) setError(null); }}
-                placeholder="Enter your username"
-                maxLength={16}
+                value={fullName}
+                onChange={(e) => { setFullName(e.target.value); if (error) setError(null); }}
+                placeholder="Enter your full name"
+                maxLength={50}
                 disabled={isSubmitting}
-                className="h-14 w-full rounded-2xl border border-white/10 bg-black/60 px-4 text-base text-white outline-none transition-colors placeholder:text-white/30 focus:border-[rgba(62,162,255,0.45)] focus:ring-1 focus:ring-[rgba(62,162,255,0.3)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-1.5 h-14 w-full rounded-2xl border border-white/10 bg-black/60 px-4 text-base text-white outline-none transition-colors placeholder:text-white/30 focus:border-[rgba(62,162,255,0.45)] focus:ring-1 focus:ring-[rgba(62,162,255,0.3)] disabled:cursor-not-allowed disabled:opacity-50"
                 autoFocus
               />
             </div>
 
-            {error ? (
+            <div>
+              <label className="block text-sm font-medium text-white/72">Phone Number</label>
+              <input
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => { setPhoneNumber(e.target.value); if (error) setError(null); }}
+                placeholder="e.g. 9876543210"
+                maxLength={15}
+                disabled={isSubmitting}
+                className="mt-1.5 h-14 w-full rounded-2xl border border-white/10 bg-black/60 px-4 text-base text-white outline-none transition-colors placeholder:text-white/30 focus:border-[rgba(62,162,255,0.45)] focus:ring-1 focus:ring-[rgba(62,162,255,0.3)] disabled:cursor-not-allowed disabled:opacity-50"
+              />
+            </div>
+
+            {error && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-4 flex items-start gap-3 rounded-2xl border border-[rgba(255,138,42,0.25)] bg-[rgba(255,138,42,0.08)] px-4 py-3 text-sm leading-6 text-white/82"
+                className="flex items-start gap-3 rounded-2xl border border-[rgba(255,138,42,0.25)] bg-[rgba(255,138,42,0.08)] px-4 py-3 text-sm leading-6 text-white/82"
               >
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[var(--hub-orange)]" />
                 <span>{error}</span>
               </motion.div>
-            ) : null}
+            )}
 
-            <div className="mt-6">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className={`h-14 w-full rounded-2xl text-base font-semibold transition-all duration-300 ${
-                  isSubmitting
-                    ? "cursor-not-allowed bg-white/8 text-white/40"
-                    : "bg-[var(--hub-blue)] text-white hover:-translate-y-0.5 hover:bg-[#51adff]"
-                }`}
-              >
-                {isSubmitting ? (
-                  <span className="inline-flex items-center gap-2">
-                    <LoaderCircle className="h-5 w-5 animate-spin" />
-                    Verifying with Mojang...
-                  </span>
-                ) : (
-                  "Continue"
-                )}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`h-14 w-full rounded-2xl text-base font-semibold transition-all duration-300 ${
+                isSubmitting
+                  ? "cursor-not-allowed bg-white/8 text-white/40"
+                  : "bg-[var(--hub-blue)] text-white hover:-translate-y-0.5 hover:bg-[#51adff]"
+              }`}
+            >
+              {isSubmitting ? (
+                <span className="inline-flex items-center gap-2">
+                  <LoaderCircle className="h-5 w-5 animate-spin" />
+                  Logging in...
+                </span>
+              ) : (
+                "Continue"
+              )}
+            </button>
           </form>
 
           <p className="mt-5 text-center text-sm leading-7 text-white/46">
-            We verify your Minecraft account using the Mojang API. Only real Minecraft accounts can log in.
+            Your phone number is used as your account identifier.
           </p>
 
           <div className="mt-8 flex justify-center gap-6">
@@ -181,17 +200,19 @@ export default function LoginPage() {
   const [showAlreadySignedIn, setShowAlreadySignedIn] = useState(false);
 
   useEffect(() => {
-    if (!isPending && session?.user?.minecraftUsername) {
+    if (!isPending && (session?.user?.phoneNumber || session?.user?.customerId)) {
       setShowAlreadySignedIn(true);
     } else if (!isPending) {
       setShowAlreadySignedIn(false);
     }
   }, [session, isPending]);
 
-  if (showAlreadySignedIn && session?.user?.minecraftUsername) {
+  const displayName = session?.user?.fullName || session?.user?.phoneNumber || "Player";
+
+  if (showAlreadySignedIn && (session?.user?.phoneNumber || session?.user?.customerId)) {
     return (
       <AlreadySignedIn
-        username={session.user.minecraftUsername}
+        name={displayName}
         onGoToProfile={() => window.location.href = "/profile"}
       />
     );

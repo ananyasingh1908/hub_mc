@@ -1,25 +1,25 @@
 import { desc, eq, inArray } from "drizzle-orm";
 import { getHubMCSession } from "@/lib/auth/session";
 import { db } from "@/lib/db";
-import { orderItems, orders } from "@/lib/db/schema";
+import { orderItems, orders, customers } from "@/lib/db/schema";
 import { toNumber } from "@/lib/db/drizzle-helpers";
 
 export async function handleGetProfile(request: Request): Promise<Response> {
   try {
     const session = await getHubMCSession(request);
-    if (!session?.user?.minecraftUsername) {
+    if (!session?.user?.customerId) {
       return new Response(
         JSON.stringify({ error: "Authentication required." }),
         { status: 401, headers: { "content-type": "application/json" } },
       );
     }
 
-    const username = session.user.minecraftUsername;
+    const customerId = session.user.customerId;
 
     const userOrders = await db
       .select()
       .from(orders)
-      .where(eq(orders.minecraftUsername, username))
+      .where(eq(orders.customerId, customerId))
       .orderBy(desc(orders.createdAt));
 
     const orderIds = userOrders.map((o) => o.id);
@@ -70,8 +70,8 @@ export async function handleGetProfile(request: Request): Promise<Response> {
     return new Response(
       JSON.stringify({
         profile: {
-          minecraftUsername: username,
-          minecraftUuid: session.user.minecraftUuid,
+          fullName: session.user.fullName,
+          phoneNumber: session.user.phoneNumber,
           email: userOrders[0]?.email || session.user.email || "",
           totalOrders: userOrders.length,
           totalSpent,

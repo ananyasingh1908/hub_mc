@@ -13,7 +13,7 @@ import {
   X,
 } from "lucide-react";
 import logoImg from "@/assets/hubmc-logo.png";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -124,24 +124,20 @@ export const HubMCNavbar = forwardRef<HTMLElement>(function HubMCNavbar(
               <LoaderCircle className="h-4 w-4 animate-spin text-[var(--hub-blue)]" />
               <span className="hidden sm:inline">Loading</span>
             </div>
-          ) : hubUser?.minecraftUsername ? (
+          ) : hubUser?.customerId ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="group inline-flex items-center gap-3 rounded-full border border-[rgba(62,162,255,0.22)] bg-[rgba(62,162,255,0.08)] px-3 py-2 text-left text-sm text-white transition-all duration-300 hover:-translate-y-0.5 hover:border-[rgba(255,138,42,0.3)] hover:bg-[rgba(255,138,42,0.12)]">
                   <Avatar className="h-9 w-9 border border-white/10">
-                    <AvatarImage
-                      src={hubUser.minecraftAvatarUrl ?? undefined}
-                      alt={hubUser.minecraftUsername}
-                    />
                     <AvatarFallback className="bg-black text-sm font-black text-white">
-                      {hubUser.minecraftUsername.slice(0, 2).toUpperCase()}
+                      {hubUser.fullName?.slice(0, 2).toUpperCase() || hubUser.phoneNumber?.slice(0, 2)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="hidden sm:block">
                     <div className="font-semibold text-white">
-                      {hubUser.minecraftUsername}
+                      {hubUser.fullName || hubUser.phoneNumber}
                     </div>
-                    <div className="text-xs text-white/46">Minecraft Player</div>
+                    <div className="text-xs text-white/46">Player</div>
                   </div>
                 </button>
               </DropdownMenuTrigger>
@@ -152,7 +148,7 @@ export const HubMCNavbar = forwardRef<HTMLElement>(function HubMCNavbar(
               >
                 <div className="px-3 py-2">
                   <div className="text-sm font-semibold text-white">
-                    {hubUser.minecraftUsername}
+                    {hubUser.fullName || hubUser.phoneNumber}
                   </div>
                 </div>
                 <DropdownMenuSeparator className="bg-white/8" />
@@ -207,7 +203,7 @@ export const HubMCNavbar = forwardRef<HTMLElement>(function HubMCNavbar(
             </Link>
           )}
 
-          {hubUser?.minecraftUsername && <NotificationBell />}
+          {hubUser?.customerId && <NotificationBell />}
 
           <Link
             to="/cart"
@@ -267,18 +263,17 @@ export const HubMCNavbar = forwardRef<HTMLElement>(function HubMCNavbar(
               </div>
 
               <div className="flex-1 overflow-y-auto px-3 py-4">
-                {hubUser?.minecraftUsername && (
+                {hubUser?.customerId && (
                   <div className="mb-4 rounded-2xl bg-white/[0.03] p-4">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10 border border-white/10">
-                        <AvatarImage src={hubUser.minecraftAvatarUrl ?? undefined} alt={hubUser.minecraftUsername} />
                         <AvatarFallback className="bg-black text-sm font-black text-white">
-                          {hubUser.minecraftUsername.slice(0, 2).toUpperCase()}
+                          {hubUser.fullName?.slice(0, 2).toUpperCase() || hubUser.phoneNumber?.slice(0, 2)}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <div className="text-sm font-semibold text-white">{hubUser.minecraftUsername}</div>
-                        <div className="text-xs text-white/46">Minecraft Player</div>
+                        <div className="text-sm font-semibold text-white">{hubUser.fullName || hubUser.phoneNumber}</div>
+                        <div className="text-xs text-white/46">Player</div>
                       </div>
                     </div>
                   </div>
@@ -298,7 +293,7 @@ export const HubMCNavbar = forwardRef<HTMLElement>(function HubMCNavbar(
                   ))}
                 </div>
 
-                {hubUser?.minecraftUsername && (
+                {hubUser?.customerId && (
                   <>
                     <div className="mt-6 mb-3 text-xs font-semibold uppercase tracking-wider text-white/40 px-3">Account</div>
                     <div className="space-y-0.5">
@@ -348,7 +343,7 @@ export const HubMCNavbar = forwardRef<HTMLElement>(function HubMCNavbar(
               </div>
 
               <div className="border-t border-white/10 px-3 py-4">
-                {hubUser?.minecraftUsername ? (
+                {hubUser?.customerId ? (
                   <button
                     onClick={() => {
                       setMobileMenuOpen(false);

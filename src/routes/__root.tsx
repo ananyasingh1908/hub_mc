@@ -16,7 +16,6 @@ import { initAnalytics, trackPageView } from "@/lib/analytics";
 import { initSentry } from "@/lib/sentry";
 
 import appCss from "../styles.css?url";
-import logoPng from "@/assets/hubmc-logo.png";
 import heroPng from "@/assets/last_home_hub.png";
 
 function NotFoundComponent() {
@@ -109,8 +108,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", type: "image/png", href: logoPng },
-      { rel: "apple-touch-icon", href: logoPng },
+      { rel: "icon", type: "image/png", href: "/favicon.png" },
+      { rel: "apple-touch-icon", href: "/favicon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" },

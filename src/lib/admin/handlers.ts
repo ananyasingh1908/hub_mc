@@ -885,7 +885,7 @@ export async function handleSubmitServerReview(request: Request) {
   devlog("[ServerReviews] === Submit review request ===");
 
   const session = await getHubMCSession(request);
-  if (!session?.user?.minecraftUsername) return json({ error: "Unauthorized — login required" }, 401);
+  if (!session?.user?.customerId) return json({ error: "Unauthorized — login required" }, 401);
 
   let body: Record<string, unknown>;
   try { body = await request.json(); }
@@ -903,21 +903,20 @@ export async function handleSubmitServerReview(request: Request) {
 
   try {
     const customerId = session.user.customerId;
-    const userId = session.user.minecraftUuid;
 
-    const existingRows = userId
-      ? await db.select().from(serverReviews).where(eq(serverReviews.userId, userId)).limit(1)
+    const existingRows = customerId
+      ? await db.select().from(serverReviews).where(eq(serverReviews.customerId, customerId)).limit(1)
       : [];
     const existing = existingRows[0] ?? null;
-    if (existing) { devlog("[ServerReviews] Duplicate review from", session.user.minecraftUsername); return error("You have already submitted a review", 409); }
+    if (existing) { devlog("[ServerReviews] Duplicate review from customer", customerId); return error("You have already submitted a review", 409); }
 
     const reviewId = crypto.randomUUID();
     const now = new Date();
     await db.insert(serverReviews).values({
       id: reviewId,
-      userId,
-      customerId: customerId ?? null,
-      minecraftUsername: session.user.minecraftUsername,
+      userId: null,
+      customerId: customerId,
+      minecraftUsername: session.user.fullName || session.user.phoneNumber || "",
       rating,
       title,
       message,

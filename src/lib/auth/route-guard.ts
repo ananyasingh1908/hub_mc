@@ -10,7 +10,7 @@ export async function requireAuth(loginPath?: string) {
     const res = await fetch("/api/auth/session", { credentials: "include", headers: { accept: "application/json" } });
     if (!res.ok) throw new Error("Failed to fetch session");
     const session = await res.json();
-    if (!session?.user?.minecraftUsername) throw redirect({ to: path, replace: true });
+    if (!session?.user?.customerId) throw redirect({ to: path, replace: true });
   } catch (err) {
     if (err && typeof err === "object" && "code" in err && (err as any).code === "REDIRECT") throw err;
     throw redirect({ to: path, replace: true });
@@ -24,8 +24,8 @@ export async function requireRole(allowedRoles: UserRoleType[], loginPath?: stri
     const res = await fetch("/api/auth/session", { credentials: "include", headers: { accept: "application/json" } });
     if (!res.ok) throw new Error("Failed to fetch session");
     const session = await res.json();
-    if (!session?.user?.minecraftUsername && !session?.user?.role) throw redirect({ to: path, replace: true });
-    if (!session?.user?.minecraftUsername && session?.user?.role !== "SUPER_ADMIN") throw redirect({ to: path, replace: true });
+    if (!session?.user?.customerId && !session?.user?.role) throw redirect({ to: path, replace: true });
+    if (!session?.user?.customerId && session?.user?.role !== "SUPER_ADMIN") throw redirect({ to: path, replace: true });
     const userRole = (session?.user?.role ?? "CUSTOMER") as UserRoleType;
     if (!allowedRoles.includes(userRole)) throw redirect({ to: "/", replace: true });
   } catch (err) {

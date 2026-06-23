@@ -105,7 +105,15 @@ export function useInvalidateAllSessions() {
   return async () => { await queryClient.invalidateQueries({ queryKey: allSessionsQueryKey }); };
 }
 
-export async function loginWithMinecraft(username: string): Promise<{ ok: boolean; error?: string; redirectTo?: string }> {
-  const response = await fetch("/api/auth/login", { method: "POST", credentials: "include", headers: { "content-type": "application/json" }, body: JSON.stringify({ username }) });
+export async function loginWithPhone(
+  phoneNumber: string,
+  fullName: string,
+): Promise<{ ok: boolean; error?: string; redirectTo?: string; isNewUser?: boolean }> {
+  const response = await fetch("/api/auth/player/login", {
+    method: "POST",
+    credentials: "include",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ phoneNumber, fullName }),
+  });
   return await response.json();
 }

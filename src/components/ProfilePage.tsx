@@ -9,8 +9,8 @@ import { StorePageLayout } from "@/components/commerce/StorePageLayout";
 import { useAuthSession } from "@/lib/auth/client";
 
 type ProfileData = {
-  minecraftUsername: string;
-  minecraftUuid: string;
+  fullName: string;
+  phoneNumber: string;
   email: string;
   totalOrders: number;
   totalSpent: number;
@@ -30,7 +30,7 @@ export default function ProfilePage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!user?.minecraftUsername) return;
+    if (!user?.customerId) return;
     setLoading(true);
     fetch("/api/profile", { credentials: "include" })
       .then((r) => r.json())
@@ -40,7 +40,7 @@ export default function ProfilePage() {
       })
       .catch(() => setError("Network error"))
       .finally(() => setLoading(false));
-  }, [user?.minecraftUsername]);
+  }, [user?.customerId]);
 
   const statusBadge = (status: string) => {
     const map: Record<string, { color: string; label: string }> = {
@@ -80,14 +80,14 @@ export default function ProfilePage() {
               Loading...
             </div>
           </div>
-        ) : !user?.minecraftUsername ? (
+        ) : !user?.customerId ? (
           <div className="mt-14 rounded-[28px] border border-white/10 bg-[rgba(11,11,11,0.92)] p-8 text-center">
             <div className="mx-auto inline-flex rounded-3xl bg-[rgba(62,162,255,0.12)] p-4 text-[var(--hub-blue)]">
               <ShieldCheck className="h-8 w-8" />
             </div>
             <h2 className="mt-6 text-3xl font-black text-white">Login required</h2>
             <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-white/64">
-              Sign in with your Minecraft username to view your profile.
+              Sign in with your name and phone number to view your profile.
             </p>
             <div className="mt-8">
               <Link to="/login"
@@ -110,7 +110,7 @@ export default function ProfilePage() {
                   <div className="flex items-center gap-5">
                     <div className="flex h-24 w-24 overflow-hidden rounded-[24px] border border-[rgba(62,162,255,0.22)] bg-black/70">
                       <div className="flex h-full w-full items-center justify-center text-3xl font-black text-white">
-                        {user.minecraftUsername?.slice(0, 1).toUpperCase()}
+                        {user.fullName?.slice(0, 1).toUpperCase() || user.phoneNumber?.slice(0, 1)}
                       </div>
                     </div>
                     <div>
@@ -119,11 +119,11 @@ export default function ProfilePage() {
                         Registered Player
                       </div>
                       <h2 className="mt-4 text-3xl font-black text-white">
-                        {user.minecraftUsername}
+                        {user.fullName || user.phoneNumber}
                       </h2>
-                      {user.minecraftUuid && (
+                      {user.phoneNumber && (
                         <p className="mt-2 text-sm text-white/56">
-                          UUID: {user.minecraftUuid}
+                          Phone: {user.phoneNumber}
                         </p>
                       )}
                     </div>
@@ -265,8 +265,8 @@ export default function ProfilePage() {
                 <h3 className="text-xl font-black text-white">Player Snapshot</h3>
                 <div className="mt-6 space-y-4">
                   {[
-                    { icon: Pickaxe, label: "Minecraft Username", value: user.minecraftUsername },
-                    { icon: BadgeCheck, label: "UUID", value: user.minecraftUuid },
+                    { icon: Pickaxe, label: "Name", value: user.fullName || "—" },
+                    { icon: BadgeCheck, label: "Phone", value: user.phoneNumber || "—" },
                     { icon: CreditCard, label: "Total Orders", value: String(profile?.totalOrders || 0) },
                     { icon: Trophy, label: "Total Spent", value: `₹${(profile?.totalSpent || 0).toLocaleString("en-IN")}` },
                   ].map((detail) => {

@@ -200,7 +200,7 @@ export default function LivestreamPage() {
     finally { setSubmitting(false); }
   };
 
-  const isCustomer = !sessionLoading && session?.user?.minecraftUsername;
+  const isCustomer = !sessionLoading && session?.user?.customerId;
   const dsConnected = discordStatus?.connected;
   const discordInvite = discordStatus?.invite;
 
@@ -518,7 +518,7 @@ export default function LivestreamPage() {
                   {isCustomer ? (
                     <div className="text-sm text-white/60">
                       <CheckCircle className="inline h-4 w-4 text-green-400 mr-1" />
-                      Logged in as <span className="font-semibold text-white">{session.user.minecraftUsername}</span>
+                      Logged in as <span className="font-semibold text-white">{session.user.fullName || session.user.phoneNumber}</span>
                     </div>
                   ) : (
                     <div className="text-sm text-white/40">
