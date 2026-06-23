@@ -9,11 +9,16 @@ import {
   orders,
   supportTickets,
   siteNotifications,
+  notifications,
   playerBans,
+  playerNotes,
   activityLogs,
   tournamentAnnouncements,
   playerRanks,
   users,
+  serverReviews,
+  forumThreads,
+  forumReplies,
 } from "@/lib/db/schema";
 import { count, eq, inArray, like, desc, and, or, sql, gte } from "drizzle-orm";
 
@@ -151,19 +156,25 @@ export async function handleAdminMonitorTournaments(request: Request) {
   const offset = (page - 1) * limit;
 
   const conditions = [];
-  if (status) conditions.push(eq(tournaments.status, status as "UPCOMING" | "LIVE" | "COMPLETED"));
+  if (status) conditions.push(eq(tournaments.status, status as any));
   if (search) conditions.push(like(tournaments.title, `%${search}%`));
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
   const [tournamentRows, totalRows] = await Promise.all([
-    db.select().from(tournaments).where(whereClause).orderBy(desc(tournaments.dateTime)).limit(limit).offset(offset),
+    db
+      .select()
+      .from(tournaments)
+      .where(whereClause)
+      .orderBy(desc(tournaments.createdAt))
+      .limit(limit)
+      .offset(offset),
     db.select({ count: count() }).from(tournaments).where(whereClause),
   ]);
 
   const total = Number(totalRows[0]?.count ?? 0);
   const tournamentIds = tournamentRows.map((t) => t.id);
 
-  const [countRows, recentRegRows] = await Promise.all([
+  const [regCountRows, announceRows] = await Promise.all([
     tournamentIds.length > 0
       ? db
           .select({ tournamentId: tournamentRegistrations.tournamentId, count: count() })
@@ -174,48 +185,36 @@ export async function handleAdminMonitorTournaments(request: Request) {
     tournamentIds.length > 0
       ? db
           .select()
-          .from(tournamentRegistrations)
-          .where(inArray(tournamentRegistrations.tournamentId, tournamentIds))
-          .orderBy(desc(tournamentRegistrations.createdAt))
+          .from(tournamentAnnouncements)
+          .where(inArray(tournamentAnnouncements.tournamentId, tournamentIds))
       : [],
   ]);
 
-  const countMap = new Map(countRows.map((r) => [r.tournamentId, Number(r.count)]));
-
-  const recentByTournament = new Map<string, typeof recentRegRows>();
-  for (const r of recentRegRows) {
-    const list = recentByTournament.get(r.tournamentId) ?? [];
-    if (list.length < 5) {
-      list.push(r);
-      recentByTournament.set(r.tournamentId, list);
-    }
+  const regCountMap = new Map(regCountRows.map((r) => [r.tournamentId, Number(r.count)]));
+  const announceByTournament = new Map<string, typeof announceRows>();
+  for (const a of announceRows) {
+    if (!a.tournamentId) continue;
+    const list = announceByTournament.get(a.tournamentId) ?? [];
+    list.push(a);
+    announceByTournament.set(a.tournamentId, list);
   }
 
   return json({
     tournaments: tournamentRows.map((t) => ({
       id: t.id,
       title: t.title,
-      bannerUrl: t.bannerUrl,
-      type: t.type,
-      gameMode: t.gameMode,
-      dateTime: t.dateTime,
-      registrationDeadline: t.registrationDeadline,
-      maxParticipants: t.maxParticipants,
-      entryFee: t.entryFee ? Number(t.entryFee) : null,
-      prizePool: t.prizePool,
-      discordLink: t.discordLink,
-      rules: t.rules,
-      serverIp: t.serverIp,
+      game: t.game,
       status: t.status,
-      registrationsCount: countMap.get(t.id) ?? 0,
-      recentRegistrations: (recentByTournament.get(t.id) ?? []).map((r) => ({
-        id: r.id,
-        minecraftUsername: r.minecraftUsername,
-        discordUsername: r.discordUsername,
-        teamName: r.teamName,
-        email: r.email,
-        region: r.region,
-        createdAt: r.createdAt,
+      entryFee: t.entryFee,
+      maxPlayers: t.maxPlayers,
+      startDate: t.startDate,
+      createdAt: t.createdAt,
+      registrationCount: regCountMap.get(t.id) ?? 0,
+      announcements: (announceByTournament.get(t.id) ?? []).map((a) => ({
+        id: a.id,
+        title: a.title,
+        content: a.content,
+        createdAt: a.createdAt,
       })),
     })),
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
@@ -486,8 +485,9 @@ export async function handleAdminAllPlayers(request: Request) {
   if (search) {
     conditions.push(
       or(
+        like(customers.fullName, `%${search}%`),
         like(customers.minecraftUsername, `%${search}%`),
-        like(customers.minecraftUuid, `%${search}%`),
+        like(customers.phoneNumber, `%${search}%`),
       )!,
     );
   }
@@ -497,6 +497,9 @@ export async function handleAdminAllPlayers(request: Request) {
     db
       .select({
         id: customers.id,
+        userId: customers.userId,
+        fullName: customers.fullName,
+        phoneNumber: customers.phoneNumber,
         minecraftUsername: customers.minecraftUsername,
         minecraftUuid: customers.minecraftUuid,
         country: customers.country,
@@ -505,20 +508,22 @@ export async function handleAdminAllPlayers(request: Request) {
         createdAt: customers.createdAt,
         email: users.email,
         role: users.role,
+        authProvider: customers.authProvider,
       })
       .from(customers)
       .leftJoin(users, eq(customers.userId, users.id))
-      .where(whereClause)
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
       .orderBy(desc(customers.lastLoginAt))
       .limit(limit)
       .offset(offset),
-    db.select({ count: count() }).from(customers).where(whereClause),
+    db.select({ count: count() }).from(customers).where(conditions.length > 0 ? and(...conditions) : undefined),
   ]);
 
   const total = Number(totalRows[0]?.count ?? 0);
   const customerIds = customerRows.map((c) => c.id);
+  const userIds = customerRows.map((c) => c.userId).filter(Boolean) as string[];
 
-  const [orderCountRows, rankRows] = await Promise.all([
+  const [orderCountRows, rankRows, regCountRows, ticketCountRows] = await Promise.all([
     customerIds.length > 0
       ? db
           .select({ customerId: orders.customerId, count: count() })
@@ -532,9 +537,25 @@ export async function handleAdminAllPlayers(request: Request) {
           .from(playerRanks)
           .where(and(inArray(playerRanks.customerId, customerIds), eq(playerRanks.active, true)))
       : [],
+    userIds.length > 0
+      ? db
+          .select({ userId: tournamentRegistrations.userId, count: count() })
+          .from(tournamentRegistrations)
+          .where(inArray(tournamentRegistrations.userId, userIds))
+          .groupBy(tournamentRegistrations.userId)
+      : [],
+    userIds.length > 0
+      ? db
+          .select({ userId: supportTickets.userId, count: count() })
+          .from(supportTickets)
+          .where(inArray(supportTickets.userId, userIds))
+          .groupBy(supportTickets.userId)
+      : [],
   ]);
 
   const orderCountMap = new Map(orderCountRows.map((r) => [r.customerId, Number(r.count)]));
+  const regCountMap = new Map(regCountRows.map((r) => [r.userId!, Number(r.count)]));
+  const ticketCountMap = new Map(ticketCountRows.map((r) => [r.userId!, Number(r.count)]));
 
   const rankMap = new Map<string, string[]>();
   for (const r of rankRows) {
@@ -547,6 +568,8 @@ export async function handleAdminAllPlayers(request: Request) {
   return json({
     players: customerRows.map((c) => ({
       id: c.id,
+      fullName: c.fullName,
+      phoneNumber: c.phoneNumber,
       minecraftUsername: c.minecraftUsername,
       minecraftUuid: c.minecraftUuid,
       country: c.country,
@@ -555,8 +578,11 @@ export async function handleAdminAllPlayers(request: Request) {
       createdAt: c.createdAt,
       email: c.email ?? "",
       role: c.role ?? "CUSTOMER",
-      ordersCount: orderCountMap.get(c.id) ?? 0,
-      ranks: rankMap.get(c.id) ?? [],
+      authProvider: c.authProvider ?? "phone",
+      orders: orderCountMap.get(c.id) ?? 0,
+      tickets: c.userId ? (ticketCountMap.get(c.userId) ?? 0) : 0,
+      registrations: c.userId ? (regCountMap.get(c.userId) ?? 0) : 0,
+      rank: (() => { const ranks = rankMap.get(c.id); return ranks && ranks.length > 0 ? { name: ranks[0], color: "#8b5cf6" } : null; })(),
     })),
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   });
@@ -592,4 +618,85 @@ export async function handleAdminSendGlobalNotification(request: Request) {
   const notifRows = await db.select().from(siteNotifications).where(eq(siteNotifications.id, id)).limit(1);
 
   return json({ ok: true, notification: notifRows[0] }, 201);
+}
+
+// ─── DELETE PLAYER (Admin only) ──────────────────────────────
+
+export async function handleAdminDeletePlayer(request: Request) {
+  const authErr = await requireSuperAdmin(request);
+  if (authErr) return authErr;
+
+  let body: any;
+  try {
+    body = await request.json();
+  } catch {
+    return error("Invalid request body", 400);
+  }
+
+  const { customerId } = body;
+  if (!customerId) return error("Missing customerId", 400);
+
+  try {
+    const existingRows = await db
+      .select({ id: customers.id, userId: customers.userId })
+      .from(customers)
+      .where(eq(customers.id, customerId))
+      .limit(1);
+
+    if (!existingRows[0]) return error("Player not found", 404);
+
+    const customer = existingRows[0];
+    const userId = customer.userId;
+
+    // Check for orders — block deletion if player has financial history
+    const orderCountRows = await db
+      .select({ count: count() })
+      .from(orders)
+      .where(eq(orders.customerId, customerId));
+    const orderCount = Number(orderCountRows[0]?.count ?? 0);
+
+    if (orderCount > 0) {
+      return error(`Cannot delete player with ${orderCount} order(s). Order history must be preserved.`, 400);
+    }
+
+    // Check for tournament registrations — block if exists (registrations link by userId)
+    if (userId) {
+      const regCountRows = await db
+        .select({ count: count() })
+        .from(tournamentRegistrations)
+        .where(eq(tournamentRegistrations.userId, userId));
+      const regCount = Number(regCountRows[0]?.count ?? 0);
+
+      if (regCount > 0) {
+        return error(`Cannot delete player with ${regCount} tournament registration(s). Tournament history must be preserved.`, 400);
+      }
+    }
+
+    // Safe to delete — no orders, no tournament registrations
+    // Delete related data in order (non-cascade schema)
+    await db.delete(playerBans).where(eq(playerBans.customerId, customerId));
+    await db.delete(playerNotes).where(eq(playerNotes.customerId, customerId));
+    await db.delete(playerRanks).where(eq(playerRanks.customerId, customerId));
+
+    if (userId) {
+      await db.delete(notifications).where(eq(notifications.userId, userId));
+      await db.delete(supportTickets).where(eq(supportTickets.userId, userId));
+      await db.delete(serverReviews).where(eq(serverReviews.userId, userId));
+      await db.delete(forumThreads).where(eq(forumThreads.authorId, userId));
+      await db.delete(forumReplies).where(eq(forumReplies.authorId, userId));
+    }
+
+    // Delete the customer record
+    await db.delete(customers).where(eq(customers.id, customerId));
+
+    // Delete the linked user account
+    if (userId) {
+      await db.delete(users).where(eq(users.id, userId));
+    }
+
+    return json({ ok: true, message: "Player record deleted successfully" });
+  } catch (e: any) {
+    console.error("Delete player error:", e);
+    return error(`Delete failed: ${e.message || "Unknown database error"}`, 500);
+  }
 }

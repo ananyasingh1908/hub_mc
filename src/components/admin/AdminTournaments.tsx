@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Trophy, Plus, Pencil, Trash2, Users, Calendar, Gamepad2,
-  Sword, LoaderCircle, X, Award,
+  Sword, LoaderCircle, X, Award, CheckCircle, XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import ImageUpload from "@/components/ui/ImageUpload";
@@ -35,6 +35,7 @@ type Registration = {
   email: string;
   region: string;
   age: number | null;
+  paymentStatus: string | null;
   createdAt: string;
 };
 
@@ -233,6 +234,26 @@ export default function AdminTournaments() {
     }
   };
 
+  const handleUpdateRegistrationStatus = async (registrationId: string, paymentStatus: string) => {
+    try {
+      const res = await fetch("/api/tournaments/staff/update-registration-status", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ registrationId, paymentStatus }),
+      });
+      const d = await res.json();
+      if (d.ok) {
+        toast.success(paymentStatus === "payment_approved" ? "Payment approved." : "Payment rejected.");
+        if (showRegistrations) loadRegistrationsPage(showRegistrations, regPage);
+      } else {
+        toast.error(d.error || "Failed to update status.");
+      }
+    } catch {
+      toast.error("Something went wrong.");
+    }
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -345,20 +366,56 @@ export default function AdminTournaments() {
                         <div className="max-h-64 space-y-2 overflow-y-auto">
                           {registrations.map((r) => (
                             <div key={r.id} className="flex items-center justify-between rounded-xl bg-white/5 px-3 py-2">
-                              <div>
-                                <span className="text-sm font-medium text-white">{r.minecraftUsername}</span>
-                                <span className="ml-2 text-xs text-white/40">{r.discordUsername}</span>
-                                {r.teamName && <span className="ml-2 text-xs text-white/30">[{r.teamName}]</span>}
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-medium text-white">{r.minecraftUsername}</span>
+                                  <span className="text-xs text-white/40">{r.discordUsername}</span>
+                                  {r.teamName && <span className="text-xs text-white/30">[{r.teamName}]</span>}
+                                  {r.paymentStatus && r.paymentStatus !== "free" && (
+                                    <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase ${
+                                      r.paymentStatus === "pending_payment" ? "bg-yellow-500/20 text-yellow-400" :
+                                      r.paymentStatus === "payment_approved" ? "bg-green-500/20 text-green-400" :
+                                      r.paymentStatus === "payment_rejected" ? "bg-red-500/20 text-red-400" :
+                                      r.paymentStatus === "cancelled_by_user" ? "bg-zinc-500/20 text-zinc-400" :
+                                      "bg-white/10 text-white/40"
+                                    }`}>
+                                      {r.paymentStatus === "pending_payment" ? "Pending" :
+                                       r.paymentStatus === "payment_approved" ? "Approved" :
+                                       r.paymentStatus === "payment_rejected" ? "Rejected" :
+                                       r.paymentStatus === "cancelled_by_user" ? "Cancelled" : r.paymentStatus}
+                                    </span>
+                                  )}
+                                </div>
                                 <div className="mt-0.5 text-[11px] text-white/30">
                                   {r.email} &middot; {r.region}
                                 </div>
                               </div>
-                              <button
-                                onClick={() => handleDeleteRegistration(r.id)}
-                                className="rounded p-1 text-red-400/40 transition-colors hover:bg-red-500/10 hover:text-red-400"
-                              >
-                                <X className="h-3.5 w-3.5" />
-                              </button>
+                              <div className="flex items-center gap-1">
+                                {r.paymentStatus === "pending_payment" && (
+                                  <>
+                                    <button
+                                      onClick={() => handleUpdateRegistrationStatus(r.id, "payment_approved")}
+                                      className="rounded p-1 text-green-400/60 transition-colors hover:bg-green-500/10 hover:text-green-400"
+                                      title="Approve payment"
+                                    >
+                                      <CheckCircle className="h-3.5 w-3.5" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleUpdateRegistrationStatus(r.id, "payment_rejected")}
+                                      className="rounded p-1 text-red-400/60 transition-colors hover:bg-red-500/10 hover:text-red-400"
+                                      title="Reject payment"
+                                    >
+                                      <XCircle className="h-3.5 w-3.5" />
+                                    </button>
+                                  </>
+                                )}
+                                <button
+                                  onClick={() => handleDeleteRegistration(r.id)}
+                                  className="rounded p-1 text-red-400/40 transition-colors hover:bg-red-500/10 hover:text-red-400"
+                                >
+                                  <X className="h-3.5 w-3.5" />
+                                </button>
+                              </div>
                             </div>
                           ))}
                         </div>

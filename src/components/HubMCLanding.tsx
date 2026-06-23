@@ -137,7 +137,7 @@ function Hero({ navHeight }: { navHeight: number }) {
     <section
       id="home"
       ref={heroRef}
-      className="relative left-1/2 w-screen -translate-x-1/2"
+      className="relative left-1/2 w-[100vw] max-w-full -translate-x-1/2"
       style={{ height: stageHeight }}
     >
       <div
@@ -145,7 +145,7 @@ function Hero({ navHeight }: { navHeight: number }) {
         style={{
           top: navHeight,
           height: heroHeight,
-          minHeight: "650px",
+          minHeight: "min(650px, 85vh)",
           maxHeight: "850px",
         }}
       >
@@ -174,8 +174,8 @@ function Hero({ navHeight }: { navHeight: number }) {
           </div>
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent to-[#050505]" />
-          {/* Subtle blur overlay behind navbar */}
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-28 bg-gradient-to-b from-black/25 to-transparent backdrop-blur-[3px]" />
+          {/* Subtle gradient overlay behind navbar */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-28 bg-gradient-to-b from-black/25 to-transparent" />
         </motion.div>
 
         <motion.div
@@ -192,7 +192,7 @@ function Hero({ navHeight }: { navHeight: number }) {
           {/* ─── FEATURE CARDS ─── */}
           <div
             className="pointer-events-auto absolute left-1/2 -translate-x-1/2 w-full px-4"
-            style={{ bottom: "clamp(170px, 27vh, 240px)" }}
+            style={{ bottom: "clamp(55px, 12vh, 110px)" }}
           >
             <div className="mx-auto max-w-6xl">
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5 md:gap-3">
@@ -245,7 +245,7 @@ function Hero({ navHeight }: { navHeight: number }) {
           {/* ─── COMMUNITY BANNER ─── */}
           <div
             className="pointer-events-auto absolute left-1/2 -translate-x-1/2 w-full px-4"
-            style={{ bottom: "clamp(95px, 17vh, 155px)" }}
+            style={{ bottom: "clamp(8px, 3vh, 35px)" }}
           >
             <a
               href="https://discord.gg/CwNVBCuSbj"
@@ -360,7 +360,7 @@ function AboutSection() {
             Home <span className="mx-2 text-white/30">›</span>{" "}
             <span className="text-[var(--hub-orange)]">About Us</span>
           </p>
-          <h2 className="mt-6 text-5xl md:text-7xl font-black leading-[0.95] tracking-tight text-white">
+          <h2 className="mt-6 text-4xl sm:text-5xl md:text-7xl font-black leading-[0.95] tracking-tight text-white">
             About <span className="text-[var(--hub-orange)]">Us</span>
           </h2>
           <div className="mt-6 h-px w-24 bg-gradient-to-r from-[var(--hub-blue)] via-[var(--hub-orange)] to-transparent" />
@@ -377,7 +377,7 @@ function AboutSection() {
 
           <div className="mt-10 flex flex-wrap gap-8">
             {[
-              { k: "120K+", v: "Active Players" },
+              { k: "120+", v: "Active Players" },
               { k: "40+", v: "Custom Biomes" },
               { k: "24/7", v: "Lag-free Servers" },
             ].map((s) => (
@@ -416,7 +416,7 @@ function AboutSection() {
                 repeat: Infinity,
                 ease: "easeInOut",
               }}
-              className="relative h-[320px] w-[320px] md:h-[440px] md:w-[440px] object-contain drop-shadow-[0_30px_60px_rgba(40,90,200,0.55)]"
+              className="relative h-[240px] w-[240px] sm:h-[320px] sm:w-[320px] md:h-[440px] md:w-[440px] object-contain drop-shadow-[0_30px_60px_rgba(40,90,200,0.55)]"
               draggable={false}
             />
           </motion.div>
@@ -501,7 +501,7 @@ function ContactSection() {
             Home <span className="mx-2 text-white/30">›</span>{" "}
             <span className="text-[var(--hub-orange)]">Contact Us</span>
           </p>
-          <h2 className="mt-6 text-5xl md:text-7xl font-black leading-[0.95] tracking-tight text-white">
+          <h2 className="mt-6 text-4xl sm:text-5xl md:text-7xl font-black leading-[0.95] tracking-tight text-white">
             Contact <span className="text-[var(--hub-orange)]">HUBMC</span>
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/60">
@@ -677,6 +677,54 @@ function Particles() {
   );
 }
 
+function SeoContentSection() {
+  return (
+    <section className="relative overflow-hidden py-16 md:py-24">
+      <div className="mx-auto max-w-4xl px-6 text-center">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white">
+          Welcome to <span className="text-[var(--hub-orange)]">HUBMC</span>
+        </h2>
+        <div className="mx-auto mt-4 h-px w-24 bg-gradient-to-r from-[var(--hub-blue)] via-[var(--hub-orange)] to-transparent" />
+        <p className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-white/60">
+          HUBMC is a premium Minecraft server community built for players who demand more. Whether you are here to compete in high-stakes tournaments, customize your experience with exclusive ranks and packages, watch live streams, or connect with fellow players — HUBMC is your home.
+        </p>
+        <div className="mx-auto mt-10 grid max-w-3xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-left">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--hub-blue)]/10 text-[var(--hub-blue)]">
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+            </div>
+            <h3 className="mt-4 text-lg font-bold text-white">Tournaments &amp; PvP</h3>
+            <p className="mt-2 text-sm leading-relaxed text-white/50">
+              Compete in organized Minecraft tournaments with brackets, prizes, and ranked leaderboards. From casual events to championship series — there is always a match waiting.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-left">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--hub-orange)]/10 text-[var(--hub-orange)]">
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+            </div>
+            <h3 className="mt-4 text-lg font-bold text-white">Store &amp; Packages</h3>
+            <p className="mt-2 text-sm leading-relaxed text-white/50">
+              Unlock exclusive ranks, cosmetics, and perks through the HUBMC store. Choose from VIP, MVP, and premium packages tailored to your playstyle.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-left sm:col-span-2 lg:col-span-1">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-500/10 text-green-400">
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+            </div>
+            <h3 className="mt-4 text-lg font-bold text-white">Community &amp; Forum</h3>
+            <p className="mt-2 text-sm leading-relaxed text-white/50">
+              Join the HUBMC community on our forum and Discord. Get support, share feedback, discuss strategies, and connect with thousands of fellow Minecraft players.
+            </p>
+          </div>
+        </div>
+        <p className="mx-auto mt-10 max-w-xl text-sm text-white/40">
+          Play now at <span className="font-mono text-[var(--hub-blue)]">hubmc.in</span> — the official HUBMC Minecraft server. Available on Java Edition and Bedrock Edition.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 export default function HubMCLanding() {
   const navRef = useRef<HTMLElement>(null);
   const navHeight = useElementHeight(navRef);
@@ -687,6 +735,7 @@ export default function HubMCLanding() {
       <div aria-hidden="true" style={{ height: navHeight }} />
       <Hero navHeight={navHeight} />
       <AboutSection />
+      <SeoContentSection />
       <ContactSection />
     </main>
   );

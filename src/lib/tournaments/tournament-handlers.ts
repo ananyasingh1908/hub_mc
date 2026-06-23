@@ -21,6 +21,13 @@ import {
   tournaments,
 } from "@/lib/db/schema";
 import { toNumber } from "@/lib/db/drizzle-helpers";
+import { logActivity } from "@/lib/activity-log";
+
+function toMySqlDatetime(d: Date = new Date()): Date {
+  const copy = new Date(d);
+  copy.setMilliseconds(0);
+  return copy;
+}
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -63,18 +70,19 @@ async function requireStaffRole(
 
 export async function autoUpdateStatuses() {
   try {
+    const nowStr = toMySqlDatetime();
     const now = new Date();
 
     await db
       .update(tournaments)
-      .set({ status: "LIVE", updatedAt: now })
+      .set({ status: "LIVE", updatedAt: nowStr as any })
       .where(
         and(eq(tournaments.status, "UPCOMING"), lte(tournaments.dateTime, now)),
       );
 
     await db
       .update(tournaments)
-      .set({ status: "COMPLETED", updatedAt: now })
+      .set({ status: "COMPLETED", updatedAt: nowStr as any })
       .where(
         and(
           eq(tournaments.status, "LIVE"),
@@ -132,7 +140,12 @@ export async function handleGetPublicTournaments() {
             count: count(),
           })
           .from(tournamentRegistrations)
-          .where(inArray(tournamentRegistrations.tournamentId, ids))
+          .where(
+            and(
+              inArray(tournamentRegistrations.tournamentId, ids),
+              inArray(tournamentRegistrations.paymentStatus, ACTIVE_REGISTRATION_STATUSES),
+            ),
+          )
           .groupBy(tournamentRegistrations.tournamentId)
       : [];
 
@@ -177,7 +190,12 @@ export async function handleGetTournamentById(request: Request) {
   const countRows = await db
     .select({ count: count() })
     .from(tournamentRegistrations)
-    .where(eq(tournamentRegistrations.tournamentId, id));
+    .where(
+      and(
+        eq(tournamentRegistrations.tournamentId, id),
+        inArray(tournamentRegistrations.paymentStatus, ACTIVE_REGISTRATION_STATUSES),
+      ),
+    );
 
   const registrationsCount = Number(countRows[0]?.count ?? 0);
 
@@ -185,21 +203,22 @@ export async function handleGetTournamentById(request: Request) {
   let userRegistration = null;
 
   if (session?.user?.customerId) {
+    const username = session.user.fullName || session.user.phoneNumber || "";
     const regRows = await db
       .select()
       .from(tournamentRegistrations)
       .where(
         and(
           eq(tournamentRegistrations.tournamentId, id),
-          eq(
-            tournamentRegistrations.userId,
-            session.user.customerId,
-          ),
+          eq(tournamentRegistrations.minecraftUsername, username),
         ),
       )
       .limit(1);
 
-    userRegistration = regRows[0] ?? null;
+    const reg = regRows[0] ?? null;
+    if (reg && reg.paymentStatus !== "cancelled_by_user") {
+      userRegistration = reg;
+    }
   }
 
   return json({
@@ -250,11 +269,17 @@ export async function handleRegisterForTournament(request: Request) {
 
   await autoUpdateStatuses();
 
-  const tournamentRows = await db
-    .select()
-    .from(tournaments)
-    .where(eq(tournaments.id, tournamentId))
-    .limit(1);
+  let tournamentRows: any[];
+  try {
+    tournamentRows = await db
+      .select()
+      .from(tournaments)
+      .where(eq(tournaments.id, tournamentId))
+      .limit(1);
+  } catch (dbErr) {
+    console.error("[TournamentRegister] DB error fetching tournament:", dbErr);
+    return error("Failed to load tournament. Please try again.", 500);
+  }
 
   const tournament = tournamentRows[0];
   if (!tournament) return error("Tournament not found", 404);
@@ -265,42 +290,109 @@ export async function handleRegisterForTournament(request: Request) {
     return error("Registration deadline has passed.", 400);
   }
 
-  const countRows = await db
-    .select({ count: count() })
-    .from(tournamentRegistrations)
-    .where(eq(tournamentRegistrations.tournamentId, tournamentId));
+  let countRows: any[];
+  try {
+    countRows = await db
+      .select({ count: count() })
+      .from(tournamentRegistrations)
+      .where(
+        and(
+          eq(tournamentRegistrations.tournamentId, tournamentId),
+          inArray(tournamentRegistrations.paymentStatus, ACTIVE_REGISTRATION_STATUSES),
+        ),
+      );
+  } catch (dbErr) {
+    console.error("[TournamentRegister] DB error counting registrations:", dbErr);
+    return error("Failed to check tournament capacity. Please try again.", 500);
+  }
 
   const registrationCount = Number(countRows[0]?.count ?? 0);
   if (registrationCount >= tournament.maxParticipants) {
     return error("Tournament is full. No more slots available.", 400);
   }
 
-  const existingRows = await db
-    .select()
-    .from(tournamentRegistrations)
-    .where(
-      and(
-        eq(tournamentRegistrations.tournamentId, tournamentId),
-        eq(
-          tournamentRegistrations.userId,
-          session.user.customerId,
-        ),
-      ),
-    )
-    .limit(1);
+  const username = session.user.fullName || session.user.phoneNumber || "";
 
-  if (existingRows[0]) {
+  let existingRows: any[];
+  try {
+    existingRows = await db
+      .select()
+      .from(tournamentRegistrations)
+      .where(
+        and(
+          eq(tournamentRegistrations.tournamentId, tournamentId),
+          eq(tournamentRegistrations.minecraftUsername, username),
+        ),
+      )
+      .limit(1);
+  } catch (dbErr) {
+    console.error("[TournamentRegister] DB error checking duplicates:", dbErr);
+    return error("Failed to verify registration. Please try again.", 500);
+  }
+
+  const existing = existingRows[0];
+  if (existing) {
+    if (existing.paymentStatus === "cancelled_by_user") {
+      const hasEntryFee = tournament.entryFee && Number(tournament.entryFee) > 0;
+      const newPaymentStatus = hasEntryFee ? "pending_payment" : "free";
+      const nowStr = toMySqlDatetime();
+      try {
+        await db
+          .update(tournamentRegistrations)
+          .set({
+            discordUsername,
+            discordId: discordId || null,
+            teamName: teamName || null,
+            teamMembers: teamMembers || null,
+            email,
+            region,
+            age: age ? Number(age) : null,
+            agreedToRules: true,
+            paymentStatus: newPaymentStatus,
+            updatedAt: nowStr as any,
+          })
+          .where(eq(tournamentRegistrations.id, existing.id));
+      } catch (dbErr: any) {
+        console.error("[TournamentRegister] DB REACTIVATE FAILED:", dbErr?.cause?.message || dbErr?.message || dbErr);
+        return error("Failed to save registration. Please try again.", 500);
+      }
+
+      let registration: any;
+      try {
+        registration = (
+          await db
+            .select()
+            .from(tournamentRegistrations)
+            .where(eq(tournamentRegistrations.id, existing.id))
+            .limit(1)
+        )[0];
+      } catch {
+        registration = { id: existing.id };
+      }
+
+      const response: any = { ok: true, registration, reactivated: true };
+      if (hasEntryFee) {
+        response.requiresPayment = true;
+        response.entryFee = Number(tournament.entryFee);
+        response.paymentInstructions = "Your registration is pending. Please complete the entry fee payment via Discord and contact our staff for approval.";
+      }
+      return json(response, 201);
+    }
+
     return error("You are already registered for this tournament.", 409);
   }
 
   const now = new Date();
   const registrationId = crypto.randomUUID();
+  const hasEntryFee = tournament.entryFee && Number(tournament.entryFee) > 0;
+
+  const nowStr = toMySqlDatetime(now);
 
   const payload: InferInsertModel<typeof tournamentRegistrations> = {
     id: registrationId,
     tournamentId,
-    userId: session.user.customerId ?? null,
-    minecraftUsername: session.user.fullName || session.user.phoneNumber || "",
+    userId: null,
+    minecraftUsername: username,
     minecraftUuid: session.user.customerId || "",
     discordUsername,
     discordId: discordId || null,
@@ -310,21 +402,50 @@ export async function handleRegisterForTournament(request: Request) {
     region,
     age: age ? Number(age) : null,
     agreedToRules: true,
-    createdAt: now,
-    updatedAt: now,
+    paymentStatus: hasEntryFee ? "pending_payment" : "free",
+    createdAt: nowStr as any,
+    updatedAt: nowStr as any,
   };
 
-  await db.insert(tournamentRegistrations).values(payload);
+  try {
+    await db.insert(tournamentRegistrations).values(payload);
+  } catch (dbErr: any) {
+    console.error("[TournamentRegister] DB INSERT FAILED:", dbErr?.cause?.message || dbErr?.message || dbErr);
+    return error("Failed to save registration. Please try again.", 500);
+  }
 
-  const registration = (
-    await db
-      .select()
-      .from(tournamentRegistrations)
-      .where(eq(tournamentRegistrations.id, registrationId))
-      .limit(1)
-  )[0];
+  let registration: any;
+  try {
+    registration = (
+      await db
+        .select()
+        .from(tournamentRegistrations)
+        .where(eq(tournamentRegistrations.id, registrationId))
+        .limit(1)
+    )[0];
+  } catch (dbErr) {
+    console.error("[TournamentRegister] DB error fetching registration:", dbErr);
+    registration = { id: registrationId };
+  }
 
-  return json({ ok: true, registration }, 201);
+  const response: any = { ok: true, registration };
+  if (hasEntryFee) {
+    response.requiresPayment = true;
+    response.entryFee = Number(tournament.entryFee);
+    response.paymentInstructions = "Your registration is pending. Please complete the entry fee payment via Discord and contact our staff for approval.";
+  }
+
+  logActivity({
+    actorType: "customer",
+    actorId: session.user.customerId,
+    actorName: username,
+    action: "REGISTER",
+    entity: "tournament_registration",
+    entityId: registrationId,
+    summary: `Registered for tournament "${tournament.title}"${hasEntryFee ? " (payment pending)" : ""}`,
+  });
+
+  return json(response, 201);
 }
 
 export async function handleGetTournamentRegistrations(request: Request) {
@@ -382,7 +503,12 @@ export async function handleStaffGetTournaments(request: Request) {
             count: count(),
           })
           .from(tournamentRegistrations)
-          .where(inArray(tournamentRegistrations.tournamentId, ids))
+          .where(
+            and(
+              inArray(tournamentRegistrations.tournamentId, ids),
+              inArray(tournamentRegistrations.paymentStatus, ACTIVE_REGISTRATION_STATUSES),
+            ),
+          )
           .groupBy(tournamentRegistrations.tournamentId)
       : [];
 
@@ -439,7 +565,6 @@ export async function handleStaffCreateTournament(request: Request) {
     );
   }
 
-  const now = new Date();
   const tournamentId = crypto.randomUUID();
 
   const payload: InferInsertModel<typeof tournaments> = {
@@ -448,8 +573,8 @@ export async function handleStaffCreateTournament(request: Request) {
     bannerUrl: bannerUrl || null,
     type: type || "SOLO",
     gameMode,
-    dateTime: new Date(dateTime),
-    registrationDeadline: new Date(registrationDeadline),
+    dateTime: toMySqlDatetime(new Date(dateTime)) as any,
+    registrationDeadline: toMySqlDatetime(new Date(registrationDeadline)) as any,
     maxParticipants: Number(maxParticipants),
     entryFee: entryFee ? String(entryFee) : null,
     prizePool: prizePool || null,
@@ -457,8 +582,8 @@ export async function handleStaffCreateTournament(request: Request) {
     rules,
     serverIp: serverIp || null,
     status: "UPCOMING",
-    createdAt: now,
-    updatedAt: now,
+    createdAt: toMySqlDatetime() as any,
+    updatedAt: toMySqlDatetime() as any,
   };
 
   await db.insert(tournaments).values(payload);
@@ -470,6 +595,17 @@ export async function handleStaffCreateTournament(request: Request) {
       .where(eq(tournaments.id, tournamentId))
       .limit(1)
   )[0];
+
+  const staff = (request as any).__staffSession;
+  logActivity({
+    actorType: "employee",
+    actorId: staff?.employeeId,
+    actorName: staff?.email || "Staff",
+    action: "CREATE",
+    entity: "tournament",
+    entityId: tournamentId,
+    summary: `Tournament created: "${title}"`,
+  });
 
   return json({ ok: true, tournament }, 201);
 }
@@ -513,16 +649,16 @@ export async function handleStaffUpdateTournament(request: Request) {
   if (!existingRows[0]) return error("Tournament not found", 404);
 
   const data: Partial<InferInsertModel<typeof tournaments>> = {
-    updatedAt: new Date(),
+    updatedAt: toMySqlDatetime() as any,
   };
 
   if (title !== undefined) data.title = title;
   if (bannerUrl !== undefined) data.bannerUrl = bannerUrl;
   if (type !== undefined) data.type = type;
   if (gameMode !== undefined) data.gameMode = gameMode;
-  if (dateTime !== undefined) data.dateTime = new Date(dateTime);
+  if (dateTime !== undefined) data.dateTime = toMySqlDatetime(new Date(dateTime)) as any;
   if (registrationDeadline !== undefined) {
-    data.registrationDeadline = new Date(registrationDeadline);
+    data.registrationDeadline = toMySqlDatetime(new Date(registrationDeadline)) as any;
   }
   if (maxParticipants !== undefined) {
     data.maxParticipants = Number(maxParticipants);
@@ -543,6 +679,17 @@ export async function handleStaffUpdateTournament(request: Request) {
       .where(eq(tournaments.id, id))
       .limit(1)
   )[0];
+
+  const staff = (request as any).__staffSession;
+  logActivity({
+    actorType: "employee",
+    actorId: staff?.employeeId,
+    actorName: staff?.email || "Staff",
+    action: "UPDATE",
+    entity: "tournament",
+    entityId: id,
+    summary: `Tournament updated: "${tournament.title}"`,
+  });
 
   return json({
     ok: true,
@@ -577,6 +724,18 @@ export async function handleStaffDeleteTournament(request: Request) {
 
   await db.delete(tournaments).where(eq(tournaments.id, id));
 
+  const staff = (request as any).__staffSession;
+  logActivity({
+    actorType: "employee",
+    actorId: staff?.employeeId,
+    actorName: staff?.email || "Staff",
+    action: "DELETE",
+    entity: "tournament",
+    entityId: id,
+    summary: `Tournament deleted`,
+    severity: "WARN",
+  });
+
   return json({ ok: true });
 }
 
@@ -609,6 +768,133 @@ export async function handleDeleteTournamentRegistration(request: Request) {
   return json({ ok: true });
 }
 
+export async function handleStaffUpdateRegistrationStatus(request: Request) {
+  const authErr = await requireStaffRole(request, ["SUPER_ADMIN", "EMPLOYEE"]);
+  if (authErr) return authErr;
+
+  let body: any;
+  try {
+    body = await request.json();
+  } catch {
+    return error("Invalid request body", 400);
+  }
+
+  const { registrationId, paymentStatus } = body;
+  if (!registrationId) return error("Missing registrationId", 400);
+  if (!paymentStatus || !["free", "pending_payment", "payment_approved", "payment_rejected", "cancelled_by_user"].includes(paymentStatus)) {
+    return error("Invalid paymentStatus.", 400);
+  }
+
+  const existingRows = await db
+    .select({ id: tournamentRegistrations.id, paymentStatus: tournamentRegistrations.paymentStatus })
+    .from(tournamentRegistrations)
+    .where(eq(tournamentRegistrations.id, registrationId))
+    .limit(1);
+
+  if (!existingRows[0]) return error("Registration not found", 404);
+
+  const staff = (request as any).__staffSession;
+  const oldStatus = existingRows[0].paymentStatus;
+
+  await db
+    .update(tournamentRegistrations)
+    .set({ paymentStatus, updatedAt: toMySqlDatetime() as any })
+    .where(eq(tournamentRegistrations.id, registrationId));
+
+  logActivity({
+    actorType: "employee",
+    actorId: staff?.employeeId,
+    actorName: staff?.email || "Staff",
+    action: paymentStatus === "payment_approved" ? "APPROVE" : paymentStatus === "payment_rejected" ? "REJECT" : "UPDATE",
+    entity: "tournament_registration",
+    entityId: registrationId,
+    summary: `Registration status changed: ${oldStatus} → ${paymentStatus}`,
+    severity: paymentStatus === "payment_rejected" ? "WARN" : "INFO",
+  });
+
+  return json({ ok: true, registrationId, paymentStatus });
+}
+
+const CANCELLABLE_STATUSES = ["pending_payment", "payment_rejected"];
+const ACTIVE_REGISTRATION_STATUSES = ["free", "pending_payment", "payment_approved"];
+
+export async function handleUserCancelRegistration(request: Request) {
+  const session = await getHubMCSession(request);
+  if (!session?.user?.customerId) {
+    return error("You must be logged in.", 401);
+  }
+
+  let body: any;
+  try {
+    body = await request.json();
+  } catch {
+    return error("Invalid request body", 400);
+  }
+
+  const { tournamentId } = body;
+  if (!tournamentId) return error("Missing tournamentId", 400);
+
+  const username = session.user.fullName || session.user.phoneNumber || "";
+  if (!username) return error("Could not identify your account.", 400);
+
+  const tournamentRows = await db
+    .select()
+    .from(tournaments)
+    .where(eq(tournaments.id, tournamentId))
+    .limit(1);
+
+  const tournament = tournamentRows[0];
+  if (!tournament) return error("Tournament not found", 404);
+
+  if (tournament.status === "COMPLETED") {
+    return error("Cannot cancel registration for a completed tournament.", 400);
+  }
+
+  const regRows = await db
+    .select()
+    .from(tournamentRegistrations)
+    .where(
+      and(
+        eq(tournamentRegistrations.tournamentId, tournamentId),
+        eq(tournamentRegistrations.minecraftUsername, username),
+      ),
+    )
+    .limit(1);
+
+  const registration = regRows[0];
+  if (!registration) return error("You are not registered for this tournament.", 404);
+
+  if (registration.paymentStatus === "payment_approved") {
+    return error("Cannot cancel an approved registration. Please contact staff.", 400);
+  }
+
+  if (registration.paymentStatus === "cancelled_by_user") {
+    return error("Registration is already cancelled.", 400);
+  }
+
+  if (!CANCELLABLE_STATUSES.includes(registration.paymentStatus || "")) {
+    return error("Your registration cannot be cancelled at this time.", 400);
+  }
+
+  await db
+    .update(tournamentRegistrations)
+    .set({ paymentStatus: "cancelled_by_user", updatedAt: toMySqlDatetime() as any })
+    .where(eq(tournamentRegistrations.id, registration.id));
+
+  logActivity({
+    actorType: "customer",
+    actorId: session.user.customerId,
+    actorName: username,
+    action: "CANCEL",
+    entity: "tournament_registration",
+    entityId: registration.id,
+    summary: `Cancelled registration for tournament (status was: ${registration.paymentStatus})`,
+    severity: "WARN",
+  });
+
+  return json({ ok: true, message: "Registration cancelled successfully." });
+}
+
 export async function handleGetTournamentBrackets(request: Request) {
   const url = new URL(request.url);
   const tournamentId = url.searchParams.get("tournamentId");
@@ -623,16 +909,21 @@ export async function handleGetTournamentBrackets(request: Request) {
   const tournament = tournamentRows[0];
   if (!tournament) return error("Tournament not found", 404);
 
+  const activeWhere = and(
+    eq(tournamentRegistrations.tournamentId, tournamentId),
+    inArray(tournamentRegistrations.paymentStatus, ACTIVE_REGISTRATION_STATUSES),
+  );
+
   const [registrations, countRows] = await Promise.all([
     db
       .select()
       .from(tournamentRegistrations)
-      .where(eq(tournamentRegistrations.tournamentId, tournamentId))
+      .where(activeWhere)
       .orderBy(tournamentRegistrations.createdAt),
     db
       .select({ count: count() })
       .from(tournamentRegistrations)
-      .where(eq(tournamentRegistrations.tournamentId, tournamentId)),
+      .where(activeWhere),
   ]);
 
   const registrationsCount = Number(countRows[0]?.count ?? 0);
@@ -713,6 +1004,7 @@ export async function handleStaffSearchRegistrations(request: Request) {
         region: tournamentRegistrations.region,
         age: tournamentRegistrations.age,
         agreedToRules: tournamentRegistrations.agreedToRules,
+        paymentStatus: tournamentRegistrations.paymentStatus,
         createdAt: tournamentRegistrations.createdAt,
         tournamentTitle: tournaments.title,
       })
@@ -742,6 +1034,7 @@ export async function handleStaffSearchRegistrations(request: Request) {
       region: r.region,
       age: r.age,
       agreedToRules: r.agreedToRules,
+      paymentStatus: r.paymentStatus,
       createdAt: r.createdAt,
     })),
     pagination: {
@@ -852,7 +1145,7 @@ export async function handleStaffStartTournament(request: Request) {
 
   await db
     .update(tournaments)
-    .set({ status: "LIVE", updatedAt: new Date() })
+    .set({ status: "LIVE", updatedAt: toMySqlDatetime() as any })
     .where(eq(tournaments.id, id));
 
   const updated = (
@@ -896,7 +1189,7 @@ export async function handleStaffEndTournament(request: Request) {
 
   await db
     .update(tournaments)
-    .set({ status: "COMPLETED", updatedAt: new Date() })
+    .set({ status: "COMPLETED", updatedAt: toMySqlDatetime() as any })
     .where(eq(tournaments.id, id));
 
   const updated = (
@@ -929,7 +1222,12 @@ export async function handleGetTournamentLeaderboard(request: Request) {
   const countRows = await db
     .select({ count: count() })
     .from(tournamentRegistrations)
-    .where(eq(tournamentRegistrations.tournamentId, tournamentId));
+    .where(
+      and(
+        eq(tournamentRegistrations.tournamentId, tournamentId),
+        inArray(tournamentRegistrations.paymentStatus, ACTIVE_REGISTRATION_STATUSES),
+      ),
+    );
 
   const registrationsCount = Number(countRows[0]?.count ?? 0);
 
@@ -1044,7 +1342,12 @@ export async function handleGetTournamentMatches(request: Request) {
   const countRows = await db
     .select({ count: count() })
     .from(tournamentRegistrations)
-    .where(eq(tournamentRegistrations.tournamentId, tournamentId));
+    .where(
+      and(
+        eq(tournamentRegistrations.tournamentId, tournamentId),
+        inArray(tournamentRegistrations.paymentStatus, ACTIVE_REGISTRATION_STATUSES),
+      ),
+    );
 
   const registrationsCount = Number(countRows[0]?.count ?? 0);
 
@@ -1159,7 +1462,12 @@ export async function handleStaffGenerateBracket(request: Request) {
   const registrations = await db
     .select({ id: tournamentRegistrations.id })
     .from(tournamentRegistrations)
-    .where(eq(tournamentRegistrations.tournamentId, tournamentId))
+    .where(
+      and(
+        eq(tournamentRegistrations.tournamentId, tournamentId),
+        inArray(tournamentRegistrations.paymentStatus, ACTIVE_REGISTRATION_STATUSES),
+      ),
+    )
     .orderBy(tournamentRegistrations.createdAt);
 
   if (registrations.length < 2) {
@@ -1172,7 +1480,7 @@ export async function handleStaffGenerateBracket(request: Request) {
     shuffled.push(shuffled[0]);
   }
 
-  const now = new Date();
+  const nowStr = toMySqlDatetime();
   const matchPayloads: InferInsertModel<typeof tournamentMatches>[] = [];
 
   for (let i = 0; i < shuffled.length; i += 2) {
@@ -1190,8 +1498,8 @@ export async function handleStaffGenerateBracket(request: Request) {
       scheduledAt: null,
       playedAt: null,
       notes: null,
-      createdAt: now,
-      updatedAt: now,
+      createdAt: nowStr as any,
+      updatedAt: nowStr as any,
     });
   }
 
@@ -1229,7 +1537,7 @@ export async function handleStaffUpdateMatch(request: Request) {
   if (!matchRows[0]) return error("Match not found", 404);
 
   const data: Partial<InferInsertModel<typeof tournamentMatches>> = {
-    updatedAt: new Date(),
+    updatedAt: toMySqlDatetime() as any,
   };
 
   if (score1 !== undefined) data.score1 = score1;
@@ -1237,7 +1545,7 @@ export async function handleStaffUpdateMatch(request: Request) {
   if (winnerId !== undefined) data.winnerId = winnerId || null;
   if (status !== undefined) data.status = status;
   if (notes !== undefined) data.notes = notes;
-  if (status === "COMPLETED") data.playedAt = new Date();
+  if (status === "COMPLETED") data.playedAt = toMySqlDatetime() as any;
 
   await db
     .update(tournamentMatches)
@@ -1307,7 +1615,7 @@ export async function handleStaffCreateNextRound(request: Request) {
   }
 
   const nextRound = currentRound + 1;
-  const now = new Date();
+  const nowStr2 = toMySqlDatetime();
   const newMatchPayloads: InferInsertModel<typeof tournamentMatches>[] = [];
 
   for (let i = 0; i < winners.length; i += 2) {
@@ -1325,8 +1633,8 @@ export async function handleStaffCreateNextRound(request: Request) {
       scheduledAt: null,
       playedAt: null,
       notes: null,
-      createdAt: now,
-      updatedAt: now,
+      createdAt: nowStr2 as any,
+      updatedAt: nowStr2 as any,
     });
   }
 

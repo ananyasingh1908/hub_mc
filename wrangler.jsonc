@@ -17,7 +17,7 @@
     "DISCORD_SERVER_ID": "1425411040329465878",
     "DISCORD_INVITE": "https://discord.gg/CwNVBCuSbj",
     "MC_RCON_PORT": "25575",
-    "BASE_URL": "https://hubmc-live.varunvishwakarma1411.workers.dev",
+    "BASE_URL": "https://hubmc.in",
     "NODE_ENV": "production"
   }
 }

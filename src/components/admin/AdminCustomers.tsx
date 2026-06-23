@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { Users, Search, ChevronDown, ChevronUp, DollarSign } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Users, Search, ChevronDown, ChevronUp, DollarSign, Trash2, X, LoaderCircle } from "lucide-react";
 
 type Customer = { id: string; minecraftUsername: string; minecraftUuid: string; avatarUrl: string | null; country: string | null; email: string; totalSpent: number; purchaseCount: number; lastLoginAt: string | null; createdAt: string };
 
@@ -12,6 +12,9 @@ export default function AdminCustomers() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [deleteTarget, setDeleteTarget] = useState<Customer | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
 
   const fetchCustomers = async (p: number) => {
     setLoading(true);
@@ -27,6 +30,38 @@ export default function AdminCustomers() {
 
   useEffect(() => { fetchCustomers(page); }, [page]);
 
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 3000);
+    return () => clearTimeout(t);
+  }, [toast]);
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      const res = await fetch("/api/admin/customers/delete", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customerId: deleteTarget.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setToast({ type: "error", msg: data.error || "Failed to delete customer" });
+        return;
+      }
+      setToast({ type: "success", msg: data.message || "Customer removed" });
+      setDeleteTarget(null);
+      setCustomers((prev) => prev.filter((c) => c.id !== deleteTarget.id));
+      setTotal((t) => Math.max(0, t - 1));
+    } catch {
+      setToast({ type: "error", msg: "Network error" });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const filtered = customers.filter((c) =>
     !search || c.minecraftUsername?.toLowerCase().includes(search.toLowerCase()) ||
     c.email?.toLowerCase().includes(search.toLowerCase())
@@ -37,7 +72,7 @@ export default function AdminCustomers() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-black text-white">Customers</h1>
-          <p className="mt-2 text-white/56">{customers.length} registered customers</p>
+          <p className="mt-2 text-white/56">{total} customers with purchase history</p>
         </div>
       </div>
 
@@ -47,6 +82,15 @@ export default function AdminCustomers() {
           placeholder="Search by username or email..."
           className="h-11 w-full rounded-xl border border-white/10 bg-[rgba(11,11,11,0.92)] pl-10 pr-4 text-sm text-white outline-none focus:border-[rgba(62,162,255,0.45)]" />
       </div>
+
+      <AnimatePresence>
+        {toast && (
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            className={`mt-4 rounded-xl border p-3 text-sm ${toast.type === "success" ? "border-green-500/20 bg-green-500/10 text-green-400" : "border-red-500/20 bg-red-500/10 text-red-400"}`}>
+            {toast.msg}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {loading ? (
         <div className="mt-6 space-y-3">{[1,2,3].map((i) => <div key={i} className="h-16 animate-pulse rounded-2xl border border-white/10 bg-[rgba(11,11,11,0.6)]"/>)}</div>
@@ -96,6 +140,13 @@ export default function AdminCustomers() {
                       </div>
                     </div>
                   </div>
+                  <div className="mt-4 flex justify-end">
+                    <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(c); }}
+                      className="flex items-center gap-1.5 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-400 hover:bg-red-500/20">
+                      <Trash2 className="h-3.5 w-3.5" />
+                      {c.purchaseCount > 0 ? "Archive" : "Delete"}
+                    </button>
+                  </div>
                 </div>
               )}
             </motion.div>
@@ -109,6 +160,48 @@ export default function AdminCustomers() {
           )}
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deleteTarget && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => !deleting && setDeleteTarget(null)}>
+            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }}
+              className="w-full max-w-md rounded-2xl border border-white/10 bg-[rgba(11,11,11,0.96)] p-6"
+              onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-white">
+                  {deleteTarget.purchaseCount > 0 ? "Archive Customer" : "Delete Customer"}
+                </h3>
+                <button onClick={() => !deleting && setDeleteTarget(null)} className="rounded-lg p-1 text-white/40 hover:bg-white/10">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="mt-4 space-y-3">
+                <p className="text-sm text-white/70">
+                  {deleteTarget.purchaseCount > 0
+                    ? `This customer has ${deleteTarget.purchaseCount} order(s). They will be archived (hidden from views) but order history is preserved.`
+                    : "This customer has no purchase history. They will be permanently deleted."}
+                </p>
+                <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                  <p className="text-sm font-semibold text-white">{deleteTarget.minecraftUsername}</p>
+                  <p className="text-xs text-white/40">{deleteTarget.email}</p>
+                </div>
+              </div>
+              <div className="mt-6 flex justify-end gap-3">
+                <button onClick={() => !deleting && setDeleteTarget(null)} disabled={deleting}
+                  className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/60 hover:bg-white/5 disabled:opacity-50">Cancel</button>
+                <button onClick={handleDelete} disabled={deleting}
+                  className="flex items-center gap-2 rounded-xl bg-red-500 px-4 py-2 text-sm font-bold text-white hover:bg-red-600 disabled:opacity-50">
+                  {deleting ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                  {deleteTarget.purchaseCount > 0 ? "Archive" : "Delete"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

@@ -47,6 +47,7 @@ export default function AdminStreams() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [blacklistChannelId, setBlacklistChannelId] = useState("");
+  const [blacklistChannelTitle, setBlacklistChannelTitle] = useState("");
   const [blacklistReason, setBlacklistReason] = useState("");
   const [showBlacklist, setShowBlacklist] = useState<string | null>(null);
 
@@ -55,7 +56,7 @@ export default function AdminStreams() {
     try {
       const [featRes, commRes] = await Promise.all([
         fetch("/api/admin/streams/featured", { credentials: "include" }),
-        fetch("/api/youtube/community-streams"),
+        fetch("/api/youtube/community-streams", { credentials: "include" }),
       ]);
       const featData = await featRes.json();
       const commData = await commRes.json();
@@ -109,13 +110,14 @@ export default function AdminStreams() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           channelId: blacklistChannelId.trim(),
-          channelTitle: showBlacklist,
+          channelTitle: blacklistChannelTitle.trim() || blacklistChannelId.trim(),
           reason: blacklistReason.trim() || null,
         }),
       });
       if (!res.ok) { toast.error("Failed to blacklist"); return; }
       toast.success("Channel blacklisted");
       setBlacklistChannelId("");
+      setBlacklistChannelTitle("");
       setBlacklistReason("");
       setShowBlacklist(null);
       await fetchAll();
@@ -151,7 +153,7 @@ export default function AdminStreams() {
                 <div className="relative aspect-video">
                   {stream.thumbnailUrl && <img src={stream.thumbnailUrl} alt="" className="h-full w-full object-cover" />}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                  <span className="absolute top-2 left-2 rounded-full bg-red-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-red-400">LIVE</span>
+                  <span className="absolute top-2 left-2 rounded-full bg-yellow-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-yellow-400">PENDING</span>
                   {stream.liveViewers > 0 && (
                     <span className="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] text-white/70">
                       <Users className="h-3 w-3" /> {stream.liveViewers}
@@ -168,7 +170,7 @@ export default function AdminStreams() {
                     <button onClick={() => handleRemove(stream.videoId)} className="inline-flex items-center gap-1 rounded-lg border border-red-500/30 bg-red-500/15 px-3 py-1.5 text-[11px] font-semibold text-red-400 transition-all hover:bg-red-500/25">
                       <XCircle className="h-3.5 w-3.5" /> Remove
                     </button>
-                    <button onClick={() => setShowBlacklist(stream.channelId)} className="inline-flex items-center gap-1 rounded-lg border border-orange-500/30 bg-orange-500/15 px-3 py-1.5 text-[11px] font-semibold text-orange-400 transition-all hover:bg-orange-500/25">
+                    <button onClick={() => { setBlacklistChannelId(stream.channelId); setBlacklistChannelTitle(stream.channelTitle); setShowBlacklist(stream.channelId); }} className="inline-flex items-center gap-1 rounded-lg border border-orange-500/30 bg-orange-500/15 px-3 py-1.5 text-[11px] font-semibold text-orange-400 transition-all hover:bg-orange-500/25">
                       <Ban className="h-3.5 w-3.5" /> Blacklist
                     </button>
                     <a href={`https://www.youtube.com/watch?v=${stream.videoId}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] text-white/50 transition-all hover:bg-white/[0.08]">

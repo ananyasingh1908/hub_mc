@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  LayoutDashboard, Users, UserCog, ScrollText, Shield, LogOut,
+  LayoutDashboard, Users, UserCog, Shield, LogOut,
   Menu, X, ChevronRight, Store, LoaderCircle, Trophy, Megaphone,
-  BarChart3, Truck, Radio,
+  BarChart3, Truck, Radio, MessageSquare,
 } from "lucide-react";
 import { useAdminSession, beginAdminSignOut, useInvalidateAdminSession } from "@/lib/auth/client";
 
@@ -14,11 +14,11 @@ const navItems = [
   { path: "/admin/players", label: "Players", icon: Users },
   { path: "/admin/employees-monitor", label: "Employee Monitor", icon: UserCog },
   { path: "/admin/notifications", label: "Notifications", icon: Megaphone },
-  { path: "/admin/logs", label: "Activity Logs", icon: ScrollText },
   { path: "/admin/customers", label: "Customers", icon: Store },
   { path: "/admin/employees", label: "Employees", icon: BarChart3 },
   { path: "/admin/delivery", label: "Delivery Management", icon: Truck },
   { path: "/admin/streams", label: "Stream Moderation", icon: Radio },
+  { path: "/admin/forum", label: "Forum Moderation", icon: MessageSquare },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

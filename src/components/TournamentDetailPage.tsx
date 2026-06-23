@@ -5,7 +5,7 @@ import {
   Calendar, Clock, Users, Award, Trophy, Sword, Gamepad2,
   Server, ExternalLink, ArrowLeft, CheckCircle, AlertCircle,
   LoaderCircle, MessageSquare, User, ChevronDown, ChevronUp,
-  Swords, Medal, BookOpen,
+  Swords, Medal, BookOpen, CreditCard, Clock3,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthSession } from "@/lib/auth/client";
@@ -13,6 +13,8 @@ import { devlog, devwarn } from "@/lib/dev-log";
 import { trackEvent, AnalyticsEvents } from "@/lib/analytics";
 import { JsonLd } from "@/components/JsonLd";
 import { eventSchema, breadcrumbSchema } from "@/lib/json-ld";
+
+const DEFAULT_DISCORD_LINK = "https://discord.gg/CwNVBCuSbj";
 
 type TournamentDetail = {
   id: string;
@@ -39,6 +41,7 @@ type RegistrationInfo = {
   teamName: string | null;
   email: string;
   region: string;
+  paymentStatus: string | null;
   createdAt: string;
 };
 
@@ -88,6 +91,7 @@ export default function TournamentDetailPage({ tournamentId }: { tournamentId: s
     agreedToRules: false,
   });
   const [submitting, setSubmitting] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const [rulesOpen, setRulesOpen] = useState(false);
 
   const { data: session } = useAuthSession();
@@ -203,7 +207,11 @@ export default function TournamentDetailPage({ tournamentId }: { tournamentId: s
           tournament_id: tournamentId,
           tournament_title: tournament?.title ?? "",
         });
-        toast.success("Successfully registered for the tournament!");
+        if (d.requiresPayment) {
+          toast.success("Registration submitted! Complete payment to confirm your spot.");
+        } else {
+          toast.success("Successfully registered for the tournament!");
+        }
         const full = await fetch(`/api/tournaments/detail?id=${tournamentId}`).then((r) => r.json());
         if (full.userRegistration) setUserRegistration(full.userRegistration);
         loadBrackets();
@@ -216,6 +224,29 @@ export default function TournamentDetailPage({ tournamentId }: { tournamentId: s
       toast.error("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!confirm("Are you sure you want to cancel your registration?")) return;
+    setCancelling(true);
+    try {
+      const res = await fetch("/api/tournaments/cancel-registration", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tournamentId }),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        toast.success("Registration cancelled.");
+        setUserRegistration(null);
+      } else {
+        toast.error(data.error || "Failed to cancel registration.");
+      }
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setCancelling(false);
     }
   };
 
@@ -658,20 +689,100 @@ export default function TournamentDetailPage({ tournamentId }: { tournamentId: s
 
             {/* Registration / Status Card */}
             {userRegistration ? (
-              <div className="rounded-2xl border border-green-500/20 bg-green-500/5 p-6">
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="h-6 w-6 text-green-400" />
-                  <div>
-                    <h3 className="font-bold text-white">Registered!</h3>
-                    <p className="text-xs text-white/50">You are signed up for this tournament.</p>
+              userRegistration.paymentStatus === "pending_payment" ? (
+                <div className="rounded-2xl border border-yellow-500/20 bg-yellow-500/5 p-6">
+                  <div className="flex items-center gap-3">
+                    <Clock3 className="h-6 w-6 text-yellow-400" />
+                    <div>
+                      <h3 className="font-bold text-white">Registration Pending Payment</h3>
+                      <p className="text-xs text-white/50">Complete the entry fee to confirm your spot.</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 space-y-3 text-sm text-white/60">
+                    <p>Discord: {userRegistration.discordUsername}</p>
+                    <p>Email: {userRegistration.email}</p>
+                    <p>Region: {userRegistration.region}</p>
+                    <div className="rounded-xl bg-yellow-500/10 border border-yellow-500/20 p-4 mt-3">
+                      <p className="text-xs font-bold text-yellow-400 uppercase mb-2">Entry Fee: ₹{tournament.entryFee}</p>
+                      <p className="text-xs text-white/50 mb-3">
+                        Join our Discord and contact a staff member with your registration details to make the payment.
+                      </p>
+                      <a
+                        href={tournament.discordLink || DEFAULT_DISCORD_LINK}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-[#5865F2] px-3 py-1.5 text-xs font-bold text-white hover:bg-[#4752C4] transition-colors"
+                      >
+                        <MessageSquare className="h-3.5 w-3.5" />
+                        Join Discord & Pay
+                      </a>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleCancel}
+                    disabled={cancelling}
+                    className="mt-4 w-full rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-bold text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-50"
+                  >
+                    {cancelling ? "Cancelling…" : "Cancel Registration"}
+                  </button>
+                </div>
+              ) : userRegistration.paymentStatus === "payment_rejected" ? (
+                <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-6">
+                  <div className="flex items-center gap-3">
+                    <AlertCircle className="h-6 w-6 text-red-400" />
+                    <div>
+                      <h3 className="font-bold text-white">Payment Rejected</h3>
+                      <p className="text-xs text-white/50">Your payment was not verified. Please contact staff on Discord.</p>
+                    </div>
+                  </div>
+                  <a
+                    href={tournament.discordLink || DEFAULT_DISCORD_LINK}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-[#5865F2] px-3 py-1.5 text-xs font-bold text-white hover:bg-[#4752C4] transition-colors"
+                  >
+                    <MessageSquare className="h-3.5 w-3.5" />
+                    Contact on Discord
+                  </a>
+                  <button
+                    onClick={handleCancel}
+                    disabled={cancelling}
+                    className="mt-4 w-full rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-bold text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-50"
+                  >
+                    {cancelling ? "Cancelling…" : "Cancel Registration"}
+                  </button>
+                </div>
+              ) : userRegistration.paymentStatus === "payment_approved" ? (
+                <div className="rounded-2xl border border-green-500/20 bg-green-500/5 p-6">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-6 w-6 text-green-400" />
+                    <div>
+                      <h3 className="font-bold text-white">Registration Approved</h3>
+                      <p className="text-xs text-white/50">Your payment has been verified.</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 space-y-2 text-sm text-white/60">
+                    <p>Discord: {userRegistration.discordUsername}</p>
+                    <p>Email: {userRegistration.email}</p>
+                    <p>Region: {userRegistration.region}</p>
                   </div>
                 </div>
-                <div className="mt-4 space-y-2 text-sm text-white/60">
-                  <p>Discord: {userRegistration.discordUsername}</p>
-                  <p>Email: {userRegistration.email}</p>
-                  <p>Region: {userRegistration.region}</p>
+              ) : (
+                <div className="rounded-2xl border border-green-500/20 bg-green-500/5 p-6">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-6 w-6 text-green-400" />
+                    <div>
+                      <h3 className="font-bold text-white">Registered!</h3>
+                      <p className="text-xs text-white/50">You are signed up for this tournament.</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 space-y-2 text-sm text-white/60">
+                    <p>Discord: {userRegistration.discordUsername}</p>
+                    <p>Email: {userRegistration.email}</p>
+                    <p>Region: {userRegistration.region}</p>
+                  </div>
                 </div>
-              </div>
+              )
             ) : isOpen ? (
               <div className="rounded-2xl border border-white/10 bg-[rgba(11,11,11,0.92)] p-6">
                 <div className="flex items-center gap-2">
@@ -688,6 +799,13 @@ export default function TournamentDetailPage({ tournamentId }: { tournamentId: s
                   </p>
                 ) : (
                   <p className="mt-1 text-sm text-red-400">Tournament is full!</p>
+                )}
+                {tournament.entryFee && tournament.entryFee > 0 && (
+                  <div className="mt-3 flex items-center gap-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20 px-3 py-2">
+                    <CreditCard className="h-4 w-4 text-yellow-400" />
+                    <span className="text-xs font-bold text-yellow-400">Entry Fee: ₹{tournament.entryFee}</span>
+                    <span className="text-xs text-white/40">— Payment via Discord after registration</span>
+                  </div>
                 )}
 
                 {!session?.user?.customerId ? (
@@ -815,6 +933,8 @@ export default function TournamentDetailPage({ tournamentId }: { tournamentId: s
                     >
                       {submitting ? (
                         <LoaderCircle className="mx-auto h-5 w-5 animate-spin" />
+                      ) : tournament.entryFee && tournament.entryFee > 0 ? (
+                        "Register & Pay ₹" + tournament.entryFee
                       ) : (
                         "Register for Tournament"
                       )}

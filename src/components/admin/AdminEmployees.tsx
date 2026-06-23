@@ -1,15 +1,52 @@
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { UserCog, Plus, Shield, ToggleLeft, ToggleRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { UserCog, Plus, Shield, ToggleLeft, ToggleRight, Edit3, Trash2, X, LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 
-type Employee = { id: string; displayName: string; department: string | null; isActive: boolean; email: string; minecraftUsername: string; role: string; createdAt: string; permissions: { products: boolean; orders: boolean; support: boolean; customers: boolean; employees: boolean; logs: boolean } | null };
+type Employee = {
+  id: string;
+  displayName: string;
+  department: string | null;
+  isActive: boolean;
+  email: string;
+  minecraftUsername: string;
+  role: string;
+  createdAt: string;
+  permissions: Record<string, boolean> | null;
+};
+
+const ALL_PERMISSIONS = [
+  "products", "orders", "support", "customers", "employees",
+  "settings", "tournaments", "notifications", "playerManage",
+  "employeeMonitor", "platformLogs",
+];
+
+const PERMISSION_LABELS: Record<string, string> = {
+  products: "Products",
+  orders: "Orders",
+  support: "Support",
+  customers: "Customers",
+  employees: "Employees",
+  settings: "Settings",
+  tournaments: "Tournaments",
+  notifications: "Notifications",
+  playerManage: "Player Mgmt",
+  employeeMonitor: "Emp Monitor",
+  platformLogs: "Platform Logs",
+};
 
 export default function AdminEmployees() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [addForm, setAddForm] = useState({ email: "", displayName: "", department: "", role: "EMPLOYEE" });
+
+  const [editing, setEditing] = useState<Employee | null>(null);
+  const [editForm, setEditForm] = useState({ displayName: "", department: "" });
+  const [saving, setSaving] = useState(false);
+
+  const [deleteTarget, setDeleteTarget] = useState<Employee | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchEmployees = async () => {
     try {
@@ -30,12 +67,38 @@ export default function AdminEmployees() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(addForm),
       });
-      if (!res.ok) throw Error();
+      const data = await res.json();
+      if (!res.ok) return toast.error(data.error || "Failed to create employee");
       toast.success("Employee created");
       setShowAdd(false);
       setAddForm({ email: "", displayName: "", department: "", role: "EMPLOYEE" });
       await fetchEmployees();
     } catch { toast.error("Failed to create employee"); }
+  };
+
+  const openEdit = (emp: Employee) => {
+    setEditing(emp);
+    setEditForm({ displayName: emp.displayName, department: emp.department ?? "" });
+  };
+
+  const saveEdit = async () => {
+    if (!editing || !editForm.displayName.trim()) return;
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/employees/update", {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: editing.id, displayName: editForm.displayName.trim(), department: editForm.department.trim() || null }),
+      });
+      if (res.ok) {
+        toast.success("Employee updated");
+        setEditing(null);
+        await fetchEmployees();
+      } else {
+        toast.error("Failed to update");
+      }
+    } catch { toast.error("Failed to update"); }
+    finally { setSaving(false); }
   };
 
   const toggleActive = async (id: string, current: boolean) => {
@@ -62,6 +125,26 @@ export default function AdminEmployees() {
     } catch { toast.error("Failed to update role"); }
   };
 
+  const deleteEmployee = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      const res = await fetch("/api/admin/employees/delete", {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: deleteTarget.id }),
+      });
+      if (res.ok) {
+        toast.success("Employee removed");
+        setDeleteTarget(null);
+        await fetchEmployees();
+      } else {
+        toast.error("Failed to delete");
+      }
+    } catch { toast.error("Failed to delete"); }
+    finally { setDeleting(false); }
+  };
+
   const updatePermission = async (employeeId: string, key: string, value: boolean) => {
     try {
       await fetch("/api/admin/permissions/update", {
@@ -74,8 +157,8 @@ export default function AdminEmployees() {
   };
 
   const togglePerm = (employee: Employee, key: string) => {
-    const perms = employee.permissions ?? { products: true, orders: true, support: true, customers: false, employees: false, logs: false };
-    updatePermission(employee.id, key, !(perms as any)[key]);
+    const perms = employee.permissions ?? {};
+    updatePermission(employee.id, key, !perms[key]);
   };
 
   return (
@@ -141,28 +224,36 @@ export default function AdminEmployees() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 shrink-0">
                   <select value={e.role} onChange={(v) => updateRole(e.id, v.target.value)}
                     className="rounded-lg border border-white/10 bg-black/60 px-2 py-1.5 text-xs text-white outline-none">
                     <option value="EMPLOYEE">Employee</option>
                     <option value="SUPER_ADMIN">Super Admin</option>
                   </select>
-                  <button onClick={() => toggleActive(e.id, e.isActive)}
-                    className={`rounded-lg border p-2 ${e.isActive ? "border-white/10 text-white/50" : "border-red-500/30 text-red-400"}`}>
+                  <button onClick={() => toggleActive(e.id, e.isActive)} title={e.isActive ? "Disable" : "Enable"}
+                    className={`rounded-lg border p-2 transition-colors ${e.isActive ? "border-white/10 text-white/50 hover:text-green-400" : "border-red-500/30 text-red-400 hover:text-green-400"}`}>
                     {e.isActive ? <ToggleRight className="h-4 w-4" /> : <ToggleLeft className="h-4 w-4" />}
+                  </button>
+                  <button onClick={() => openEdit(e)} title="Edit"
+                    className="rounded-lg border border-white/10 p-2 text-white/50 hover:text-[var(--hub-blue)] hover:border-[var(--hub-blue)]/30 transition-colors">
+                    <Edit3 className="h-4 w-4" />
+                  </button>
+                  <button onClick={() => setDeleteTarget(e)} title="Delete"
+                    className="rounded-lg border border-white/10 p-2 text-white/50 hover:text-red-400 hover:border-red-500/30 transition-colors">
+                    <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
               </div>
 
-              <div className="mt-3 flex flex-wrap gap-2 border-t border-white/10 pt-3">
-                {["products", "orders", "support", "customers", "employees", "logs"].map((key) => {
-                  const val = e.permissions ? (e.permissions as any)[key] ?? (key === "products" || key === "orders" || key === "support") : key === "products" || key === "orders" || key === "support";
+              <div className="mt-3 flex flex-wrap gap-1.5 border-t border-white/10 pt-3">
+                {ALL_PERMISSIONS.map((key) => {
+                  const val = e.permissions?.[key] ?? false;
                   return (
-                    <button key={key} onClick={() => togglePerm(e, key)}
-                      className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                        val ? "bg-[rgba(62,162,255,0.15)] text-[var(--hub-blue)]" : "bg-white/[0.05] text-white/40"
+                    <button key={key} onClick={() => togglePerm(e, key)} title={`${val ? "Revoke" : "Grant"} ${PERMISSION_LABELS[key]}`}
+                      className={`rounded-lg px-2.5 py-1 text-[10px] font-medium transition-colors ${
+                        val ? "bg-[rgba(62,162,255,0.15)] text-[var(--hub-blue)]" : "bg-white/[0.05] text-white/30"
                       }`}>
-                      {key}
+                      {PERMISSION_LABELS[key] || key}
                     </button>
                   );
                 })}
@@ -171,6 +262,75 @@ export default function AdminEmployees() {
           ))}
         </div>
       )}
+
+      {/* Edit Modal */}
+      <AnimatePresence>
+        {editing && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => !saving && setEditing(null)}>
+            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }}
+              className="w-full max-w-md rounded-2xl border border-white/10 bg-[rgba(11,11,11,0.96)] p-6"
+              onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-white">Edit Employee</h3>
+                <button onClick={() => !saving && setEditing(null)} className="rounded-lg p-1 text-white/40 hover:bg-white/10"><X className="h-5 w-5" /></button>
+              </div>
+              <div className="mt-4 space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-white/40 mb-1.5">Display Name</label>
+                  <input type="text" value={editForm.displayName} onChange={(e) => setEditForm({ ...editForm, displayName: e.target.value })}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-[var(--hub-blue)]/40" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-white/40 mb-1.5">Department</label>
+                  <input type="text" value={editForm.department} onChange={(e) => setEditForm({ ...editForm, department: e.target.value })}
+                    placeholder="e.g., Support, Moderation"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-[var(--hub-blue)]/40" />
+                </div>
+              </div>
+              <div className="mt-6 flex justify-end gap-3">
+                <button onClick={() => !saving && setEditing(null)} disabled={saving}
+                  className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/60 hover:bg-white/5 disabled:opacity-50">Cancel</button>
+                <button onClick={saveEdit} disabled={saving || !editForm.displayName.trim()}
+                  className="flex items-center gap-2 rounded-xl bg-[var(--hub-blue)] px-4 py-2 text-sm font-bold text-black hover:shadow-[0_0_16px_rgba(62,162,255,0.3)] disabled:opacity-50">
+                  {saving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : null}
+                  Save
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deleteTarget && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => !deleting && setDeleteTarget(null)}>
+            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }}
+              className="w-full max-w-md rounded-2xl border border-white/10 bg-[rgba(11,11,11,0.96)] p-6"
+              onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-lg font-bold text-white">Delete Employee</h3>
+              <p className="mt-2 text-sm text-white/60">Are you sure you want to remove this employee? This action cannot be undone.</p>
+              <div className="mt-3 rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <p className="text-sm font-semibold text-white">{deleteTarget.displayName}</p>
+                <p className="text-xs text-white/40">{deleteTarget.email}</p>
+              </div>
+              <div className="mt-6 flex justify-end gap-3">
+                <button onClick={() => !deleting && setDeleteTarget(null)} disabled={deleting}
+                  className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/60 hover:bg-white/5 disabled:opacity-50">Cancel</button>
+                <button onClick={deleteEmployee} disabled={deleting}
+                  className="flex items-center gap-2 rounded-xl bg-red-500 px-4 py-2 text-sm font-bold text-white hover:bg-red-600 disabled:opacity-50">
+                  {deleting ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                  Delete
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

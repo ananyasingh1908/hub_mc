@@ -328,6 +328,7 @@ export const tournamentRegistrations = mysqlTable(
     region: varchar("region", { length: 191 }).notNull(),
     age: int("age"),
     agreedToRules: boolean("agreedToRules").notNull().default(false),
+    paymentStatus: varchar("paymentStatus", { length: 50 }).default("free"),
     createdAt: datetime("createdAt").notNull(),
     updatedAt: datetime("updatedAt").notNull(),
   },
@@ -339,6 +340,7 @@ export const tournamentRegistrations = mysqlTable(
     tournamentIdIdx: index("TournamentRegistration_tournamentId_fkey").on(table.tournamentId),
     userIdIdx: index("TournamentRegistration_userId_fkey").on(table.userId),
     minecraftUsernameIdx: index("TournamentRegistration_minecraftUsername_idx").on(table.minecraftUsername),
+    paymentStatusIdx: index("TournamentRegistration_paymentStatus_idx").on(table.paymentStatus),
   }),
 );
 
@@ -562,5 +564,88 @@ export const tournamentMatches = mysqlTable(
     player1IdIdx: index("TournamentMatch_player1Id_fkey").on(table.player1Id),
     player2IdIdx: index("TournamentMatch_player2Id_fkey").on(table.player2Id),
     winnerIdIdx: index("TournamentMatch_winnerId_fkey").on(table.winnerId),
+  }),
+);
+
+// ─── Forum ────────────────────────────────────────────────────
+
+export const forumThreadStatusValues = ["OPEN", "LOCKED", "HIDDEN"] as const;
+
+export const forumCategories = mysqlTable(
+  "ForumCategory",
+  {
+    id: varchar("id", { length: 191 }).primaryKey(),
+    slug: varchar("slug", { length: 100 }).notNull(),
+    name: varchar("name", { length: 100 }).notNull(),
+    description: text("description"),
+    icon: varchar("icon", { length: 50 }),
+    sortOrder: int("sortOrder").notNull().default(0),
+    isActive: boolean("isActive").notNull().default(true),
+    threadCount: int("threadCount").notNull().default(0),
+    postCount: int("postCount").notNull().default(0),
+    createdAt: datetime("createdAt").notNull(),
+    updatedAt: datetime("updatedAt").notNull(),
+  },
+  (table) => ({
+    slugUnique: uniqueIndex("ForumCategory_slug_key").on(table.slug),
+  }),
+);
+
+export const forumThreads = mysqlTable(
+  "ForumThread",
+  {
+    id: varchar("id", { length: 191 }).primaryKey(),
+    categoryId: varchar("categoryId", { length: 191 }).notNull(),
+    authorId: varchar("authorId", { length: 191 }).notNull(),
+    authorName: varchar("authorName", { length: 191 }).notNull(),
+    title: varchar("title", { length: 200 }).notNull(),
+    slug: varchar("slug", { length: 250 }).notNull(),
+    content: text("content").notNull(),
+    status: mysqlEnum("status", forumThreadStatusValues).notNull().default("OPEN"),
+    isPinned: boolean("isPinned").notNull().default(false),
+    replyCount: int("replyCount").notNull().default(0),
+    viewCount: int("viewCount").notNull().default(0),
+    lastReplyAt: datetime("lastReplyAt"),
+    createdAt: datetime("createdAt").notNull(),
+    updatedAt: datetime("updatedAt").notNull(),
+  },
+  (table) => ({
+    slugUnique: uniqueIndex("ForumThread_slug_key").on(table.slug),
+    categoryIdIdx: index("ForumThread_categoryId_idx").on(table.categoryId),
+    authorIdIdx: index("ForumThread_authorId_idx").on(table.authorId),
+    isPinnedIdx: index("ForumThread_isPinned_idx").on(table.isPinned),
+    lastReplyAtIdx: index("ForumThread_lastReplyAt_idx").on(table.lastReplyAt),
+  }),
+);
+
+export const forumReplies = mysqlTable(
+  "ForumReply",
+  {
+    id: varchar("id", { length: 191 }).primaryKey(),
+    threadId: varchar("threadId", { length: 191 }).notNull(),
+    authorId: varchar("authorId", { length: 191 }).notNull(),
+    authorName: varchar("authorName", { length: 191 }).notNull(),
+    content: text("content").notNull(),
+    isHidden: boolean("isHidden").notNull().default(false),
+    createdAt: datetime("createdAt").notNull(),
+    updatedAt: datetime("updatedAt").notNull(),
+  },
+  (table) => ({
+    threadIdIdx: index("ForumReply_threadId_idx").on(table.threadId),
+    authorIdIdx: index("ForumReply_authorId_idx").on(table.authorId),
+  }),
+);
+
+export const forumThreadViews = mysqlTable(
+  "ForumThreadView",
+  {
+    id: varchar("id", { length: 191 }).primaryKey(),
+    threadId: varchar("threadId", { length: 191 }).notNull(),
+    viewerId: varchar("viewerId", { length: 191 }),
+    viewerIp: varchar("viewerIp", { length: 45 }),
+    createdAt: datetime("createdAt").notNull(),
+  },
+  (table) => ({
+    threadIdIdx: index("ForumThreadView_threadId_idx").on(table.threadId),
   }),
 );

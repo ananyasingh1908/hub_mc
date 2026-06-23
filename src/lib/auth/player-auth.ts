@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { customers, users } from "@/lib/db/schema";
 import { signToken, buildSetCookieHeader, SESSION_COOKIE_NAME, SESSION_MAX_AGE_SECONDS } from "@/lib/auth/session";
+import { logActivity } from "@/lib/activity-log";
 
 export function normalizePhone(raw: string): string | null {
   const digits = raw.replace(/\D/g, "");
@@ -159,6 +160,18 @@ export async function handlePlayerLogin(request: Request): Promise<Response> {
       "set-cookie",
       buildSetCookieHeader(SESSION_COOKIE_NAME, token, SESSION_MAX_AGE_SECONDS, secure),
     );
+
+    logActivity({
+      actorType: "customer",
+      actorId: customer.id,
+      actorName: trimmedName,
+      action: isNewUser ? "REGISTER" : "LOGIN",
+      entity: "customer",
+      entityId: customer.id,
+      summary: isNewUser
+        ? `New customer registered: ${trimmedName}`
+        : `Customer logged in: ${trimmedName}`,
+    });
 
     return new Response(
       JSON.stringify({ ok: true, redirectTo: "/", isNewUser }),

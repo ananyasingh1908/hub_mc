@@ -8,8 +8,8 @@ export const Route = createFileRoute("/tournaments/")({
   component: TournamentsRoute,
   errorComponent: RouteErrorBoundary,
   head: () => seoHead({
-    title: "HUBMC Tournaments — Minecraft PvP Events",
-    description: "Browse HUBMC Minecraft tournaments. Compete in PvP events, win prizes, and climb the leaderboard.",
+    title: "HUBMC Tournaments — Minecraft PvP Events, Prizes & Live Brackets",
+    description: "Browse HUBMC Minecraft tournaments. Compete in PvP events like Bedwars, Skywars, and KitPvP. Free and paid entry tournaments with prize pools, live brackets, and real-time leaderboards.",
     path: "/tournaments",
   }),
 });

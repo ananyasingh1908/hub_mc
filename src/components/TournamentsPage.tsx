@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 import {
   Calendar, Clock, Users, Award, Trophy, Sword, Gamepad2,
-  ChevronRight, LoaderCircle,
+  ChevronRight, LoaderCircle, Swords, Target, Zap, Shield,
 } from "lucide-react";
 import { devlog, devwarn } from "@/lib/dev-log";
 import { JsonLd } from "@/components/JsonLd";
@@ -200,12 +200,62 @@ export default function TournamentsPage() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-center gap-4 mb-2">
           <Trophy className="h-8 w-8 text-[var(--hub-orange)]" />
-          <h1 className="text-4xl font-black text-white">Tournaments</h1>
+          <h1 className="text-4xl font-black text-white">HUBMC Tournaments</h1>
         </div>
         <p className="mt-2 text-white/56 max-w-2xl">
-          Compete against the best players in HUBMC. Register for upcoming tournaments, check live events, and view past results.
+          Compete against the best Minecraft players in HUBMC tournaments. Join PvP events, win prizes, and climb the leaderboard. Register for upcoming tournaments, check live events, and view past results.
         </p>
       </motion.div>
+
+      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-2xl border border-white/10 bg-[rgba(11,11,11,0.6)] p-5">
+          <Swords className="h-6 w-6 text-[var(--hub-orange)]" />
+          <h3 className="mt-3 font-bold text-white">Solo, Duo & Squad</h3>
+          <p className="mt-1 text-xs text-white/40">Compete alone, with a partner, or as a full squad across multiple game modes.</p>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-[rgba(11,11,11,0.6)] p-5">
+          <Target className="h-6 w-6 text-[var(--hub-blue)]" />
+          <h3 className="mt-3 font-bold text-white">Multiple Game Modes</h3>
+          <p className="mt-1 text-xs text-white/40">Bedwars, Skywars, PvP, KitPvP, UHC, and more — find your specialty.</p>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-[rgba(11,11,11,0.6)] p-5">
+          <Award className="h-6 w-6 text-yellow-400" />
+          <h3 className="mt-3 font-bold text-white">Prize Pools</h3>
+          <p className="mt-1 text-xs text-white/40">Win prizes in our competitive tournaments. Both free and paid entry events available.</p>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-[rgba(11,11,11,0.6)] p-5">
+          <Zap className="h-6 w-6 text-green-400" />
+          <h3 className="mt-3 font-bold text-white">Live Brackets</h3>
+          <p className="mt-1 text-xs text-white/40">Real-time brackets, match tracking, and leaderboards for every tournament.</p>
+        </div>
+      </div>
+
+      <div className="mt-10 rounded-2xl border border-white/10 bg-[rgba(11,11,11,0.6)] p-6">
+        <h2 className="text-lg font-bold text-white">How to Register</h2>
+        <div className="mt-4 grid gap-4 sm:grid-cols-3">
+          <div className="flex items-start gap-3">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--hub-blue)]/20 text-xs font-bold text-[var(--hub-blue)]">1</span>
+            <div>
+              <p className="text-sm font-medium text-white">Create an Account</p>
+              <p className="text-xs text-white/40">Sign up on HUBMC with your name and phone number.</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--hub-blue)]/20 text-xs font-bold text-[var(--hub-blue)]">2</span>
+            <div>
+              <p className="text-sm font-medium text-white">Choose a Tournament</p>
+              <p className="text-xs text-white/40">Browse upcoming events and pick one that suits your playstyle.</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--hub-blue)]/20 text-xs font-bold text-[var(--hub-blue)]">3</span>
+            <div>
+              <p className="text-sm font-medium text-white">Register & Play</p>
+              <p className="text-xs text-white/40">Fill in your Discord details, agree to rules, and you're in. Free tournaments register instantly; paid events require Discord payment confirmation.</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {error && (
         <div className="mt-8 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-center text-sm text-red-400">

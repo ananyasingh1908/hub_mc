@@ -47,7 +47,7 @@ export function StorePageLayout({
   const navHeight = useElementHeight(navRef);
 
   return (
-    <main className="hubmc min-h-screen bg-black text-white">
+    <main className="hubmc min-h-screen overflow-x-hidden bg-black text-white">
       <HubMCNavbar ref={navRef} />
       <div aria-hidden="true" style={{ height: navHeight }} />
       <div className="relative isolate overflow-hidden" style={{ position: "relative" }}>

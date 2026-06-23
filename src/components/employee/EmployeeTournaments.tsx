@@ -4,7 +4,7 @@ import {
   Trophy, Plus, Pencil, Trash2, Users, Calendar, Gamepad2,
   Sword, LoaderCircle, X, Award, Play, StopCircle, Search,
   Download, Megaphone, ChevronDown, ChevronUp,
-  Swords, ArrowRight, RotateCcw,
+  Swords, ArrowRight, RotateCcw, CheckCircle, XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import ImageUpload from "@/components/ui/ImageUpload";
@@ -40,6 +40,7 @@ type Registration = {
   email: string;
   region: string;
   age: number | null;
+  paymentStatus: string | null;
   createdAt: string;
 };
 
@@ -250,6 +251,26 @@ export default function EmployeeTournaments() {
     a.href = url; a.download = `registrations.${format}`; a.click();
     URL.revokeObjectURL(url);
     toast.success(`Exported as ${format.toUpperCase()}`);
+  };
+
+  const handleUpdateRegistrationStatus = async (registrationId: string, paymentStatus: string) => {
+    try {
+      const res = await fetch("/api/tournaments/staff/update-registration-status", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ registrationId, paymentStatus }),
+      });
+      const d = await res.json();
+      if (d.ok) {
+        toast.success(paymentStatus === "payment_approved" ? "Payment approved." : "Payment rejected.");
+        if (regTargetTournament) searchRegistrations(regTargetTournament, regSearch, regFilter, regPagination.page);
+      } else {
+        toast.error(d.error || "Failed to update status.");
+      }
+    } catch {
+      toast.error("Something went wrong.");
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -610,6 +631,7 @@ export default function EmployeeTournaments() {
                         <th className="text-left py-2 px-3 text-white/40 font-medium">Discord</th>
                         <th className="text-left py-2 px-3 text-white/40 font-medium">Team</th>
                         <th className="text-left py-2 px-3 text-white/40 font-medium">Region</th>
+                        <th className="text-left py-2 px-3 text-white/40 font-medium">Payment</th>
                         <th className="text-left py-2 px-3 text-white/40 font-medium">Registered</th>
                       </tr>
                     </thead>
@@ -621,6 +643,36 @@ export default function EmployeeTournaments() {
                           <td className="py-2.5 px-3 text-white/60">{r.discordUsername}</td>
                           <td className="py-2.5 px-3 text-white/60">{r.teamName || <span className="text-white/20">—</span>}</td>
                           <td className="py-2.5 px-3 text-white/60">{r.region}</td>
+                          <td className="py-2.5 px-3">
+                            {r.paymentStatus && r.paymentStatus !== "free" ? (
+                              <div className="flex items-center gap-1.5">
+                                <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase ${
+                                  r.paymentStatus === "pending_payment" ? "bg-yellow-500/20 text-yellow-400" :
+                                  r.paymentStatus === "payment_approved" ? "bg-green-500/20 text-green-400" :
+                                  r.paymentStatus === "payment_rejected" ? "bg-red-500/20 text-red-400" :
+                                  r.paymentStatus === "cancelled_by_user" ? "bg-zinc-500/20 text-zinc-400" :
+                                  "bg-white/10 text-white/40"
+                                }`}>
+                                  {r.paymentStatus === "pending_payment" ? "Pending" :
+                                   r.paymentStatus === "payment_approved" ? "Approved" :
+                                   r.paymentStatus === "payment_rejected" ? "Rejected" :
+                                   r.paymentStatus === "cancelled_by_user" ? "Cancelled" : r.paymentStatus}
+                                </span>
+                                {r.paymentStatus === "pending_payment" && (
+                                  <>
+                                    <button onClick={() => handleUpdateRegistrationStatus(r.id, "payment_approved")} className="rounded p-0.5 text-green-400/60 hover:bg-green-500/10 hover:text-green-400" title="Approve">
+                                      <CheckCircle className="h-3 w-3" />
+                                    </button>
+                                    <button onClick={() => handleUpdateRegistrationStatus(r.id, "payment_rejected")} className="rounded p-0.5 text-red-400/60 hover:bg-red-500/10 hover:text-red-400" title="Reject">
+                                      <XCircle className="h-3 w-3" />
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-white/20 text-xs">Free</span>
+                            )}
+                          </td>
                           <td className="py-2.5 px-3 text-white/40 text-xs">{new Date(r.createdAt).toLocaleDateString()}</td>
                         </tr>
                       ))}

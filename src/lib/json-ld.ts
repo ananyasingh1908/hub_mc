@@ -8,6 +8,7 @@ export function organizationSchema() {
     name: SITE_NAME,
     url: BASE_URL,
     logo: `${BASE_URL}/logo.png`,
+    description: "HUBMC is a premium Minecraft server community featuring competitive tournaments, exclusive store packages, live streams, and an active player community.",
     sameAs: [
       "https://discord.gg/CwNVBCuSbj",
       "https://www.youtube.com/@HUBMC",
@@ -17,6 +18,8 @@ export function organizationSchema() {
       email: "support@hubmc.in",
       contactType: "customer support",
     },
+    foundingDate: "2024",
+    slogan: "The World You Love",
   };
 }
 
@@ -26,10 +29,29 @@ export function websiteSchema() {
     "@type": "WebSite",
     name: SITE_NAME,
     url: BASE_URL,
+    description: "Official HUBMC Minecraft server community — tournaments, store, livestreams, forum, and more.",
     potentialAction: {
       "@type": "SearchAction",
       target: `${BASE_URL}/packages?search={search_term_string}`,
       "query-input": "required name=search_term_string",
+    },
+  };
+}
+
+export function gameSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    name: "HUBMC Minecraft Server",
+    description: "HUBMC is a premium Minecraft server featuring custom gameplay, competitive tournaments, and a vibrant community.",
+    url: BASE_URL,
+    applicationCategory: "GameApplication",
+    operatingSystem: "Windows, macOS, Linux, Android, iOS",
+    genre: "Sandbox, PvP, Survival",
+    provider: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: BASE_URL,
     },
   };
 }
@@ -78,6 +100,10 @@ export function productSchema(product: {
     description: product.description,
     image: `${BASE_URL}${product.image}`,
     category: product.category,
+    brand: {
+      "@type": "Brand",
+      name: SITE_NAME,
+    },
     offers: {
       "@type": "Offer",
       price: product.price,
@@ -129,6 +155,11 @@ export function eventSchema(event: {
       : event.status === "COMPLETED"
       ? "https://schema.org/EventEnded"
       : "https://schema.org/EventScheduled",
+    organizer: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: BASE_URL,
+    },
   };
   if (event.endDate) base.endDate = event.endDate;
   if (event.image) base.image = event.image;
@@ -158,6 +189,10 @@ export function reviewAggregateSchema(data: {
     name: data.itemName,
     description: data.itemDescription,
     url: `${BASE_URL}${data.itemUrl}`,
+    brand: {
+      "@type": "Brand",
+      name: SITE_NAME,
+    },
     aggregateRating: {
       "@type": "AggregateRating",
       ratingValue: data.ratingValue,

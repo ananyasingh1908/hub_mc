@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, Package, ShoppingCart, HeadphonesIcon, LogOut,
   Menu, X, ChevronRight, Store, LoaderCircle, Trophy, Megaphone,
-  Users,
+  Users, MessageSquare,
 } from "lucide-react";
 import { useEmployeeSession, beginEmployeeSignOut, useInvalidateEmployeeSession } from "@/lib/auth/client";
 
@@ -16,6 +16,7 @@ const navItems = [
   { path: "/employee/products", label: "Products", icon: Package },
   { path: "/employee/orders", label: "Orders", icon: ShoppingCart },
   { path: "/employee/support", label: "Support", icon: HeadphonesIcon },
+  { path: "/employee/forum", label: "Forum", icon: MessageSquare },
 ];
 
 export default function EmployeeLayout({ children }: { children: React.ReactNode }) {

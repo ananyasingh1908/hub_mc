@@ -54,6 +54,7 @@ export function PackageCard({ product }: { product: Product }) {
     fireAddToCart(product);
     toast.success(`${product.name} added to cart`, {
       description: "Your HUBMC order summary updated instantly.",
+      duration: 800,
     });
   };
 

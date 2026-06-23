@@ -7,6 +7,9 @@ import { initDb, db, testDbConnection, type CloudflareEnv } from "@/lib/db";
 import { setR2Bucket } from "@/lib/storage/storage";
 import { sql } from "drizzle-orm";
 import { createStartHandler, defaultStreamHandler } from "@tanstack/react-start/server";
+import { getAdminSession } from "@/lib/auth/admin-session";
+import { getEmployeeSession } from "@/lib/auth/employee-session";
+import { getHubMCSession } from "@/lib/auth/session";
 
 import {
   getClientVisibleAuthState,
@@ -45,11 +48,11 @@ import {
   handleAdminReplyTicket,
   handleAdminResolveTicket,
   handleAdminGetCustomers,
+  handleAdminDeleteCustomer,
   handleAdminGetEmployees,
   handleAdminCreateEmployee,
   handleAdminUpdateEmployee,
   handleAdminDeleteEmployee,
-  handleAdminGetLogs,
   handleAdminGetPermissions,
   handleAdminUpdatePermissions,
   handleAdminDashboardStats,
@@ -65,6 +68,7 @@ import {
   handleAdminPlatformLogs,
   handleAdminTournamentActions,
   handleAdminAllPlayers,
+  handleAdminDeletePlayer,
   handleAdminSendGlobalNotification,
 } from "@/lib/admin/admin-monitor";
 import { consumeLastCapturedError } from "./lib/error-capture";
@@ -76,11 +80,13 @@ import {
   handleGetTournamentById,
   handleRegisterForTournament,
   handleGetTournamentRegistrations,
+  handleUserCancelRegistration,
   handleStaffGetTournaments,
   handleStaffCreateTournament,
   handleStaffUpdateTournament,
   handleStaffDeleteTournament,
   handleDeleteTournamentRegistration,
+  handleStaffUpdateRegistrationStatus,
   handleGetTournamentBrackets,
   handleStaffSearchRegistrations,
   handleStaffExportRegistrations,
@@ -130,6 +136,23 @@ import {
   handleMarkAllRead,
 } from "@/lib/notifications/notification-handler";
 import { handleGetProfile } from "@/lib/profile/profile-handlers";
+import {
+  handleGetForumCategories,
+  handleGetForumThreads,
+  handleGetForumThread,
+  handleCreateForumThread,
+  handleCreateForumReply,
+  handleModerateForumThread,
+  handleDeleteForumReply,
+  handleCreateForumAnnouncement,
+  handleStaffGetAllForumThreads,
+  handleStaffGetForumThreadDetail,
+  handleStaffDeleteForumThread,
+  handleStaffGetForumCategories,
+  handleStaffCreateForumCategory,
+  handleStaffUpdateForumCategory,
+  handleStaffDeleteForumCategory,
+} from "@/lib/forum/forum-handlers";
 
 // ─────────────────────────────────────────────────────────────
 // Types
@@ -215,30 +238,61 @@ function checkCsrf(request: Request, url: URL, env: CloudflareEnv): Response | n
   const referer = request.headers.get("referer");
   const allowedHost = url.host;
   const allowedOrigin = env.BASE_URL;
+  const allowedOriginHost = allowedOrigin ? new URL(allowedOrigin).host : null;
+
+  function isAllowedHost(host: string): boolean {
+    return host === allowedHost || (allowedOriginHost != null && host === allowedOriginHost);
+  }
 
   if (origin) {
     try {
       const originHost = new URL(origin).host;
-      if (originHost === allowedHost || (allowedOrigin && origin === allowedOrigin)) {
-        return null;
-      }
+      if (isAllowedHost(originHost)) return null;
     } catch {
-      // invalid origin => reject
+      // invalid origin
     }
-  } else if (referer) {
+  }
+
+  if (referer) {
     try {
       const refererHost = new URL(referer).host;
-      if (refererHost === allowedHost) {
-        return null;
-      }
+      if (isAllowedHost(refererHost)) return null;
     } catch {
-      // invalid referer => reject
+      // invalid referer
     }
   }
 
   if (!origin && !referer) return null;
 
   return Response.json({ error: "CSRF validation failed" }, { status: 403 });
+}
+
+// ─────────────────────────────────────────────────────────────
+// Route-level auth guards (defense-in-depth)
+// ─────────────────────────────────────────────────────────────
+function requireAdminSession(request: Request): Promise<Response | null> {
+  return getAdminSession(request).then((session) =>
+    session
+      ? null
+      : Response.json({ error: "Unauthorized. Admin session required." }, { status: 401 })
+  );
+}
+
+function requireStaffSession(request: Request): Promise<Response | null> {
+  return Promise.all([getAdminSession(request), getEmployeeSession(request)]).then(
+    ([admin, employee]) =>
+      admin || employee
+        ? null
+        : Response.json({ error: "Unauthorized. Staff session required." }, { status: 401 })
+  );
+}
+
+function requireEmployeeSession(request: Request): Promise<Response | null> {
+  return getEmployeeSession(request).then((session) =>
+    session
+      ? null
+      : Response.json({ error: "Unauthorized. Employee session required." }, { status: 401 })
+  );
 }
 
 function brandedErrorResponse(): Response {
@@ -358,6 +412,8 @@ async function handleCustomRequest(
       "Allow: /tournaments/",
       "Allow: /contact",
       "Allow: /livestream",
+      "Allow: /forum",
+      "Allow: /forum/",
       "Allow: /login",
       "Disallow: /admin",
       "Disallow: /admin-login",
@@ -368,6 +424,7 @@ async function handleCustomRequest(
       "Disallow: /cart",
       "Disallow: /checkout",
       "Disallow: /api/",
+      "",
       `Sitemap: ${baseUrl}/sitemap.xml`,
     ].join("\n");
 
@@ -379,13 +436,14 @@ async function handleCustomRequest(
   // sitemap.xml
   if (url.pathname === "/sitemap.xml") {
     const baseUrl = env.BASE_URL || "https://hubmc.in";
+    const lastmod = new Date().toISOString().split("T")[0];
     const urls = [
       { loc: "/", priority: "1.0", changefreq: "weekly" },
       { loc: "/packages", priority: "0.9", changefreq: "weekly" },
       { loc: "/tournaments", priority: "0.8", changefreq: "daily" },
-      { loc: "/contact", priority: "0.6", changefreq: "monthly" },
+      { loc: "/forum", priority: "0.7", changefreq: "daily" },
       { loc: "/livestream", priority: "0.7", changefreq: "daily" },
-      { loc: "/login", priority: "0.3", changefreq: "monthly" },
+      { loc: "/contact", priority: "0.6", changefreq: "monthly" },
     ];
 
     const sitemap = [
@@ -393,7 +451,7 @@ async function handleCustomRequest(
       `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
       ...urls.map(
         (u) =>
-          `  <url><loc>${baseUrl}${u.loc}</loc><priority>${u.priority}</priority><changefreq>${u.changefreq}</changefreq></url>`
+          `  <url><loc>${baseUrl}${u.loc}</loc><lastmod>${lastmod}</lastmod><priority>${u.priority}</priority><changefreq>${u.changefreq}</changefreq></url>`
       ),
       `</urlset>`,
     ].join("\n");
@@ -458,12 +516,16 @@ async function handleCustomRequest(
     return await handleGetOrders(request);
   }
   if (url.pathname === "/api/orders/refund" && request.method === "POST") {
+    const rl = checkRateLimit(request, { limit: 5, label: "order-refund" });
+    if (rl) return rl;
     return await handleRefundOrder(request);
   }
   if (url.pathname === "/api/orders/invoice" && request.method === "GET") {
     return await handleGetOrderInvoice(request);
   }
   if (url.pathname === "/api/delivery/retry" && request.method === "POST") {
+    const rl = checkRateLimit(request, { limit: 5, label: "delivery-retry" });
+    if (rl) return rl;
     return await handleRetryDelivery(request);
   }
 
@@ -481,6 +543,9 @@ async function handleCustomRequest(
 
   // Admin
   if (url.pathname.startsWith("/api/admin/")) {
+    const adminGuard = await requireAdminSession(request);
+    if (adminGuard) return adminGuard;
+
     const route = url.pathname;
     const method = request.method;
 
@@ -527,6 +592,11 @@ async function handleCustomRequest(
     }
 
     if (route === "/api/admin/customers" && method === "GET") return await handleAdminGetCustomers(request);
+    if (route === "/api/admin/customers/delete" && method === "POST") {
+      const rl = checkRateLimit(request, { limit: 5, label: "admin-customer-delete" });
+      if (rl) return rl;
+      return await handleAdminDeleteCustomer(request);
+    }
     if (route === "/api/admin/employees" && method === "GET") return await handleAdminGetEmployees(request);
 
     if (route === "/api/admin/employees/create" && method === "POST") {
@@ -545,7 +615,6 @@ async function handleCustomRequest(
       return await handleAdminDeleteEmployee(request);
     }
 
-    if (route === "/api/admin/logs" && method === "GET") return await handleAdminGetLogs(request);
     if (route === "/api/admin/permissions" && method === "GET") return await handleAdminGetPermissions(request);
     if (route === "/api/admin/permissions/update" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 10, label: "admin-permissions-update" });
@@ -559,6 +628,11 @@ async function handleCustomRequest(
     if (route === "/api/admin/platform/logs" && method === "GET") return await handleAdminPlatformLogs(request);
     if (route === "/api/admin/platform/tournament-actions" && method === "GET") return await handleAdminTournamentActions(request);
     if (route === "/api/admin/platform/players" && method === "GET") return await handleAdminAllPlayers(request);
+    if (route === "/api/admin/platform/delete-player" && method === "POST") {
+      const rl = checkRateLimit(request, { limit: 10, label: "admin-delete-player" });
+      if (rl) return rl;
+      return await handleAdminDeletePlayer(request);
+    }
 
     if (route === "/api/admin/platform/send-notification" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 5, label: "admin-send-notif" });
@@ -610,6 +684,73 @@ async function handleCustomRequest(
     const rl = checkRateLimit(request, { limit: 5, label: "review-submit" });
     if (rl) return rl;
     return await handleSubmitServerReview(request);
+  }
+
+  // Forum
+  if (url.pathname === "/api/forum/categories" && request.method === "GET") {
+    return await handleGetForumCategories();
+  }
+  if (url.pathname === "/api/forum/threads" && request.method === "GET") {
+    return await handleGetForumThreads(request);
+  }
+  if (url.pathname === "/api/forum/thread" && request.method === "GET") {
+    return await handleGetForumThread(request);
+  }
+  if (url.pathname === "/api/forum/threads/create" && request.method === "POST") {
+    const rl = checkRateLimit(request, { limit: 10, label: "forum-create-thread" });
+    if (rl) return rl;
+    return await handleCreateForumThread(request);
+  }
+  if (url.pathname === "/api/forum/replies/create" && request.method === "POST") {
+    const rl = checkRateLimit(request, { limit: 20, label: "forum-create-reply" });
+    if (rl) return rl;
+    return await handleCreateForumReply(request);
+  }
+  if (url.pathname === "/api/forum/moderate" && request.method === "POST") {
+    const rl = checkRateLimit(request, { limit: 10, label: "forum-moderate" });
+    if (rl) return rl;
+    return await handleModerateForumThread(request);
+  }
+  if (url.pathname === "/api/forum/replies/delete" && request.method === "POST") {
+    const rl = checkRateLimit(request, { limit: 10, label: "forum-delete-reply" });
+    if (rl) return rl;
+    return await handleDeleteForumReply(request);
+  }
+  if (url.pathname === "/api/forum/announcements/create" && request.method === "POST") {
+    return await handleCreateForumAnnouncement(request);
+  }
+
+  // ─── Staff Forum Management ───────────────────────────────
+  if (url.pathname === "/api/forum/staff/threads" && request.method === "GET") {
+    const rl = checkRateLimit(request, { limit: 20, label: "forum-staff-threads" });
+    if (rl) return rl;
+    return await handleStaffGetAllForumThreads(request);
+  }
+  if (url.pathname === "/api/forum/staff/thread" && request.method === "GET") {
+    return await handleStaffGetForumThreadDetail(request);
+  }
+  if (url.pathname === "/api/forum/staff/thread/delete" && request.method === "POST") {
+    const rl = checkRateLimit(request, { limit: 10, label: "forum-staff-delete-thread" });
+    if (rl) return rl;
+    return await handleStaffDeleteForumThread(request);
+  }
+  if (url.pathname === "/api/forum/staff/categories" && request.method === "GET") {
+    return await handleStaffGetForumCategories(request);
+  }
+  if (url.pathname === "/api/forum/staff/categories" && request.method === "POST") {
+    const rl = checkRateLimit(request, { limit: 10, label: "forum-staff-create-cat" });
+    if (rl) return rl;
+    return await handleStaffCreateForumCategory(request);
+  }
+  if (url.pathname === "/api/forum/staff/categories" && request.method === "PUT") {
+    const rl = checkRateLimit(request, { limit: 10, label: "forum-staff-update-cat" });
+    if (rl) return rl;
+    return await handleStaffUpdateForumCategory(request);
+  }
+  if (url.pathname === "/api/forum/staff/categories/delete" && request.method === "POST") {
+    const rl = checkRateLimit(request, { limit: 10, label: "forum-staff-delete-cat" });
+    if (rl) return rl;
+    return await handleStaffDeleteForumCategory(request);
   }
 
   // YouTube
@@ -679,47 +820,81 @@ async function handleCustomRequest(
     if (route === "/api/tournaments/registrations" && method === "GET") {
       return await handleGetTournamentRegistrations(request);
     }
+    if (route === "/api/tournaments/cancel-registration" && method === "POST") {
+      const rl = checkRateLimit(request, { limit: 10, label: "tournament-cancel-reg" });
+      if (rl) return rl;
+      return await handleUserCancelRegistration(request);
+    }
     if (route === "/api/tournaments/brackets" && method === "GET") {
       return await handleGetTournamentBrackets(request);
     }
 
     if (route === "/api/tournaments/staff" && method === "GET") {
+      const staffGuard = await requireStaffSession(request);
+      if (staffGuard) return staffGuard;
       return await handleStaffGetTournaments(request);
     }
     if (route === "/api/tournaments/staff/create" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 10, label: "tournament-create" });
       if (rl) return rl;
+      const sg = await requireStaffSession(request);
+      if (sg) return sg;
       return await handleStaffCreateTournament(request);
     }
     if (route === "/api/tournaments/staff/update" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 15, label: "tournament-update" });
       if (rl) return rl;
+      const sg = await requireStaffSession(request);
+      if (sg) return sg;
       return await handleStaffUpdateTournament(request);
     }
     if (route === "/api/tournaments/staff/delete" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 5, label: "tournament-delete" });
       if (rl) return rl;
+      const sg = await requireStaffSession(request);
+      if (sg) return sg;
       return await handleStaffDeleteTournament(request);
     }
     if (route === "/api/tournaments/staff/delete-registration" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 10, label: "tournament-delete-reg" });
       if (rl) return rl;
+      const sg = await requireStaffSession(request);
+      if (sg) return sg;
       return await handleDeleteTournamentRegistration(request);
     }
+    if (route === "/api/tournaments/staff/update-registration-status" && method === "POST") {
+      const rl = checkRateLimit(request, { limit: 15, label: "tournament-update-reg-status" });
+      if (rl) return rl;
+      const sg = await requireStaffSession(request);
+      if (sg) return sg;
+      return await handleStaffUpdateRegistrationStatus(request);
+    }
     if (route === "/api/tournaments/staff/search-registrations" && method === "GET") {
+      const rl = checkRateLimit(request, { limit: 10, label: "tournament-search-reg" });
+      if (rl) return rl;
+      const sg = await requireStaffSession(request);
+      if (sg) return sg;
       return await handleStaffSearchRegistrations(request);
     }
     if (route === "/api/tournaments/staff/export-registrations" && method === "GET") {
+      const rl = checkRateLimit(request, { limit: 5, label: "tournament-export-reg" });
+      if (rl) return rl;
+      const sg = await requireStaffSession(request);
+      if (sg) return sg;
       return await handleStaffExportRegistrations(request);
     }
     if (route === "/api/tournaments/staff/start" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 5, label: "tournament-start" });
       if (rl) return rl;
+      const sg = await requireStaffSession(request);
+      if (sg) return sg;
       return await handleStaffStartTournament(request);
     }
     if (route === "/api/tournaments/staff/end" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 5, label: "tournament-end" });
       if (rl) return rl;
+      const sg = await requireStaffSession(request);
+      if (sg) return sg;
       return await handleStaffEndTournament(request);
     }
 
@@ -733,21 +908,29 @@ async function handleCustomRequest(
     if (route === "/api/tournaments/staff/generate-bracket" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 5, label: "tournament-gen-bracket" });
       if (rl) return rl;
+      const sg = await requireStaffSession(request);
+      if (sg) return sg;
       return await handleStaffGenerateBracket(request);
     }
     if (route === "/api/tournaments/staff/update-match" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 30, label: "tournament-update-match" });
       if (rl) return rl;
+      const sg = await requireStaffSession(request);
+      if (sg) return sg;
       return await handleStaffUpdateMatch(request);
     }
     if (route === "/api/tournaments/staff/create-next-round" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 5, label: "tournament-next-round" });
       if (rl) return rl;
+      const sg = await requireStaffSession(request);
+      if (sg) return sg;
       return await handleStaffCreateNextRound(request);
     }
     if (route === "/api/tournaments/staff/delete-matches" && method === "POST") {
       const rl = checkRateLimit(request, { limit: 5, label: "tournament-delete-matches" });
       if (rl) return rl;
+      const sg = await requireStaffSession(request);
+      if (sg) return sg;
       return await handleStaffDeleteMatches(request);
     }
 
@@ -756,6 +939,9 @@ async function handleCustomRequest(
 
   // Employee
   if (url.pathname.startsWith("/api/employee/")) {
+    const employeeGuard = await requireEmployeeSession(request);
+    if (employeeGuard) return employeeGuard;
+
     const route = url.pathname;
     const method = request.method;
 

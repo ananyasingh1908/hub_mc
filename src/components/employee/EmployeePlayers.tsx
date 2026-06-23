@@ -3,12 +3,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, X, User, Shield, FileText, ShoppingCart,
   HeadphonesIcon, Star, Trophy, Ban,
-  LoaderCircle, Award,
+  LoaderCircle, Award, Phone,
 } from "lucide-react";
 import { toast } from "sonner";
 
 type Player = {
   id: string;
+  fullName: string | null;
+  phoneNumber: string | null;
   minecraftUsername: string;
   minecraftUuid: string;
   avatarUrl: string | null;
@@ -25,6 +27,8 @@ type Pagination = { page: number; limit: number; total: number; totalPages: numb
 type PlayerProfile = {
   customer: {
     id: string;
+    fullName: string | null;
+    phoneNumber: string | null;
     minecraftUsername: string;
     minecraftUuid: string;
     avatarUrl: string | null;
@@ -55,6 +59,10 @@ type BanEntry = {
 
 const rankOptions = ["VIP", "MVP", "MVP+", "HELPER", "MOD", "BUILDER", "CONTENT", "CHAMPION", "LEGEND"];
 
+function playerDisplayName(p: { fullName?: string | null; minecraftUsername?: string }): string {
+  return p.fullName || p.minecraftUsername || "Unknown";
+}
+
 const deliveryBadge = (s: string) => {
   const map: Record<string, string> = {
     DELIVERED: "text-green-400",
@@ -78,16 +86,19 @@ export default function EmployeePlayers() {
   const [profileLoading, setProfileLoading] = useState(false);
 
   const [noteModal, setNoteModal] = useState(false);
+  const [noteCustomerId, setNoteCustomerId] = useState("");
   const [noteUsername, setNoteUsername] = useState("");
   const [noteText, setNoteText] = useState("");
   const [noteSeverity, setNoteSeverity] = useState("INFO");
 
   const [banModal, setBanModal] = useState(false);
+  const [banCustomerId, setBanCustomerId] = useState("");
   const [banUsername, setBanUsername] = useState("");
   const [banReason, setBanReason] = useState("");
   const [banDuration, setBanDuration] = useState("");
 
   const [rankModal, setRankModal] = useState(false);
+  const [rankCustomerId, setRankCustomerId] = useState("");
   const [rankUsername, setRankUsername] = useState("");
   const [rankValue, setRankValue] = useState("VIP");
   const [rankExpiry, setRankExpiry] = useState("");
@@ -114,12 +125,12 @@ export default function EmployeePlayers() {
 
   useEffect(() => { searchPlayers("", 1); }, []);
 
-  const openProfile = async (username: string) => {
+  const openProfile = async (customerId: string) => {
     setProfileLoading(true);
     setShowProfile(true);
     setProfile(null);
     try {
-      const res = await fetch(`/api/employee/players/profile?username=${encodeURIComponent(username)}`, { credentials: "include" });
+      const res = await fetch(`/api/employee/players/profile?customerId=${encodeURIComponent(customerId)}`, { credentials: "include" });
       const d = await res.json();
       if (d.customer) setProfile(d as PlayerProfile);
     } catch {}
@@ -130,10 +141,10 @@ export default function EmployeePlayers() {
     e.preventDefault();
     const res = await fetch("/api/employee/players/note", {
       method: "POST", headers: { "content-type": "application/json" }, credentials: "include",
-      body: JSON.stringify({ minecraftUsername: noteUsername, note: noteText, severity: noteSeverity }),
+      body: JSON.stringify({ customerId: noteCustomerId, note: noteText, severity: noteSeverity }),
     });
     const d = await res.json();
-    if (d.ok) { toast.success("Note added."); setNoteModal(false); setNoteText(""); if (profile) openProfile(noteUsername); }
+    if (d.ok) { toast.success("Note added."); setNoteModal(false); setNoteText(""); if (profile) openProfile(profile.customer.id); }
     else toast.error(d.error || "Failed.");
   };
 
@@ -142,13 +153,13 @@ export default function EmployeePlayers() {
     const res = await fetch("/api/employee/players/ban", {
       method: "POST", headers: { "content-type": "application/json" }, credentials: "include",
       body: JSON.stringify({
-        minecraftUsername: banUsername,
+        customerId: banCustomerId,
         reason: banReason,
         bannedUntil: banDuration || undefined,
       }),
     });
     const d = await res.json();
-    if (d.ok) { toast.success("Player banned."); setBanModal(false); setBanReason(""); setBanDuration(""); if (profile) openProfile(banUsername); }
+    if (d.ok) { toast.success("Player banned."); setBanModal(false); setBanReason(""); setBanDuration(""); if (profile) openProfile(profile.customer.id); loadBans(banSearch, banPage); }
     else toast.error(d.error || "Failed.");
   };
 
@@ -159,7 +170,7 @@ export default function EmployeePlayers() {
       body: JSON.stringify({ banId }),
     });
     const d = await res.json();
-    if (d.ok) { toast.success("Player unbanned."); if (profile) openProfile(profile.customer.minecraftUsername); loadBans(banSearch, banPage); }
+    if (d.ok) { toast.success("Player unbanned."); if (profile) openProfile(profile.customer.id); loadBans(banSearch, banPage); }
     else toast.error(d.error || "Failed.");
   };
 
@@ -168,13 +179,13 @@ export default function EmployeePlayers() {
     const res = await fetch("/api/employee/players/assign-rank", {
       method: "POST", headers: { "content-type": "application/json" }, credentials: "include",
       body: JSON.stringify({
-        minecraftUsername: rankUsername,
+        customerId: rankCustomerId,
         rank: rankValue,
         expiresAt: rankExpiry || undefined,
       }),
     });
     const d = await res.json();
-    if (d.ok) { toast.success("Rank assigned!"); setRankModal(false); setRankValue("VIP"); setRankExpiry(""); if (profile) openProfile(rankUsername); }
+    if (d.ok) { toast.success("Rank assigned!"); setRankModal(false); setRankValue("VIP"); setRankExpiry(""); if (profile) openProfile(profile.customer.id); }
     else toast.error(d.error || "Failed.");
   };
 
@@ -185,7 +196,7 @@ export default function EmployeePlayers() {
       body: JSON.stringify({ rankId }),
     });
     const d = await res.json();
-    if (d.ok) { toast.success("Rank removed."); if (profile) openProfile(profile.customer.minecraftUsername); }
+    if (d.ok) { toast.success("Rank removed."); if (profile) openProfile(profile.customer.id); }
     else toast.error(d.error || "Failed.");
   };
 
@@ -227,7 +238,7 @@ export default function EmployeePlayers() {
               type="text"
               value={search}
               onChange={(e) => { setSearch(e.target.value); searchPlayers(e.target.value, 1); }}
-              placeholder="Search by Minecraft username, email, or display name..."
+              placeholder="Search by name, phone, or email..."
               className="w-full rounded-xl border border-white/10 bg-white/5 pl-9 pr-3 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-[var(--hub-blue)]"
             />
           </div>
@@ -248,15 +259,18 @@ export default function EmployeePlayers() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="rounded-2xl border border-white/10 bg-[rgba(11,11,11,0.92)] p-4 cursor-pointer transition-all hover:border-[var(--hub-blue)]/30 hover:shadow-[0_0_16px_rgba(62,162,255,0.06)]"
-                    onClick={() => { setNoteUsername(p.minecraftUsername); setBanUsername(p.minecraftUsername); setRankUsername(p.minecraftUsername); openProfile(p.minecraftUsername); }}
+                    onClick={() => { setNoteUsername(p.minecraftUsername); setBanUsername(p.minecraftUsername); setRankUsername(p.minecraftUsername); openProfile(p.id); }}
                   >
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-full bg-[var(--hub-blue)]/20 flex items-center justify-center">
                         {p.avatarUrl ? <img src={p.avatarUrl} alt="" className="h-10 w-10 rounded-full" /> : <User className="h-5 w-5 text-[var(--hub-blue)]" />}
                       </div>
                       <div>
-                        <div className="font-medium text-white">{p.minecraftUsername}</div>
-                        <div className="text-xs text-white/40">{p.country || "Unknown"} &middot; {p.lastLoginAt ? new Date(p.lastLoginAt).toLocaleDateString() : "Never"}</div>
+                        <div className="font-medium text-white">{playerDisplayName(p)}</div>
+                        <div className="text-xs text-white/40 truncate">{p.email || p.user?.email || ""}</div>
+                        {p.phoneNumber && (
+                          <div className="text-xs text-white/30 truncate flex items-center gap-1 mt-0.5"><Phone className="h-2.5 w-2.5 shrink-0" />{p.phoneNumber}</div>
+                        )}
                       </div>
                     </div>
                     <div className="mt-3 flex gap-2 text-xs text-white/40">
@@ -284,7 +298,7 @@ export default function EmployeePlayers() {
         <div className="mt-4">
           <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
-            <input type="text" value={banSearch} onChange={(e) => { setBanSearch(e.target.value); loadBans(e.target.value, 1); }} placeholder="Search bans by username..." className="w-full rounded-xl border border-white/10 bg-white/5 pl-9 pr-3 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-[var(--hub-blue)]" />
+            <input type="text" value={banSearch} onChange={(e) => { setBanSearch(e.target.value); loadBans(e.target.value, 1); }} placeholder="Search bans by name or username..." className="w-full rounded-xl border border-white/10 bg-white/5 pl-9 pr-3 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-[var(--hub-blue)]" />
           </div>
           <div className="space-y-2">
             {banList.length === 0 ? (
@@ -292,15 +306,15 @@ export default function EmployeePlayers() {
             ) : (
               banList.map((b) => (
                 <div key={b.id} className="rounded-xl border border-white/10 bg-[rgba(11,11,11,0.6)] p-4">
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between gap-3">
                     <div>
                       <div className="flex items-center gap-2">
                         <Ban className={`h-4 w-4 ${b.active ? "text-red-400" : "text-green-400"}`} />
-                        <span className="font-medium text-white">{b.minecraftUsername}</span>
+                        <span className="font-medium text-white">{b.minecraftUsername || "Unknown Player"}</span>
                         <span className={`text-[10px] font-bold uppercase ${b.active ? "text-red-400" : "text-green-400"}`}>{b.active ? "Active" : "Expired"}</span>
                       </div>
                       <p className="mt-1 text-sm text-white/60">{b.reason}</p>
-                      <div className="mt-1 flex gap-3 text-xs text-white/30">
+                      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-white/30">
                         <span>By: {b.employeeName}</span>
                         {b.tournamentTitle && <span>Tournament: {b.tournamentTitle}</span>}
                         {b.bannedUntil && <span>Until: {new Date(b.bannedUntil).toLocaleDateString()}</span>}
@@ -330,24 +344,29 @@ export default function EmployeePlayers() {
       {/* Player Profile Modal */}
       <AnimatePresence>
         {showProfile && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm" onClick={() => setShowProfile(false)}>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-[rgba(11,11,11,0.98)] p-6" onClick={(e) => e.stopPropagation()}>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 p-0 sm:p-4 backdrop-blur-sm" onClick={() => setShowProfile(false)}>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full sm:max-w-3xl max-h-[92vh] sm:max-h-[90vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl border border-white/10 bg-[rgba(11,11,11,0.98)] p-5 sm:p-6" onClick={(e) => e.stopPropagation()}>
               {profileLoading ? (
                 <div className="flex justify-center py-16"><LoaderCircle className="h-10 w-10 animate-spin text-[var(--hub-blue)]" /></div>
               ) : profile ? (
                 <>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="h-14 w-14 rounded-full bg-[var(--hub-blue)]/20 flex items-center justify-center overflow-hidden">
-                        {profile.customer.avatarUrl ? <img src={profile.customer.avatarUrl} alt="" className="h-14 w-14" /> : <User className="h-7 w-7 text-[var(--hub-blue)]" />}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                      <div className="h-11 w-11 sm:h-14 sm:w-14 shrink-0 rounded-full bg-[var(--hub-blue)]/20 flex items-center justify-center overflow-hidden">
+                        {profile.customer.avatarUrl ? <img src={profile.customer.avatarUrl} alt="" className="h-11 w-11 sm:h-14 sm:w-14" /> : <User className="h-5 w-5 sm:h-7 sm:w-7 text-[var(--hub-blue)]" />}
                       </div>
-                      <div>
-                        <h2 className="text-2xl font-bold text-white">{profile.customer.minecraftUsername}</h2>
-                        <p className="text-sm text-white/50">
+                      <div className="min-w-0">
+                        <h2 className="text-lg sm:text-2xl font-bold text-white truncate">{playerDisplayName(profile.customer)}</h2>
+                        <p className="text-xs sm:text-sm text-white/50 truncate">
                           {profile.customer.country || "No region"} &middot; Joined {new Date(profile.customer.createdAt).toLocaleDateString()}
                           {profile.customer.lastLoginAt && <> &middot; Last login {new Date(profile.customer.lastLoginAt).toLocaleDateString()}</>}
                         </p>
-                        <div className="mt-1 flex gap-2">
+                        {profile.customer.phoneNumber ? (
+                          <p className="text-xs text-white/40 flex items-center gap-1 mt-0.5"><Phone className="h-3 w-3 shrink-0" />{profile.customer.phoneNumber}</p>
+                        ) : (
+                          <p className="text-xs text-white/30 mt-0.5">Phone: Not provided</p>
+                        )}
+                        <div className="mt-1 flex gap-2 flex-wrap">
                           {profile.ranks.map((r) => (
                             <span key={r.id} className="inline-flex items-center gap-1 rounded-full bg-yellow-500/20 px-2.5 py-0.5 text-[10px] font-bold text-yellow-400">
                               <Award className="h-3 w-3" />{r.rank}
@@ -356,12 +375,13 @@ export default function EmployeePlayers() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <button onClick={() => { setBanUsername(profile.customer.minecraftUsername); setBanModal(true); }} className="rounded-lg border border-red-500/30 px-3 py-1.5 text-xs text-red-400/70 hover:bg-red-500/10"><Ban className="h-3 w-3 inline mr-1" />Ban</button>
-                      <button onClick={() => { setNoteUsername(profile.customer.minecraftUsername); setNoteModal(true); }} className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-white/60 hover:bg-white/10"><FileText className="h-3 w-3 inline mr-1" />Note</button>
-                      <button onClick={() => { setRankUsername(profile.customer.minecraftUsername); setRankModal(true); }} className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-white/60 hover:bg-white/10"><Shield className="h-3 w-3 inline mr-1" />Rank</button>
-                      <button onClick={() => setShowProfile(false)} className="text-white/50 hover:text-white"><X className="h-5 w-5" /></button>
-                    </div>
+                    <button onClick={() => setShowProfile(false)} className="shrink-0 text-white/50 hover:text-white p-1"><X className="h-5 w-5" /></button>
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <button onClick={() => { setBanCustomerId(profile.customer.id); setBanUsername(playerDisplayName()); setBanModal(true); }} className="rounded-lg border border-red-500/30 px-3 py-1.5 text-xs text-red-400/70 hover:bg-red-500/10"><Ban className="h-3 w-3 inline mr-1" />Ban</button>
+                    <button onClick={() => { setNoteCustomerId(profile.customer.id); setNoteUsername(playerDisplayName()); setNoteModal(true); }} className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-white/60 hover:bg-white/10"><FileText className="h-3 w-3 inline mr-1" />Note</button>
+                    <button onClick={() => { setRankCustomerId(profile.customer.id); setRankUsername(playerDisplayName()); setRankModal(true); }} className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-white/60 hover:bg-white/10"><Shield className="h-3 w-3 inline mr-1" />Rank</button>
                   </div>
 
                   <div className="mt-6 grid gap-4 sm:grid-cols-3">

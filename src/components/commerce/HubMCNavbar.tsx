@@ -29,6 +29,7 @@ const NAV_LINKS = [
   { label: "Home", href: "/" },
   { label: "Packages", href: "/packages" },
   { label: "Tournaments", href: "/tournaments" },
+  { label: "Forum", href: "/forum" },
   { label: "Livestream", href: "/livestream" },
   { label: "About", href: "/#about" },
   { label: "Contact Us", href: "/contact" },
@@ -291,6 +292,15 @@ export const HubMCNavbar = forwardRef<HTMLElement>(function HubMCNavbar(
                       {link.label}
                     </Link>
                   ))}
+                  {hubUser?.customerId && (
+                    <Link
+                      to="/forum/create"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm text-white/72 transition-colors hover:bg-[rgba(255,138,42,0.14)] hover:text-white"
+                    >
+                      New Thread
+                    </Link>
+                  )}
                 </div>
 
                 {hubUser?.customerId && (
@@ -320,22 +330,6 @@ export const HubMCNavbar = forwardRef<HTMLElement>(function HubMCNavbar(
                       >
                         <Headset className="h-4 w-4 text-[var(--hub-blue)]" />
                         Support
-                      </Link>
-                      <Link
-                        to="/profile"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm text-white/72 transition-colors hover:bg-[rgba(62,162,255,0.1)] hover:text-white"
-                      >
-                        <UserRound className="h-4 w-4 text-[var(--hub-blue)]" />
-                        Profile
-                      </Link>
-                      <Link
-                        to="/purchases"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm text-white/72 transition-colors hover:bg-[rgba(62,162,255,0.1)] hover:text-white"
-                      >
-                        <WalletCards className="h-4 w-4 text-[var(--hub-blue)]" />
-                        Purchases
                       </Link>
                     </div>
                   </>

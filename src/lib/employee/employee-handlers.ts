@@ -402,7 +402,9 @@ export async function handleSearchPlayers(request: Request) {
 
   const searchCondition = search
     ? or(
+        like(customers.fullName, `%${search}%`),
         like(customers.minecraftUsername, `%${search}%`),
+        like(customers.phoneNumber, `%${search}%`),
         like(users.email, `%${search}%`),
         like(users.name, `%${search}%`),
       )
@@ -412,6 +414,8 @@ export async function handleSearchPlayers(request: Request) {
     .select({
       id: customers.id,
       userId: customers.userId,
+      fullName: customers.fullName,
+      phoneNumber: customers.phoneNumber,
       minecraftUsername: customers.minecraftUsername,
       minecraftUuid: customers.minecraftUuid,
       avatarUrl: customers.avatarUrl,
@@ -452,6 +456,8 @@ export async function handleSearchPlayers(request: Request) {
     players: playerRows.map((c) => ({
       id: c.id,
       userId: c.userId,
+      fullName: c.fullName,
+      phoneNumber: c.phoneNumber,
       minecraftUsername: c.minecraftUsername,
       minecraftUuid: c.minecraftUuid,
       avatarUrl: c.avatarUrl,
@@ -494,12 +500,17 @@ export async function handleGetPlayerProfile(request: Request) {
 
   const customerWhere = customerId
     ? eq(customers.id, customerId)
-    : eq(customers.minecraftUsername, username!);
+    : or(
+        eq(customers.fullName, username!),
+        eq(customers.minecraftUsername, username!),
+      );
 
   const customerRows = await db
     .select({
       id: customers.id,
       userId: customers.userId,
+      fullName: customers.fullName,
+      phoneNumber: customers.phoneNumber,
       minecraftUsername: customers.minecraftUsername,
       minecraftUuid: customers.minecraftUuid,
       avatarUrl: customers.avatarUrl,
@@ -583,7 +594,14 @@ export async function handleGetPlayerProfile(request: Request) {
       })
       .from(tournamentRegistrations)
       .leftJoin(tournaments, eq(tournamentRegistrations.tournamentId, tournaments.id))
-      .where(eq(tournamentRegistrations.minecraftUsername, customer.minecraftUsername))
+      .where(
+        customer.id
+          ? or(
+              eq(tournamentRegistrations.userId, customer.userId),
+              eq(tournamentRegistrations.minecraftUsername, customer.minecraftUsername),
+            )
+          : undefined,
+      )
       .orderBy(desc(tournamentRegistrations.createdAt)),
 
     db
@@ -599,7 +617,14 @@ export async function handleGetPlayerProfile(request: Request) {
       })
       .from(playerNotes)
       .leftJoin(employees, eq(playerNotes.employeeId, employees.id))
-      .where(eq(playerNotes.minecraftUsername, customer.minecraftUsername))
+      .where(
+        customer.id
+          ? or(
+              eq(playerNotes.customerId, customer.id),
+              eq(playerNotes.minecraftUsername, customer.minecraftUsername),
+            )
+          : undefined,
+      )
       .orderBy(desc(playerNotes.createdAt)),
 
     db
@@ -621,10 +646,15 @@ export async function handleGetPlayerProfile(request: Request) {
       .leftJoin(employees, eq(playerBans.employeeId, employees.id))
       .leftJoin(tournaments, eq(playerBans.tournamentId, tournaments.id))
       .where(
-        and(
-          eq(playerBans.minecraftUsername, customer.minecraftUsername),
-          eq(playerBans.active, true),
-        ),
+        customer.id
+          ? and(
+              or(
+                eq(playerBans.customerId, customer.id),
+                eq(playerBans.minecraftUsername, customer.minecraftUsername),
+              ),
+              eq(playerBans.active, true),
+            )
+          : undefined,
       )
       .orderBy(desc(playerBans.createdAt)),
 
@@ -632,10 +662,12 @@ export async function handleGetPlayerProfile(request: Request) {
       .select()
       .from(playerRanks)
       .where(
-        and(
-          eq(playerRanks.minecraftUsername, customer.minecraftUsername),
-          eq(playerRanks.active, true),
-        ),
+        customer.id
+          ? or(
+              eq(playerRanks.customerId, customer.id),
+              eq(playerRanks.minecraftUsername, customer.minecraftUsername),
+            )
+          : undefined,
       )
       .orderBy(desc(playerRanks.assignedAt)),
   ]);
@@ -643,6 +675,8 @@ export async function handleGetPlayerProfile(request: Request) {
   return json({
     customer: {
       id: customer.id,
+      fullName: customer.fullName,
+      phoneNumber: customer.phoneNumber,
       minecraftUsername: customer.minecraftUsername,
       minecraftUuid: customer.minecraftUuid,
       avatarUrl: customer.avatarUrl,
@@ -747,9 +781,23 @@ export async function handleAddPlayerNote(request: Request) {
     return error("Invalid request body", 400);
   }
 
-  const { minecraftUsername, note, severity } = body;
-  if (!minecraftUsername || !note) {
-    return error("Missing required fields: minecraftUsername, note", 400);
+  const { minecraftUsername: rawUsername, customerId, note, severity } = body;
+  if (!note) {
+    return error("Missing required fields: note", 400);
+  }
+
+  // Resolve minecraftUsername from customerId if not provided
+  let minecraftUsername = rawUsername;
+  if (!minecraftUsername && customerId) {
+    const customerRows = await db
+      .select({ minecraftUsername: customers.minecraftUsername })
+      .from(customers)
+      .where(eq(customers.id, customerId))
+      .limit(1);
+    minecraftUsername = customerRows[0]?.minecraftUsername || "";
+  }
+  if (!minecraftUsername) {
+    return error("Unable to resolve player identity.", 400);
   }
 
   const noteId = crypto.randomUUID();
@@ -788,9 +836,23 @@ export async function handleBanPlayer(request: Request) {
     return error("Invalid request body", 400);
   }
 
-  const { minecraftUsername, reason, tournamentId, bannedUntil } = body;
-  if (!minecraftUsername || !reason) {
-    return error("Missing required fields: minecraftUsername, reason", 400);
+  const { minecraftUsername: rawUsername, customerId, reason, tournamentId, bannedUntil } = body;
+  if (!reason) {
+    return error("Missing required fields: reason", 400);
+  }
+
+  // Resolve minecraftUsername from customerId if not provided
+  let minecraftUsername = rawUsername;
+  if (!minecraftUsername && customerId) {
+    const customerRows = await db
+      .select({ minecraftUsername: customers.minecraftUsername })
+      .from(customers)
+      .where(eq(customers.id, customerId))
+      .limit(1);
+    minecraftUsername = customerRows[0]?.minecraftUsername || "";
+  }
+  if (!minecraftUsername) {
+    return error("Unable to resolve player identity.", 400);
   }
 
   const banId = crypto.randomUUID();
@@ -912,15 +974,30 @@ export async function handleAssignRank(request: Request) {
     return error("Invalid request body", 400);
   }
 
-  const { minecraftUsername, rank, expiresAt } = body;
-  if (!minecraftUsername || !rank) {
-    return error("Missing required fields: minecraftUsername, rank", 400);
+  const { minecraftUsername: rawUsername, customerId, rank, expiresAt } = body;
+  if (!rank) {
+    return error("Missing required fields: rank", 400);
+  }
+
+  // Resolve minecraftUsername and customerId from each other
+  let minecraftUsername = rawUsername;
+  let resolvedCustomerId = customerId;
+  if (!minecraftUsername && resolvedCustomerId) {
+    const customerRows = await db
+      .select({ minecraftUsername: customers.minecraftUsername })
+      .from(customers)
+      .where(eq(customers.id, resolvedCustomerId))
+      .limit(1);
+    minecraftUsername = customerRows[0]?.minecraftUsername || "";
+  }
+  if (!minecraftUsername) {
+    return error("Unable to resolve player identity.", 400);
   }
 
   const customerRows = await db
     .select({ id: customers.id })
     .from(customers)
-    .where(eq(customers.minecraftUsername, minecraftUsername))
+    .where(resolvedCustomerId ? eq(customers.id, resolvedCustomerId) : eq(customers.minecraftUsername, minecraftUsername))
     .limit(1);
 
   const customer = customerRows[0];

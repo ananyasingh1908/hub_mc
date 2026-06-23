@@ -15,6 +15,7 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PackagesRouteImport } from './routes/packages'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LivestreamRouteImport } from './routes/livestream'
+import { Route as ForumRouteImport } from './routes/forum'
 import { Route as EmployeeLoginRouteImport } from './routes/employee-login'
 import { Route as EmployeeRouteImport } from './routes/employee'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -24,24 +25,29 @@ import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TournamentsIndexRouteImport } from './routes/tournaments.index'
+import { Route as ForumIndexRouteImport } from './routes/forum.index'
 import { Route as EmployeeIndexRouteImport } from './routes/employee.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as TournamentsIdRouteImport } from './routes/tournaments.$id'
+import { Route as ForumCreateRouteImport } from './routes/forum.create'
+import { Route as ForumCategorySlugRouteImport } from './routes/forum.$categorySlug'
 import { Route as EmployeeTournamentsRouteImport } from './routes/employee.tournaments'
 import { Route as EmployeeSupportRouteImport } from './routes/employee.support'
 import { Route as EmployeeProductsRouteImport } from './routes/employee.products'
 import { Route as EmployeePlayersRouteImport } from './routes/employee.players'
 import { Route as EmployeeOrdersRouteImport } from './routes/employee.orders'
 import { Route as EmployeeNotificationsRouteImport } from './routes/employee.notifications'
+import { Route as EmployeeForumRouteImport } from './routes/employee.forum'
 import { Route as AdminTournamentsRouteImport } from './routes/admin.tournaments'
 import { Route as AdminStreamsRouteImport } from './routes/admin.streams'
 import { Route as AdminPlayersRouteImport } from './routes/admin.players'
 import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
-import { Route as AdminLogsRouteImport } from './routes/admin.logs'
+import { Route as AdminForumRouteImport } from './routes/admin.forum'
 import { Route as AdminEmployeesMonitorRouteImport } from './routes/admin.employees-monitor'
 import { Route as AdminEmployeesRouteImport } from './routes/admin.employees'
 import { Route as AdminDeliveryRouteImport } from './routes/admin.delivery'
 import { Route as AdminCustomersRouteImport } from './routes/admin.customers'
+import { Route as ForumThreadThreadIdRouteImport } from './routes/forum.thread.$threadId'
 
 const TournamentsRoute = TournamentsRouteImport.update({
   id: '/tournaments',
@@ -71,6 +77,11 @@ const LoginRoute = LoginRouteImport.update({
 const LivestreamRoute = LivestreamRouteImport.update({
   id: '/livestream',
   path: '/livestream',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForumRoute = ForumRouteImport.update({
+  id: '/forum',
+  path: '/forum',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmployeeLoginRoute = EmployeeLoginRouteImport.update({
@@ -118,6 +129,11 @@ const TournamentsIndexRoute = TournamentsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => TournamentsRoute,
 } as any)
+const ForumIndexRoute = ForumIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ForumRoute,
+} as any)
 const EmployeeIndexRoute = EmployeeIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -132,6 +148,16 @@ const TournamentsIdRoute = TournamentsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => TournamentsRoute,
+} as any)
+const ForumCreateRoute = ForumCreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => ForumRoute,
+} as any)
+const ForumCategorySlugRoute = ForumCategorySlugRouteImport.update({
+  id: '/$categorySlug',
+  path: '/$categorySlug',
+  getParentRoute: () => ForumRoute,
 } as any)
 const EmployeeTournamentsRoute = EmployeeTournamentsRouteImport.update({
   id: '/tournaments',
@@ -163,6 +189,11 @@ const EmployeeNotificationsRoute = EmployeeNotificationsRouteImport.update({
   path: '/notifications',
   getParentRoute: () => EmployeeRoute,
 } as any)
+const EmployeeForumRoute = EmployeeForumRouteImport.update({
+  id: '/forum',
+  path: '/forum',
+  getParentRoute: () => EmployeeRoute,
+} as any)
 const AdminTournamentsRoute = AdminTournamentsRouteImport.update({
   id: '/tournaments',
   path: '/tournaments',
@@ -183,9 +214,9 @@ const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
   path: '/notifications',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminLogsRoute = AdminLogsRouteImport.update({
-  id: '/logs',
-  path: '/logs',
+const AdminForumRoute = AdminForumRouteImport.update({
+  id: '/forum',
+  path: '/forum',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminEmployeesMonitorRoute = AdminEmployeesMonitorRouteImport.update({
@@ -208,6 +239,11 @@ const AdminCustomersRoute = AdminCustomersRouteImport.update({
   path: '/customers',
   getParentRoute: () => AdminRoute,
 } as any)
+const ForumThreadThreadIdRoute = ForumThreadThreadIdRouteImport.update({
+  id: '/thread/$threadId',
+  path: '/thread/$threadId',
+  getParentRoute: () => ForumRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -218,6 +254,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/employee': typeof EmployeeRouteWithChildren
   '/employee-login': typeof EmployeeLoginRoute
+  '/forum': typeof ForumRouteWithChildren
   '/livestream': typeof LivestreamRoute
   '/login': typeof LoginRoute
   '/packages': typeof PackagesRoute
@@ -228,21 +265,26 @@ export interface FileRoutesByFullPath {
   '/admin/delivery': typeof AdminDeliveryRoute
   '/admin/employees': typeof AdminEmployeesRoute
   '/admin/employees-monitor': typeof AdminEmployeesMonitorRoute
-  '/admin/logs': typeof AdminLogsRoute
+  '/admin/forum': typeof AdminForumRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/players': typeof AdminPlayersRoute
   '/admin/streams': typeof AdminStreamsRoute
   '/admin/tournaments': typeof AdminTournamentsRoute
+  '/employee/forum': typeof EmployeeForumRoute
   '/employee/notifications': typeof EmployeeNotificationsRoute
   '/employee/orders': typeof EmployeeOrdersRoute
   '/employee/players': typeof EmployeePlayersRoute
   '/employee/products': typeof EmployeeProductsRoute
   '/employee/support': typeof EmployeeSupportRoute
   '/employee/tournaments': typeof EmployeeTournamentsRoute
+  '/forum/$categorySlug': typeof ForumCategorySlugRoute
+  '/forum/create': typeof ForumCreateRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/admin/': typeof AdminIndexRoute
   '/employee/': typeof EmployeeIndexRoute
+  '/forum/': typeof ForumIndexRoute
   '/tournaments/': typeof TournamentsIndexRoute
+  '/forum/thread/$threadId': typeof ForumThreadThreadIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -260,21 +302,26 @@ export interface FileRoutesByTo {
   '/admin/delivery': typeof AdminDeliveryRoute
   '/admin/employees': typeof AdminEmployeesRoute
   '/admin/employees-monitor': typeof AdminEmployeesMonitorRoute
-  '/admin/logs': typeof AdminLogsRoute
+  '/admin/forum': typeof AdminForumRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/players': typeof AdminPlayersRoute
   '/admin/streams': typeof AdminStreamsRoute
   '/admin/tournaments': typeof AdminTournamentsRoute
+  '/employee/forum': typeof EmployeeForumRoute
   '/employee/notifications': typeof EmployeeNotificationsRoute
   '/employee/orders': typeof EmployeeOrdersRoute
   '/employee/players': typeof EmployeePlayersRoute
   '/employee/products': typeof EmployeeProductsRoute
   '/employee/support': typeof EmployeeSupportRoute
   '/employee/tournaments': typeof EmployeeTournamentsRoute
+  '/forum/$categorySlug': typeof ForumCategorySlugRoute
+  '/forum/create': typeof ForumCreateRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/admin': typeof AdminIndexRoute
   '/employee': typeof EmployeeIndexRoute
+  '/forum': typeof ForumIndexRoute
   '/tournaments': typeof TournamentsIndexRoute
+  '/forum/thread/$threadId': typeof ForumThreadThreadIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -286,6 +333,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/employee': typeof EmployeeRouteWithChildren
   '/employee-login': typeof EmployeeLoginRoute
+  '/forum': typeof ForumRouteWithChildren
   '/livestream': typeof LivestreamRoute
   '/login': typeof LoginRoute
   '/packages': typeof PackagesRoute
@@ -296,21 +344,26 @@ export interface FileRoutesById {
   '/admin/delivery': typeof AdminDeliveryRoute
   '/admin/employees': typeof AdminEmployeesRoute
   '/admin/employees-monitor': typeof AdminEmployeesMonitorRoute
-  '/admin/logs': typeof AdminLogsRoute
+  '/admin/forum': typeof AdminForumRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/players': typeof AdminPlayersRoute
   '/admin/streams': typeof AdminStreamsRoute
   '/admin/tournaments': typeof AdminTournamentsRoute
+  '/employee/forum': typeof EmployeeForumRoute
   '/employee/notifications': typeof EmployeeNotificationsRoute
   '/employee/orders': typeof EmployeeOrdersRoute
   '/employee/players': typeof EmployeePlayersRoute
   '/employee/products': typeof EmployeeProductsRoute
   '/employee/support': typeof EmployeeSupportRoute
   '/employee/tournaments': typeof EmployeeTournamentsRoute
+  '/forum/$categorySlug': typeof ForumCategorySlugRoute
+  '/forum/create': typeof ForumCreateRoute
   '/tournaments/$id': typeof TournamentsIdRoute
   '/admin/': typeof AdminIndexRoute
   '/employee/': typeof EmployeeIndexRoute
+  '/forum/': typeof ForumIndexRoute
   '/tournaments/': typeof TournamentsIndexRoute
+  '/forum/thread/$threadId': typeof ForumThreadThreadIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -323,6 +376,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/employee'
     | '/employee-login'
+    | '/forum'
     | '/livestream'
     | '/login'
     | '/packages'
@@ -333,21 +387,26 @@ export interface FileRouteTypes {
     | '/admin/delivery'
     | '/admin/employees'
     | '/admin/employees-monitor'
-    | '/admin/logs'
+    | '/admin/forum'
     | '/admin/notifications'
     | '/admin/players'
     | '/admin/streams'
     | '/admin/tournaments'
+    | '/employee/forum'
     | '/employee/notifications'
     | '/employee/orders'
     | '/employee/players'
     | '/employee/products'
     | '/employee/support'
     | '/employee/tournaments'
+    | '/forum/$categorySlug'
+    | '/forum/create'
     | '/tournaments/$id'
     | '/admin/'
     | '/employee/'
+    | '/forum/'
     | '/tournaments/'
+    | '/forum/thread/$threadId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -365,21 +424,26 @@ export interface FileRouteTypes {
     | '/admin/delivery'
     | '/admin/employees'
     | '/admin/employees-monitor'
-    | '/admin/logs'
+    | '/admin/forum'
     | '/admin/notifications'
     | '/admin/players'
     | '/admin/streams'
     | '/admin/tournaments'
+    | '/employee/forum'
     | '/employee/notifications'
     | '/employee/orders'
     | '/employee/players'
     | '/employee/products'
     | '/employee/support'
     | '/employee/tournaments'
+    | '/forum/$categorySlug'
+    | '/forum/create'
     | '/tournaments/$id'
     | '/admin'
     | '/employee'
+    | '/forum'
     | '/tournaments'
+    | '/forum/thread/$threadId'
   id:
     | '__root__'
     | '/'
@@ -390,6 +454,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/employee'
     | '/employee-login'
+    | '/forum'
     | '/livestream'
     | '/login'
     | '/packages'
@@ -400,21 +465,26 @@ export interface FileRouteTypes {
     | '/admin/delivery'
     | '/admin/employees'
     | '/admin/employees-monitor'
-    | '/admin/logs'
+    | '/admin/forum'
     | '/admin/notifications'
     | '/admin/players'
     | '/admin/streams'
     | '/admin/tournaments'
+    | '/employee/forum'
     | '/employee/notifications'
     | '/employee/orders'
     | '/employee/players'
     | '/employee/products'
     | '/employee/support'
     | '/employee/tournaments'
+    | '/forum/$categorySlug'
+    | '/forum/create'
     | '/tournaments/$id'
     | '/admin/'
     | '/employee/'
+    | '/forum/'
     | '/tournaments/'
+    | '/forum/thread/$threadId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -426,6 +496,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   EmployeeRoute: typeof EmployeeRouteWithChildren
   EmployeeLoginRoute: typeof EmployeeLoginRoute
+  ForumRoute: typeof ForumRouteWithChildren
   LivestreamRoute: typeof LivestreamRoute
   LoginRoute: typeof LoginRoute
   PackagesRoute: typeof PackagesRoute
@@ -476,6 +547,13 @@ declare module '@tanstack/react-router' {
       path: '/livestream'
       fullPath: '/livestream'
       preLoaderRoute: typeof LivestreamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forum': {
+      id: '/forum'
+      path: '/forum'
+      fullPath: '/forum'
+      preLoaderRoute: typeof ForumRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/employee-login': {
@@ -541,6 +619,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TournamentsIndexRouteImport
       parentRoute: typeof TournamentsRoute
     }
+    '/forum/': {
+      id: '/forum/'
+      path: '/'
+      fullPath: '/forum/'
+      preLoaderRoute: typeof ForumIndexRouteImport
+      parentRoute: typeof ForumRoute
+    }
     '/employee/': {
       id: '/employee/'
       path: '/'
@@ -561,6 +646,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/tournaments/$id'
       preLoaderRoute: typeof TournamentsIdRouteImport
       parentRoute: typeof TournamentsRoute
+    }
+    '/forum/create': {
+      id: '/forum/create'
+      path: '/create'
+      fullPath: '/forum/create'
+      preLoaderRoute: typeof ForumCreateRouteImport
+      parentRoute: typeof ForumRoute
+    }
+    '/forum/$categorySlug': {
+      id: '/forum/$categorySlug'
+      path: '/$categorySlug'
+      fullPath: '/forum/$categorySlug'
+      preLoaderRoute: typeof ForumCategorySlugRouteImport
+      parentRoute: typeof ForumRoute
     }
     '/employee/tournaments': {
       id: '/employee/tournaments'
@@ -604,6 +703,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmployeeNotificationsRouteImport
       parentRoute: typeof EmployeeRoute
     }
+    '/employee/forum': {
+      id: '/employee/forum'
+      path: '/forum'
+      fullPath: '/employee/forum'
+      preLoaderRoute: typeof EmployeeForumRouteImport
+      parentRoute: typeof EmployeeRoute
+    }
     '/admin/tournaments': {
       id: '/admin/tournaments'
       path: '/tournaments'
@@ -632,11 +738,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminNotificationsRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/logs': {
-      id: '/admin/logs'
-      path: '/logs'
-      fullPath: '/admin/logs'
-      preLoaderRoute: typeof AdminLogsRouteImport
+    '/admin/forum': {
+      id: '/admin/forum'
+      path: '/forum'
+      fullPath: '/admin/forum'
+      preLoaderRoute: typeof AdminForumRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/employees-monitor': {
@@ -667,6 +773,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCustomersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/forum/thread/$threadId': {
+      id: '/forum/thread/$threadId'
+      path: '/thread/$threadId'
+      fullPath: '/forum/thread/$threadId'
+      preLoaderRoute: typeof ForumThreadThreadIdRouteImport
+      parentRoute: typeof ForumRoute
+    }
   }
 }
 
@@ -675,7 +788,7 @@ interface AdminRouteChildren {
   AdminDeliveryRoute: typeof AdminDeliveryRoute
   AdminEmployeesRoute: typeof AdminEmployeesRoute
   AdminEmployeesMonitorRoute: typeof AdminEmployeesMonitorRoute
-  AdminLogsRoute: typeof AdminLogsRoute
+  AdminForumRoute: typeof AdminForumRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminPlayersRoute: typeof AdminPlayersRoute
   AdminStreamsRoute: typeof AdminStreamsRoute
@@ -688,7 +801,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminDeliveryRoute: AdminDeliveryRoute,
   AdminEmployeesRoute: AdminEmployeesRoute,
   AdminEmployeesMonitorRoute: AdminEmployeesMonitorRoute,
-  AdminLogsRoute: AdminLogsRoute,
+  AdminForumRoute: AdminForumRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
   AdminPlayersRoute: AdminPlayersRoute,
   AdminStreamsRoute: AdminStreamsRoute,
@@ -699,6 +812,7 @@ const AdminRouteChildren: AdminRouteChildren = {
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface EmployeeRouteChildren {
+  EmployeeForumRoute: typeof EmployeeForumRoute
   EmployeeNotificationsRoute: typeof EmployeeNotificationsRoute
   EmployeeOrdersRoute: typeof EmployeeOrdersRoute
   EmployeePlayersRoute: typeof EmployeePlayersRoute
@@ -709,6 +823,7 @@ interface EmployeeRouteChildren {
 }
 
 const EmployeeRouteChildren: EmployeeRouteChildren = {
+  EmployeeForumRoute: EmployeeForumRoute,
   EmployeeNotificationsRoute: EmployeeNotificationsRoute,
   EmployeeOrdersRoute: EmployeeOrdersRoute,
   EmployeePlayersRoute: EmployeePlayersRoute,
@@ -721,6 +836,22 @@ const EmployeeRouteChildren: EmployeeRouteChildren = {
 const EmployeeRouteWithChildren = EmployeeRoute._addFileChildren(
   EmployeeRouteChildren,
 )
+
+interface ForumRouteChildren {
+  ForumCategorySlugRoute: typeof ForumCategorySlugRoute
+  ForumCreateRoute: typeof ForumCreateRoute
+  ForumIndexRoute: typeof ForumIndexRoute
+  ForumThreadThreadIdRoute: typeof ForumThreadThreadIdRoute
+}
+
+const ForumRouteChildren: ForumRouteChildren = {
+  ForumCategorySlugRoute: ForumCategorySlugRoute,
+  ForumCreateRoute: ForumCreateRoute,
+  ForumIndexRoute: ForumIndexRoute,
+  ForumThreadThreadIdRoute: ForumThreadThreadIdRoute,
+}
+
+const ForumRouteWithChildren = ForumRoute._addFileChildren(ForumRouteChildren)
 
 interface TournamentsRouteChildren {
   TournamentsIdRoute: typeof TournamentsIdRoute
@@ -745,6 +876,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   EmployeeRoute: EmployeeRouteWithChildren,
   EmployeeLoginRoute: EmployeeLoginRoute,
+  ForumRoute: ForumRouteWithChildren,
   LivestreamRoute: LivestreamRoute,
   LoginRoute: LoginRoute,
   PackagesRoute: PackagesRoute,

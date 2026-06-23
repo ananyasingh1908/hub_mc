@@ -15,11 +15,9 @@ export async function createAdminSession(payload: {
   email: string;
   role: "SUPER_ADMIN";
 }, request: Request): Promise<{ token: string; headers: Headers }> {
-  const url = new URL(request.url);
-  const secure = url.protocol === "https:";
   const token = await signToken({ ...payload, sessionType: "admin" });
   const headers = new Headers({ "content-type": "application/json" });
-  headers.append("set-cookie", buildSetCookieHeader(ADMIN_SESSION_COOKIE, token, SESSION_MAX_AGE_SECONDS, secure));
+  headers.append("set-cookie", buildSetCookieHeader(ADMIN_SESSION_COOKIE, token, SESSION_MAX_AGE_SECONDS, true));
   return { token, headers };
 }
 
@@ -44,9 +42,7 @@ export async function handleAdminSessionRequest(request: Request): Promise<Respo
 }
 
 export async function handleAdminLogoutRequest(request: Request): Promise<Response> {
-  const url = new URL(request.url);
-  const secure = url.protocol === "https:";
   const headers = new Headers({ "content-type": "application/json" });
-  headers.append("set-cookie", buildSetCookieHeader(ADMIN_SESSION_COOKIE, "", 0, secure));
+  headers.append("set-cookie", buildSetCookieHeader(ADMIN_SESSION_COOKIE, "", 0, true));
   return new Response(JSON.stringify({ ok: true }), { status: 200, headers });
 }

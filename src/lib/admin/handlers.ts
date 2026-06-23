@@ -16,6 +16,9 @@ import {
   users,
   rolePermissions,
   tournaments,
+  playerBans,
+  playerNotes,
+  playerRanks,
 } from "@/lib/db/schema";
 import {
   count,
@@ -27,6 +30,31 @@ import {
   inArray,
   sql,
 } from "drizzle-orm";
+
+async function logActivity(
+  employeeId: string | null | undefined,
+  action: string,
+  entity: string,
+  entityId: string | null,
+  details?: string,
+) {
+  try {
+    const id = crypto.randomUUID();
+    await db.insert(activityLogs).values({
+      id,
+      employeeId: employeeId || null,
+      action,
+      entity,
+      entityId: entityId || null,
+      details: details || null,
+      severity: "INFO",
+      ipAddress: null,
+      createdAt: new Date(),
+    });
+  } catch (e) {
+    devlog("activity-log-error", e);
+  }
+}
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -63,23 +91,6 @@ async function requireRole(request: Request, roles: string[]): Promise<Response 
 
 function getStaffSession(request: Request): StaffSession | null {
   return (request as any).__staffSession ?? null;
-}
-
-async function logActivity(employeeId: string | null | undefined, action: string, entity: string, entityId: string | null, details: string | null, severity = "INFO") {
-  try {
-    await db.insert(activityLogs).values({
-      id: crypto.randomUUID(),
-      employeeId: employeeId ?? null,
-      action,
-      entity,
-      entityId,
-      details,
-      severity,
-      createdAt: new Date(),
-    });
-  } catch (e) {
-    console.warn("Failed to log activity:", e);
-  }
 }
 
 // ─── PRODUCTS ────────────────────────────────────────────────
@@ -456,6 +467,28 @@ export async function handleAdminGetCustomers(request: Request) {
   const limit = 20;
   const offset = (page - 1) * limit;
 
+  // Subquery: customer IDs that have at least one PAID or FULFILLED order
+  const buyerIdsSubquery = db
+    .select({ customerId: orders.customerId })
+    .from(orders)
+    .where(and(
+      sql`${orders.customerId} IS NOT NULL`,
+      sql`${orders.status} IN ('PAID', 'FULFILLED')`,
+    ))
+    .groupBy(orders.customerId);
+
+  const buyerCustomerIdRows = await buyerIdsSubquery;
+  const buyerCustomerIds = buyerCustomerIdRows
+    .map((r) => r.customerId)
+    .filter((id): id is string => id !== null);
+
+  if (buyerCustomerIds.length === 0) {
+    return json({
+      customers: [],
+      pagination: { page, limit, total: 0, totalPages: 0 },
+    });
+  }
+
   const [customerRows, totalRows] = await Promise.all([
     db
       .select({
@@ -470,10 +503,13 @@ export async function handleAdminGetCustomers(request: Request) {
       })
       .from(customers)
       .leftJoin(users, eq(customers.userId, users.id))
+      .where(inArray(customers.id, buyerCustomerIds))
       .orderBy(desc(customers.createdAt))
       .limit(limit)
       .offset(offset),
-    db.select({ count: count() }).from(customers),
+    db.select({ count: count() })
+      .from(customers)
+      .where(inArray(customers.id, buyerCustomerIds)),
   ]);
 
   const total = Number(totalRows[0]?.count ?? 0);
@@ -514,6 +550,60 @@ export async function handleAdminGetCustomers(request: Request) {
     }),
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   });
+}
+
+// ─── CUSTOMER DELETE/ARCHIVE (Admin only) ────────────────────
+
+export async function handleAdminDeleteCustomer(request: Request) {
+  const authErr = await requireRole(request, ["SUPER_ADMIN"]);
+  if (authErr) return authErr;
+
+  let body: any;
+  try { body = await request.json(); } catch { return error("Invalid request body", 400); }
+
+  const { customerId } = body;
+  if (!customerId) return error("Missing customerId", 400);
+
+  // Fetch customer
+  const customerRows = await db
+    .select({ id: customers.id, userId: customers.userId })
+    .from(customers)
+    .where(eq(customers.id, customerId))
+    .limit(1);
+
+  if (!customerRows[0]) return error("Customer not found", 404);
+
+  const customer = customerRows[0];
+
+  // Check for orders
+  const orderCountRows = await db
+    .select({ count: count() })
+    .from(orders)
+    .where(eq(orders.customerId, customerId));
+
+  const orderCount = Number(orderCountRows[0]?.count ?? 0);
+
+  if (orderCount > 0) {
+    // Customer has orders — cannot delete, block with clear message
+    return json({ ok: false, action: "blocked", message: `Cannot delete customer with ${orderCount} order(s). Order history must be preserved.` }, 400);
+  }
+
+  // No orders — safe to hard delete
+  // Delete related data first (non-cascade schema)
+  await db.delete(playerBans).where(eq(playerBans.customerId, customerId));
+  await db.delete(playerNotes).where(eq(playerNotes.customerId, customerId));
+  await db.delete(playerRanks).where(eq(playerRanks.customerId, customerId));
+
+  // Delete the customer record
+  await db.delete(customers).where(eq(customers.id, customerId));
+
+  // Delete the linked user account
+  if (customer.userId) {
+    await db.delete(users).where(eq(users.id, customer.userId));
+  }
+
+  await logActivity(null, "DELETE", "customer", customerId, "Deleted orphan customer (no orders)");
+  return json({ ok: true, action: "deleted", message: "Customer record deleted (no order history)" });
 }
 
 // ─── EMPLOYEES (Admin only) ──────────────────────────────────
@@ -677,65 +767,7 @@ export async function handleAdminDeleteEmployee(request: Request) {
   return json({ success: true });
 }
 
-// ─── ACTIVITY LOGS (Admin only) ──────────────────────────────
 
-export async function handleAdminGetLogs(request: Request) {
-  const authErr = await requireRole(request, ["SUPER_ADMIN"]);
-  if (authErr) return authErr;
-
-  const url = new URL(request.url);
-  const entity = url.searchParams.get("entity") ?? "";
-  const action = url.searchParams.get("action") ?? "";
-  const page = parseInt(url.searchParams.get("page") ?? "1");
-  const limit = 50;
-  const offset = (page - 1) * limit;
-
-  const conditions = [];
-  if (entity) conditions.push(eq(activityLogs.entity, entity));
-  if (action) conditions.push(eq(activityLogs.action, action));
-  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
-
-  const [logRows, totalRows] = await Promise.all([
-    db
-      .select({
-        id: activityLogs.id,
-        action: activityLogs.action,
-        entity: activityLogs.entity,
-        entityId: activityLogs.entityId,
-        details: activityLogs.details,
-        severity: activityLogs.severity,
-        ipAddress: activityLogs.ipAddress,
-        createdAt: activityLogs.createdAt,
-        employeeName: employees.displayName,
-      })
-      .from(activityLogs)
-      .leftJoin(employees, eq(activityLogs.employeeId, employees.id))
-      .where(whereClause)
-      .orderBy(desc(activityLogs.createdAt))
-      .limit(limit)
-      .offset(offset),
-    db.select({ count: count() }).from(activityLogs).where(whereClause),
-  ]);
-
-  const total = Number(totalRows[0]?.count ?? 0);
-
-  return json({
-    logs: logRows.map((l) => ({
-      id: l.id,
-      action: l.action,
-      entity: l.entity,
-      entityId: l.entityId,
-      details: l.details,
-      severity: l.severity,
-      ipAddress: l.ipAddress,
-      createdAt: l.createdAt,
-      employeeName: l.employeeName ?? "System",
-    })),
-    total,
-    page,
-    totalPages: Math.ceil(total / limit),
-  });
-}
 
 // ─── PERMISSIONS (Admin only) ────────────────────────────────
 

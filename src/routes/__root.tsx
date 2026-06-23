@@ -11,7 +11,7 @@ import {
 } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteFooter } from "@/components/SiteFooter";
-import { organizationSchema, websiteSchema } from "@/lib/json-ld";
+import { organizationSchema, websiteSchema, gameSchema } from "@/lib/json-ld";
 import { initAnalytics, trackPageView } from "@/lib/analytics";
 import { initSentry } from "@/lib/sentry";
 
@@ -84,15 +84,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "HUBMC — The World You Love" },
-      { name: "description", content: "Premium Minecraft server with tournaments, livestreams, store, community and events." },
+      { name: "google-site-verification", content: "wxWk5BwBCWjWmwK1yopQlxttiDZOOo17VDg1mKQVBII" },
+      { title: "HUBMC — Official Minecraft Server, Store, Tournaments & Community" },
+      { name: "description", content: "HUBMC is the official HubMC Minecraft server community. Play on hubmc.in — competitive tournaments, exclusive store packages, live streams, and an active player community." },
       { name: "author", content: "HUBMC" },
-      { name: "keywords", content: "Minecraft, HUBMC, Minecraft server, tournaments, PvP, community, gaming" },
+      { name: "keywords", content: "HUBMC, HubMC, hubmc.in, Minecraft server, Minecraft community, Minecraft tournaments, Minecraft store, Minecraft ranks, PvP, gaming" },
       { name: "theme-color", content: "#050505" },
       { name: "application-name", content: siteName },
       { name: "referrer", content: "origin-when-cross-origin" },
-      { property: "og:title", content: "HUBMC — The World You Love" },
-      { property: "og:description", content: "Premium Minecraft server with tournaments, livestreams, store, community and events." },
+      { property: "og:title", content: "HUBMC — Official Minecraft Server, Store, Tournaments & Community" },
+      { property: "og:description", content: "HUBMC is the official HubMC Minecraft server community. Play on hubmc.in — competitive tournaments, exclusive store packages, live streams, and an active player community." },
       { property: "og:image", content: ogImage },
       { property: "og:image:width", content: "1920" },
       { property: "og:image:height", content: "1080" },
@@ -102,8 +103,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:locale", content: "en_US" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@HUBMC" },
-      { name: "twitter:title", content: "HUBMC — The World You Love" },
-      { name: "twitter:description", content: "Premium Minecraft server with tournaments, livestreams, store, community and events." },
+      { name: "twitter:title", content: "HUBMC — Official Minecraft Server, Store, Tournaments & Community" },
+      { name: "twitter:description", content: "HUBMC is the official HubMC Minecraft server community. Play on hubmc.in — competitive tournaments, exclusive store packages, live streams, and an active player community." },
       { name: "twitter:image", content: ogImage },
     ],
     links: [
@@ -127,12 +128,20 @@ function RootShell({ children }: { children: React.ReactNode }) {
     initAnalytics();
   }, []);
 
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isPublicPage = !pathname.startsWith("/admin") && !pathname.startsWith("/employee") && !pathname.startsWith("/admin-login") && !pathname.startsWith("/employee-login");
+
   return (
     <html lang="en" className="dark">
       <head>
         <HeadContent />
-        <script type="application/ld+json" suppressHydrationWarning dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema()) }} />
-        <script type="application/ld+json" suppressHydrationWarning dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema()) }} />
+        {isPublicPage && (
+          <>
+            <script type="application/ld+json" suppressHydrationWarning dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema()) }} />
+            <script type="application/ld+json" suppressHydrationWarning dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema()) }} />
+            <script type="application/ld+json" suppressHydrationWarning dangerouslySetInnerHTML={{ __html: JSON.stringify(gameSchema()) }} />
+          </>
+        )}
       </head>
       <body>
         {children}

@@ -22,7 +22,7 @@ export function buildSetCookieHeader(
   maxAge: number,
   secure: boolean,
 ): string {
-  return `${cookieName}=${value}; Max-Age=${maxAge}; Path=/; HttpOnly; SameSite=Strict${secure ? "; Secure" : ""}`;
+  return `${cookieName}=${value}; Max-Age=${maxAge}; Path=/; HttpOnly; SameSite=Strict; Secure`;
 }
 
 function getExpirationDate(): Date {
@@ -100,9 +100,7 @@ export async function handleSessionRequest(request: Request): Promise<Response> 
 }
 
 export async function handleLogoutRequest(request: Request): Promise<Response> {
-  const url = new URL(request.url);
-  const secure = url.protocol === "https:";
-  const clearCookie = buildSetCookieHeader(SESSION_COOKIE_NAME, "", 0, secure);
+  const clearCookie = buildSetCookieHeader(SESSION_COOKIE_NAME, "", 0, true);
 
   const headers = new Headers({ "content-type": "application/json" });
   headers.append("set-cookie", clearCookie);
@@ -114,14 +112,11 @@ export async function createSession(
   payload: Record<string, unknown>,
   request: Request,
 ): Promise<{ token: string; headers: Headers }> {
-  const url = new URL(request.url);
-  const secure = url.protocol === "https:";
-
   const token = await signToken(payload);
   const headers = new Headers({ "content-type": "application/json" });
   headers.append(
     "set-cookie",
-    buildSetCookieHeader(SESSION_COOKIE_NAME, token, SESSION_MAX_AGE_SECONDS, secure),
+    buildSetCookieHeader(SESSION_COOKIE_NAME, token, SESSION_MAX_AGE_SECONDS, true),
   );
 
   return { token, headers };

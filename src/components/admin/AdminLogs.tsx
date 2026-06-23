@@ -7,6 +7,7 @@ type LogEntry = { id: string; action: string; entity: string; entityId: string |
 export default function AdminLogs() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [entityFilter, setEntityFilter] = useState("");
   const [actionFilter, setActionFilter] = useState("");
   const [severityFilter, setSeverityFilter] = useState("");
@@ -14,8 +15,33 @@ export default function AdminLogs() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
 
+  const formatAction = (action: string): string => {
+    const map: Record<string, string> = {
+      CREATE: "created",
+      UPDATE: "updated",
+      DELETE: "deleted",
+      START: "started",
+      END: "ended",
+      REGISTER: "registered",
+      CANCEL: "cancelled",
+      BAN: "banned",
+      UNBAN: "unbanned",
+      ASSIGN: "assigned",
+      REMOVE: "removed",
+      REPLY: "replied",
+      RESOLVE: "resolved",
+      SEND: "sent",
+      LOGIN: "logged in",
+      APPROVE: "approved",
+      REJECT: "rejected",
+      ARCHIVE: "archived",
+    };
+    return map[action] || action.toLowerCase();
+  };
+
   const fetchLogs = useCallback(async () => {
     setLoading(true);
+    setError("");
     try {
       const params = new URLSearchParams({ page: String(page), limit: "20" });
       if (entityFilter) params.set("entity", entityFilter);
@@ -23,10 +49,9 @@ export default function AdminLogs() {
       if (severityFilter) params.set("severity", severityFilter);
       const res = await fetch(`/api/admin/platform/logs?${params}`, { credentials: "include" });
       const data = await res.json();
-      setLogs(data.logs ?? []);
-      setTotalPages(data.totalPages ?? 1);
-      setTotal(data.total ?? 0);
-    } catch {}
+      if (!res.ok) { setError(data.error || "Failed to load logs"); setLogs([]); }
+      else { setLogs(data.logs ?? []); setTotalPages(data.totalPages ?? 1); setTotal(data.total ?? 0); }
+    } catch { setError("Network error"); setLogs([]); }
     finally { setLoading(false); }
   }, [page, entityFilter, actionFilter, severityFilter]);
 
@@ -102,6 +127,8 @@ export default function AdminLogs() {
         </button>
       </div>
 
+      {error && <div className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-400">{error}</div>}
+
       {loading ? (
         <div className="mt-6 space-y-2">{[1,2,3,4,5].map((i) => <div key={i} className="h-14 animate-pulse rounded-xl border border-white/10 bg-[rgba(11,11,11,0.6)]"/>)}</div>
       ) : logs.length === 0 ? (
@@ -120,7 +147,7 @@ export default function AdminLogs() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 text-sm">
                   <span className="font-medium text-white/90">{log.employeeName || "System"}</span>
-                  <span className="text-white/50">{log.action.toLowerCase()}d</span>
+                  <span className="text-white/50">{formatAction(log.action)}</span>
                   <span className="font-medium text-[var(--hub-blue)]">{log.entity}</span>
                   {log.details && <span className="hidden md:inline text-white/40 truncate">— {log.details}</span>}
                 </div>

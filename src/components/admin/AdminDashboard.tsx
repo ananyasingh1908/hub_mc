@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "@tanstack/react-router";
 import {
   Trophy, Users, UserCog, Megaphone, Shield,
-  ArrowRight, BarChart3, ScrollText,
+  ArrowRight, BarChart3,
 } from "lucide-react";
 
 type PlatformStats = {
@@ -81,18 +81,6 @@ export default function AdminDashboard() {
         { label: "Active", value: stats?.activeNotifications ?? 0 },
       ],
       link: "/admin/notifications",
-    },
-    {
-      title: "Platform Activity Logs",
-      description: "Audit trail of all actions — tournament ops, employee actions, payments, login logs.",
-      icon: ScrollText,
-      color: "text-yellow-400",
-      bg: "bg-[rgba(234,179,8,0.12)]",
-      stats: [
-        { label: "Open Tickets", value: stats?.openTickets ?? 0 },
-        { label: "Total Orders", value: stats?.orders ?? 0 },
-      ],
-      link: "/admin/logs",
     },
   ];
 

@@ -52,6 +52,27 @@ export async function handleRetryDelivery(request: Request): Promise<Response> {
       });
     }
 
+    const orderRows = await db
+      .select()
+      .from(orders)
+      .where(eq(orders.id, body.orderId))
+      .limit(1);
+
+    const order = orderRows[0];
+    if (!order) {
+      return new Response(JSON.stringify({ error: "Order not found." }), {
+        status: 404,
+        headers: { "content-type": "application/json" },
+      });
+    }
+
+    if (order.customerId !== session.user.customerId) {
+      return new Response(JSON.stringify({ error: "Unauthorized." }), {
+        status: 403,
+        headers: { "content-type": "application/json" },
+      });
+    }
+
     const success = await retryDelivery(body.orderId);
 
     if (!success) {
@@ -247,6 +268,15 @@ export async function handleGetOrderInvoice(request: Request): Promise<Response>
   }
 }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 function generateInvoiceHtml(data: {
   orderNumber: string;
   createdAt: string;
@@ -266,8 +296,8 @@ function generateInvoiceHtml(data: {
     .map(
       (item) => `
     <tr>
-      <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.08);">${item.name}</td>
-      <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.08);text-align:center;">${item.quantity}</td>
+      <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.08);">${escapeHtml(item.name)}</td>
+      <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.08);text-align:center;">${escapeHtml(String(item.quantity))}</td>
       <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.08);text-align:right;">₹${item.unitPrice.toFixed(2)}</td>
       <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.08);text-align:right;">₹${item.subtotal.toFixed(2)}</td>
     </tr>
@@ -277,7 +307,7 @@ function generateInvoiceHtml(data: {
 
   return `<!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"><title>Invoice - ${data.orderNumber}</title></head>
+<head><meta charset="utf-8"><title>Invoice - ${escapeHtml(data.orderNumber)}</title></head>
 <body style="margin:0;padding:40px;background:#0a0a0a;font-family:'Segoe UI',Arial,sans-serif;">
   <div style="max-width:700px;margin:0 auto;background:rgba(11,11,11,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:40px;">
     <div style="text-align:center;margin-bottom:32px;">
@@ -287,25 +317,25 @@ function generateInvoiceHtml(data: {
     <div style="display:flex;justify-content:space-between;margin-bottom:24px;">
       <div>
         <p style="color:rgba(255,255,255,0.4);font-size:12px;margin:0;">INVOICE NUMBER</p>
-        <p style="color:#fff;font-size:18px;font-weight:700;margin:4px 0;">${data.orderNumber}</p>
+        <p style="color:#fff;font-size:18px;font-weight:700;margin:4px 0;">${escapeHtml(data.orderNumber)}</p>
       </div>
       <div style="text-align:right;">
         <p style="color:rgba(255,255,255,0.4);font-size:12px;margin:0;">DATE</p>
-        <p style="color:#fff;font-size:18px;font-weight:700;margin:4px 0;">${data.createdAt}</p>
+        <p style="color:#fff;font-size:18px;font-weight:700;margin:4px 0;">${escapeHtml(data.createdAt)}</p>
       </div>
     </div>
     <div style="display:flex;justify-content:space-between;margin-bottom:24px;padding:16px;background:rgba(255,255,255,0.03);border-radius:12px;">
       <div>
         <p style="color:rgba(255,255,255,0.4);font-size:11px;margin:0 0 4px;">PLAYER</p>
-        <p style="color:#fff;font-size:14px;margin:0;">${data.minecraftUsername}</p>
+        <p style="color:#fff;font-size:14px;margin:0;">${escapeHtml(data.minecraftUsername)}</p>
         <p style="color:rgba(255,255,255,0.4);font-size:11px;margin:0 0 4px;">EMAIL</p>
-        <p style="color:#fff;font-size:14px;margin:0;">${data.email}</p>
+        <p style="color:#fff;font-size:14px;margin:0;">${escapeHtml(data.email)}</p>
       </div>
       <div style="text-align:right;">
         <p style="color:rgba(255,255,255,0.4);font-size:11px;margin:0 0 4px;">PAYMENT</p>
-        <p style="color:#fff;font-size:14px;margin:0;">${data.paymentMethod}</p>
+        <p style="color:#fff;font-size:14px;margin:0;">${escapeHtml(data.paymentMethod)}</p>
         <p style="color:rgba(255,255,255,0.4);font-size:11px;margin:0 0 4px;">PAYMENT ID</p>
-        <p style="color:#fff;font-size:12px;margin:0;">${data.razorpayPaymentId || "—"}</p>
+        <p style="color:#fff;font-size:12px;margin:0;">${escapeHtml(data.razorpayPaymentId || "—")}</p>
       </div>
     </div>
     <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
@@ -325,7 +355,7 @@ function generateInvoiceHtml(data: {
       <p style="color:#ff8a2a;font-size:24px;font-weight:700;margin:8px 0 0;">₹${data.total.toFixed(2)}</p>
     </div>
     <div style="margin-top:24px;padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;text-align:center;">
-      <p style="color:rgba(255,255,255,0.3);font-size:11px;margin:0;">Status: <span style="color:${data.status === "REFUNDED" ? "#ef4444" : "#22c55e"};font-weight:600;">${data.status}</span> &middot; Delivery: <span style="color:${data.deliveryStatus === "DELIVERED" ? "#22c55e" : data.deliveryStatus === "FAILED" ? "#ef4444" : "#ff8a2a"};font-weight:600;">${data.deliveryStatus}</span></p>
+      <p style="color:rgba(255,255,255,0.3);font-size:11px;margin:0;">Status: <span style="color:${data.status === "REFUNDED" ? "#ef4444" : "#22c55e"};font-weight:600;">${escapeHtml(data.status)}</span> &middot; Delivery: <span style="color:${data.deliveryStatus === "DELIVERED" ? "#22c55e" : data.deliveryStatus === "FAILED" ? "#ef4444" : "#ff8a2a"};font-weight:600;">${escapeHtml(data.deliveryStatus)}</span></p>
     </div>
   </div>
 </body>
